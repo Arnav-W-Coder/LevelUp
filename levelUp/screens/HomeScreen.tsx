@@ -1,6 +1,7 @@
 // screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 type Goal = {
   id: string;
@@ -8,18 +9,68 @@ type Goal = {
   isCompleted: boolean;
 };
 
-export default function HomeScreen() {
+type Props = {
+  goToCharacter: () => void;
+  goToDungeon: () => void;
+};
+
+const GOALS_KEY = 'levelup_goals';
+const XP_KEY = 'levelup_xp';
+
+export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   const [goals, setGoals] = useState<Goal[]>([
     { id: '1', title: 'Finish React Native tutorial', isCompleted: false },
     { id: '2', title: 'Meditate for 10 minutes', isCompleted: false },
     { id: '3', title: 'Read a chapter of a book', isCompleted: false },
   ]);
+  const [xp, setXp] = useState(0);
+
+  // Load goals and XP from storage
+  useEffect(() => {
+    const loadData = async () => {
+      try {
+        const storedGoals = await AsyncStorage.getItem(GOALS_KEY);
+        const storedXp = await AsyncStorage.getItem(XP_KEY);
+
+        if (storedGoals) {
+          setGoals(JSON.parse(storedGoals));
+        } else {
+          // Default goals
+          setGoals([
+            { id: '1', title: 'Finish React Native tutorial', isCompleted: false },
+            { id: '2', title: 'Meditate for 10 minutes', isCompleted: false },
+            { id: '3', title: 'Read a chapter of a book', isCompleted: false },
+          ]);
+        }
+
+        if (storedXp) {
+          setXp(Number(storedXp));
+        }
+      } catch (e) {
+        console.error('Failed to load data', e);
+      }
+    };
+
+    loadData();
+  }, []);
+
+  // Save goals and XP when changed
+  useEffect(() => {
+    AsyncStorage.setItem(GOALS_KEY, JSON.stringify(goals)).catch(console.error);
+    AsyncStorage.setItem(XP_KEY, xp.toString()).catch(console.error);
+  }, [goals, xp]);
 
   const toggleGoalCompleted = (id: string) => {
     setGoals((prevGoals) =>
-      prevGoals.map((goal) =>
-        goal.id === id ? { ...goal, isCompleted: !goal.isCompleted } : goal
-      )
+      prevGoals.map((goal) => {
+        if (goal.id === id) {
+          const updatedGoal = { ...goal, isCompleted: !goal.isCompleted };
+          if (!goal.isCompleted) setXp((prev) => prev + 10); // +10 XP
+          else setXp((prev) => prev - 10); // -10 XP if unchecked
+          return updatedGoal;
+        }
+        return goal;
+      })
     );
   };
 
@@ -29,6 +80,7 @@ export default function HomeScreen() {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Today's Goals</Text>
+      <Button title="Go to Character Screen" onPress={goToCharacter} />
       <FlatList
         data={goals}
         keyExtractor={(item) => item.id}
@@ -46,6 +98,7 @@ export default function HomeScreen() {
           </TouchableOpacity>
         )}
       />
+      <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
       <Text style={styles.progress}>
         Completed {completedCount} / {totalGoals}
       </Text>
