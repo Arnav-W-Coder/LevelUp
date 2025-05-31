@@ -1,45 +1,41 @@
-import React from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
+//import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useXP } from '../context/XPContext';
 
 type Props = {
   onBack: () => void;
 };
 
-export default function CharacterScreen( {onBack}: Props ) {
-  const character = {
-    name: 'Pixel Warrior',
-    level: 3,
-    xp: 120,
-    xpToNextLevel: 200,
-    stats: {
-      strength: 5,
-      agility: 4,
-      intelligence: 6,
-    },
-  };
+//const XP_KEY = 'levelup_xp';
 
-  const xpProgress = (character.xp / character.xpToNextLevel) * 100;
+// const getLevelFromXp = (xp: number, level: number) => {
+//   let requiredXp = 100;
+//   let newLevel = level;
+
+//   while (xp >= requiredXp) {
+//     xp -= requiredXp;
+//     requiredXp = newLevel * 100;
+//     newLevel++;
+//   }
+  
+//   const xpToNextLevel = requiredXp - xp;
+//   const xpInLevel = xp;
+
+//   return { xpInLevel, xpToNextLevel };
+// };
+
+export default function CharacterScreen( {onBack}: Props ) {
+  const { xp, level } = useXP();
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>{character.name}</Text>
-      <Button title="Go back to homescreen" onPress={onBack} />
-      {/* Character Sprite Placeholder */}
-      <Image
-        source={require('../assets/images/testCharacter.png')} // add a pixel-style character image here
-        style={styles.image}
-      />
-
-      <Text style={styles.level}>Level: {character.level}</Text>
+      <Button title="Go to Home Screen" onPress={onBack} />
+      <Text style={styles.title}>Your Character</Text>
+      <Text style={styles.stat}>Level: {level}</Text>
+      <Text style={styles.stat}>XP: {xp} / {100}</Text>
       <View style={styles.xpBarBackground}>
-        <View style={[styles.xpBarFill, { width: `${xpProgress}%` }]} />
-      </View>
-      <Text style={styles.xpText}>{character.xp} / {character.xpToNextLevel} XP</Text>
-
-      <View style={styles.statsContainer}>
-        <Text style={styles.stat}>🗡️ Strength: {character.stats.strength}</Text>
-        <Text style={styles.stat}>🏃 Agility: {character.stats.agility}</Text>
-        <Text style={styles.stat}>🧠 Intelligence: {character.stats.intelligence}</Text>
+        <View style={[styles.xpBarFill, { width: `${(xp / 100) * 100}%` }]} />
       </View>
     </View>
   );
