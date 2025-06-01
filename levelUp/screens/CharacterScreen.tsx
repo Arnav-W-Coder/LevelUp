@@ -32,12 +32,12 @@ export default function CharacterScreen( {onBack}: Props ) {
     <View style={styles.container}>
       <Button title="Go to Home Screen" onPress={onBack} />
       <Button
-      title="Reset XP (Dev Only)"
+      title="Reset XP/Level (Dev Only)"
       onPress={async () => {
-        await AsyncStorage.removeItem('levelup_xp');
-        await AsyncStorage.removeItem('levelup_level');
         addXp(xp * -1);
         changeLevel(0);
+        await AsyncStorage.removeItem('levelup_xp');
+        await AsyncStorage.removeItem('levelup_level');
         console.log('XP and level reset');
         }}/>
       <Text style={styles.title}>Your Character</Text>

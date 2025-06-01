@@ -20,7 +20,7 @@ const LEVEL_KEY = 'levelup_level';
 
 export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [xp, setXp] = useState(0);
-  const [level, setLevel] = useState(1);
+  const [level, setLevel] = useState(0);
 
   useEffect(() => {
     const loadProgress = async () => {
@@ -49,9 +49,9 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     await AsyncStorage.setItem(LEVEL_KEY, newLevel.toString());
   };
 
-  const changeLevel = async (newLevel: number) => {
-    setLevel(newLevel);
-    await AsyncStorage.setItem(LEVEL_KEY, newLevel.toString());
+  const changeLevel = async (l: number) => {
+    setLevel(l);
+    await AsyncStorage.setItem(LEVEL_KEY, l.toString());
   }
 
   return (

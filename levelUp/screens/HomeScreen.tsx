@@ -1,9 +1,10 @@
 // screens/HomeScreen.tsx
-import React, { useState, useEffect, useRef } from 'react';
+import React, { useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
-import { v4 as uuidv4 } from 'uuid'; // UUID for unique IDs 
+import { useFocusEffect } from 'expo-router';
+
 
 type Goal = {
   id: string;
@@ -30,7 +31,12 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 
   const { xp, addXp } = useXP();
   const [newGoalTitle, setNewGoalTitle] = useState("");
-  const fadeAnim = useRef(new Animated.Value(1)).current;
+
+  useFocusEffect(
+    React.useCallback(() => {
+      setNewGoalTitle('');
+    }, [])
+  );
 
   // Load goals from storage
   useEffect(() => {
@@ -84,6 +90,10 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     );
   };
 
+  const generateId = () => {
+    return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
+  };
+
   const addNewGoal = () => {
     if (newGoalTitle.trim() === '') {
     Alert.alert('Please enter a goal title.');
@@ -91,7 +101,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     }
 
     const newGoal: Goal = {
-      id: uuidv4(),
+      id: generateId(),
       title: newGoalTitle.trim(),
       isCompleted: false,
       fadeAnim: new Animated.Value(1),
@@ -154,7 +164,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         data={goals}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <Animated.View style={ [{opacity: fadeAnim, transform: [{ scale: item.scaleAnim }]}] }>
+          <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
             <TouchableOpacity
               onPress={() => {toggleGoalCompleted(item.id); fadeAndRemoveGoal(item.id)}}
               style={[
