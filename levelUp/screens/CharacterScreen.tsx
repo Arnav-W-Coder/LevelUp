@@ -1,6 +1,6 @@
 import React, { useState, useEffect } from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
-//import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 
 type Props = {
@@ -26,11 +26,20 @@ type Props = {
 // };
 
 export default function CharacterScreen( {onBack}: Props ) {
-  const { xp, level } = useXP();
+  const { xp, level, addXp, changeLevel } = useXP();
 
   return (
     <View style={styles.container}>
       <Button title="Go to Home Screen" onPress={onBack} />
+      <Button
+      title="Reset XP (Dev Only)"
+      onPress={async () => {
+        await AsyncStorage.removeItem('levelup_xp');
+        await AsyncStorage.removeItem('levelup_level');
+        addXp(xp * -1);
+        changeLevel(0);
+        console.log('XP and level reset');
+        }}/>
       <Text style={styles.title}>Your Character</Text>
       <Text style={styles.stat}>Level: {level}</Text>
       <Text style={styles.stat}>XP: {xp} / {100}</Text>

@@ -63,11 +63,11 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
           const toggled = !goal.isCompleted
           const updatedGoal = { ...goal, isCompleted: toggled };
           if (toggled){
-            addXp(10);
+            addXp(50);
             console.log("Goal completed");
           } // +10 XP
           else{
-            addXp(-10);
+            addXp(-50);
             console.log("Goal removed");
           } // -10 XP if unchecked
           return updatedGoal;

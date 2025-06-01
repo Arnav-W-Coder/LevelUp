@@ -1,6 +1,6 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
-
+import { useXP } from '../context/XPContext';
 
 type Props = {
   onBack: () => void;
@@ -8,8 +8,10 @@ type Props = {
 
 
 export default function DungeonScreen({onBack}:Props) {
+  const {level} = useXP();
+
   const [currentDungeon, setCurrentDungeon] = useState(1);
-  const [characterLevel, setCharacterLevel] = useState(3); // Replace this later with real level
+  const characterLevel = level;
 
   const advanceDungeon = () => {
     setCurrentDungeon((prev) => prev + 1);
@@ -39,7 +41,7 @@ export default function DungeonScreen({onBack}:Props) {
       {canEnter ? (
         <Button title="Advance to Next Dungeon" onPress={advanceDungeon} />
       ) : (
-        <Text style={styles.locked}>🔒 You need to level up!</Text>
+        <Text style={styles.locked}>You can access the next level!!</Text>
       )}
     </View>
   );

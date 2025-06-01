@@ -5,12 +5,14 @@ type XPContextType = {
   xp: number;
   level: number;
   addXp: (amount: number) => void;
+  changeLevel: (newLevel: number) => void;
 };
 
 const XPContext = createContext<XPContextType>({
   xp: 0,
   level: 0,
   addXp: () => {},
+  changeLevel: () => {},
 });
 
 const XP_KEY = 'levelup_xp';
@@ -47,8 +49,13 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     await AsyncStorage.setItem(LEVEL_KEY, newLevel.toString());
   };
 
+  const changeLevel = async (newLevel: number) => {
+    setLevel(newLevel);
+    await AsyncStorage.setItem(LEVEL_KEY, newLevel.toString());
+  }
+
   return (
-    <XPContext.Provider value={{ xp, level, addXp }}>
+    <XPContext.Provider value={{ xp, level, addXp, changeLevel }}>
       {children}
     </XPContext.Provider>
   );
