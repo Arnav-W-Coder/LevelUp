@@ -1,13 +1,16 @@
 // screens/HomeScreen.tsx
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity } from 'react-native';
+import React, { useState, useEffect, useRef } from 'react';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
+import { v4 as uuidv4 } from 'uuid'; // UUID for unique IDs 
 
 type Goal = {
   id: string;
   title: string;
   isCompleted: boolean;
+  fadeAnim: Animated.Value;
+  scaleAnim: Animated.Value;
 };
 
 type Props = {
@@ -20,12 +23,14 @@ const GOALS_KEY = 'levelup_goals';
 
 export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   const [goals, setGoals] = useState<Goal[]>([
-    { id: '1', title: 'Finish React Native tutorial', isCompleted: false },
-    { id: '2', title: 'Meditate for 10 minutes', isCompleted: false },
-    { id: '3', title: 'Read a chapter of a book', isCompleted: false },
+    { id: '1', title: 'Finish React Native tutorial', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
+    { id: '2', title: 'Meditate for 10 minutes', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
+    { id: '3', title: 'Read a chapter of a book', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
   ]);
 
-  const { addXp } = useXP();
+  const { xp, addXp } = useXP();
+  const [newGoalTitle, setNewGoalTitle] = useState("");
+  const fadeAnim = useRef(new Animated.Value(1)).current;
 
   // Load goals from storage
   useEffect(() => {
@@ -38,9 +43,9 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         } else {
           // Default goals
           setGoals([
-            { id: '1', title: 'Finish React Native tutorial', isCompleted: false },
-            { id: '2', title: 'Meditate for 10 minutes', isCompleted: false },
-            { id: '3', title: 'Read a chapter of a book', isCompleted: false },
+            { id: '1', title: 'Finish React Native tutorial', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
+            { id: '2', title: 'Meditate for 10 minutes', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
+            { id: '3', title: 'Read a chapter of a book', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
           ]);
         }
       } catch (e) {
@@ -64,17 +69,61 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
           const updatedGoal = { ...goal, isCompleted: toggled };
           if (toggled){
             addXp(50);
-            console.log("Goal completed");
+            //console.log("Goal completed");
           } // +10 XP
           else{
-            addXp(-50);
-            console.log("Goal removed");
+            if(xp > 0){
+              addXp(-50);
+            }
+            //console.log("Goal removed");
           } // -10 XP if unchecked
           return updatedGoal;
         }
         return goal;
       })
     );
+  };
+
+  const addNewGoal = () => {
+    if (newGoalTitle.trim() === '') {
+    Alert.alert('Please enter a goal title.');
+    return;
+    }
+
+    const newGoal: Goal = {
+      id: uuidv4(),
+      title: newGoalTitle.trim(),
+      isCompleted: false,
+      fadeAnim: new Animated.Value(1),
+      scaleAnim: new Animated.Value(1)
+    }
+
+    setGoals((prev) => [...prev, newGoal]);
+    setNewGoalTitle('');
+  }
+
+  const removeGoal = (id: String) => {
+    setGoals((prevGoals) => prevGoals.filter(goal => goal.id !== id));
+  }
+
+  const fadeAndRemoveGoal = (id: string) => {
+    const goal = goals.find((g) => g.id === id);
+    if (!goal) return;
+
+    Animated.parallel([
+      Animated.timing(goal.fadeAnim, {
+        toValue: 0,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+      Animated.timing(goal.scaleAnim, {
+        toValue: 0.8,
+        duration: 800,
+        useNativeDriver: true,
+      }),
+    ]).start(() => {
+      removeGoal(id);
+    });
   };
 
   const completedCount = goals.filter((g) => g.isCompleted).length;
@@ -84,21 +133,40 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     <View style={styles.container}>
       <Text style={styles.title}>Today's Goals</Text>
       <Button title="Go to Character Screen" onPress={goToCharacter} />
+      <Button
+      title="Reset Goals (Dev Only)"
+      onPress={async () => {
+        setGoals([]);
+        await AsyncStorage.removeItem('levelup_goals');
+        console.log('Goals reset');
+        }}/>
+      <View style={styles.inputContainer}>
+        <TextInput
+          style={styles.input}
+          placeholder="New goal..."
+          placeholderTextColor="#aaa"
+          value={newGoalTitle}
+          onChangeText={setNewGoalTitle}
+        />
+        <Button title="Add Goal" onPress={addNewGoal} />
+      </View>
       <FlatList
         data={goals}
         keyExtractor={(item) => item.id}
         renderItem={({ item }) => (
-          <TouchableOpacity
-            onPress={() => toggleGoalCompleted(item.id)}
-            style={[
-              styles.goalItem,
-              item.isCompleted && styles.completedGoal,
-            ]}
-          >
-            <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
-              {item.title}
-            </Text>
-          </TouchableOpacity>
+          <Animated.View style={ [{opacity: fadeAnim, transform: [{ scale: item.scaleAnim }]}] }>
+            <TouchableOpacity
+              onPress={() => {toggleGoalCompleted(item.id); fadeAndRemoveGoal(item.id)}}
+              style={[
+                styles.goalItem,
+                item.isCompleted && styles.completedGoal,
+              ]}
+            >
+              <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
+                {item.title}
+              </Text>
+            </TouchableOpacity>
+          </Animated.View>
         )}
       />
       <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
@@ -139,5 +207,18 @@ const styles = StyleSheet.create({
     height: '100%',
     backgroundColor: '#0f0',
     borderRadius: 10,
+  },
+  inputContainer: {
+  flexDirection: 'row',
+  alignItems: 'center',
+  marginBottom: 10,
+  },
+  input: {
+    flex: 1,
+    backgroundColor: '#333',
+    color: '#fff',
+    padding: 10,
+    borderRadius: 8,
+    marginRight: 10,
   },
 });
