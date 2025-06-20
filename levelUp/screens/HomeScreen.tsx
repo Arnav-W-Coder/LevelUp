@@ -12,6 +12,7 @@ type Goal = {
   isCompleted: boolean;
   fadeAnim: Animated.Value;
   scaleAnim: Animated.Value;
+  category: string;
 };
 
 type Props = {
@@ -23,18 +24,13 @@ const GOALS_KEY = 'levelup_goals';
 //const XP_KEY = 'levelup_xp';
 
 export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
-  const [goals, setGoals] = useState<Goal[]>([
-    { id: '1', title: 'Finish React Native tutorial', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
-    { id: '2', title: 'Meditate for 10 minutes', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
-    { id: '3', title: 'Read a chapter of a book', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
-  ]);
-
+  const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
-  const [newGoalTitle, setNewGoalTitle] = useState("");
+  const [newGoalTitle, setNewGoalTitle] = useState<{[key: string] : string}>({"Mind": "", "Body": "", "Productivity": "", "Fun": ""});
 
   useFocusEffect(
     React.useCallback(() => {
-      setNewGoalTitle('');
+      setNewGoalTitle({});
     }, [])
   );
 
@@ -49,9 +45,9 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         } else {
           // Default goals
           setGoals([
-            { id: '1', title: 'Finish React Native tutorial', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
-            { id: '2', title: 'Meditate for 10 minutes', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
-            { id: '3', title: 'Read a chapter of a book', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1)},
+            { id: '1', title: 'Finish React Native tutorial', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1), category: "Mind"},
+            { id: '2', title: 'Meditate for 10 minutes', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1), category: "Spirit"},
+            { id: '3', title: 'Read a chapter of a book', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1), category: "Mind"},
           ]);
         }
       } catch (e) {
@@ -94,22 +90,23 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
   };
 
-  const addNewGoal = () => {
-    if (newGoalTitle.trim() === '') {
+  const addNewGoal = (place : string) => {
+    if (newGoalTitle[place].trim() === '') {
     Alert.alert('Please enter a goal title.');
     return;
     }
 
     const newGoal: Goal = {
       id: generateId(),
-      title: newGoalTitle.trim(),
+      title: newGoalTitle[place].trim(),
       isCompleted: false,
       fadeAnim: new Animated.Value(1),
-      scaleAnim: new Animated.Value(1)
+      scaleAnim: new Animated.Value(1),
+      category: place
     }
 
     setGoals((prev) => [...prev, newGoal]);
-    setNewGoalTitle('');
+    setNewGoalTitle(prev => ({...prev, [place]: ""}));
   }
 
   const removeGoal = (id: String) => {
@@ -136,6 +133,48 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     });
   };
 
+  const getGoalByCategory = (category: string) => {
+    return goals.filter((goal) => goal.category === category);
+  }
+
+  const changeGoalTitle = (place: string, value: string) => {
+    setNewGoalTitle(prev => ({...prev, [place]: value}));
+  }
+
+  const renderCategoryBox = (title: string, color: string) => ( 
+    <View style={[styles.categoryBox, {backgroundColor: color}]}>
+      <Text style={styles.categoryTitle}>{title}</Text>
+      <View style={styles.inputContainer}>
+          <TextInput
+            style={styles.input}
+            placeholder="New goal..."
+            placeholderTextColor="#aaa"
+            value={newGoalTitle[title] || ""}
+            onChangeText={(text) => changeGoalTitle(title, text)}
+          />
+          <Button title="Add Goal" onPress={() => addNewGoal(title)} />
+      </View>
+        <FlatList
+          data={getGoalByCategory(title)}
+          keyExtractor={(item) => item.id}
+          renderItem={({ item }) => (
+            <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
+              <TouchableOpacity
+                onPress={() => {toggleGoalCompleted(item.id); fadeAndRemoveGoal(item.id)}}
+                style={[
+                  styles.goalItem,
+                  item.isCompleted && styles.completedGoal,
+                ]}
+              >
+                <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
+                  {item.title + " : " + item.category}
+                </Text>
+              </TouchableOpacity>
+            </Animated.View>
+          )}
+        />
+    </View>
+  );
   const completedCount = goals.filter((g) => g.isCompleted).length;
   const totalGoals = goals.length;
 
@@ -150,35 +189,12 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
         }}/>
-      <View style={styles.inputContainer}>
-        <TextInput
-          style={styles.input}
-          placeholder="New goal..."
-          placeholderTextColor="#aaa"
-          value={newGoalTitle}
-          onChangeText={setNewGoalTitle}
-        />
-        <Button title="Add Goal" onPress={addNewGoal} />
+      <View style={styles.grid}>
+        {renderCategoryBox('Mind', '#6a0dad')}
+        {renderCategoryBox('Body', '#228B22')}
+        {renderCategoryBox('Productivity', '#1e90ff')}
+        {renderCategoryBox('Fun', '#ff8c00')}
       </View>
-      <FlatList
-        data={goals}
-        keyExtractor={(item) => item.id}
-        renderItem={({ item }) => (
-          <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
-            <TouchableOpacity
-              onPress={() => {toggleGoalCompleted(item.id); fadeAndRemoveGoal(item.id)}}
-              style={[
-                styles.goalItem,
-                item.isCompleted && styles.completedGoal,
-              ]}
-            >
-              <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
-                {item.title}
-              </Text>
-            </TouchableOpacity>
-          </Animated.View>
-        )}
-      />
       <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
       <Text style={styles.progress}>
         Completed {completedCount} / {totalGoals}
@@ -195,15 +211,30 @@ const styles = StyleSheet.create({
   container: { flex: 1, padding: 20, backgroundColor: '#222' },
   title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 10 },
   goalItem: {
-    padding: 15,
+    padding: 10,
     marginVertical: 5,
-    backgroundColor: '#444',
+    backgroundColor: '#333',
     borderRadius: 8,
   },
   completedGoal: {
     backgroundColor: '#28a745',
   },
-  goalText: { color: '#fff', fontSize: 18 },
+  grid: {
+    flex: 1,
+    flexDirection: 'row',
+    gap: 15,
+  },
+  categoryBox: {
+    padding: 15,
+    borderRadius: 10,
+  },
+  categoryTitle: {
+    fontSize: 20,
+    fontWeight: 'bold',
+    color: '#fff',
+    marginBottom: 10,
+  },
+  goalText: { color: '#fff', fontSize: 16 },
   completedText: { color: '#ccc', fontSize: 18, textDecorationLine: 'line-through' },
   progress: { color: '#aaa', marginTop: 10, fontSize: 16 },
   xpBarBackground: {
