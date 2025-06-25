@@ -1,6 +1,6 @@
 // screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
@@ -26,13 +26,19 @@ const GOALS_KEY = 'levelup_goals';
 export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
-  const [newGoalTitle, setNewGoalTitle] = useState<{[key: string] : string}>({"Mind": "", "Body": "", "Productivity": "", "Fun": ""});
+  const [modalVisible, setModalVisible] = useState(false);
+  const [customTitle, setCustomTitle] = useState('');
+  const [customTime, setCustomTime] = useState('');
+  const [selectedTemplate, setSelectedTemplate] = useState("");
+  const [selectedCategory, setSelectedCategory] = useState("");
 
-  useFocusEffect(
-    React.useCallback(() => {
-      setNewGoalTitle({});
-    }, [])
-  );
+  const defaultGoals = ['Drink Water', 'Meditate', 'Read a Book'];
+
+  // useFocusEffect(
+  //   React.useCallback(() => {
+  //     setNewGoalTitle({});
+  //   }, [])
+  // );
 
   // Load goals from storage
   useEffect(() => {
@@ -91,14 +97,13 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   };
 
   const addNewGoal = (place : string) => {
-    if (newGoalTitle[place].trim() === '') {
-    Alert.alert('Please enter a goal title.');
-    return;
-    }
+    let value = selectedTemplate;
+    if(customTitle != ""){value + " - " + customTitle}
+    if(customTime != ""){value + " - " + customTime}
 
     const newGoal: Goal = {
       id: generateId(),
-      title: newGoalTitle[place].trim(),
+      title: value,
       isCompleted: false,
       fadeAnim: new Animated.Value(1),
       scaleAnim: new Animated.Value(1),
@@ -106,7 +111,6 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     }
 
     setGoals((prev) => [...prev, newGoal]);
-    setNewGoalTitle(prev => ({...prev, [place]: ""}));
   }
 
   const removeGoal = (id: String) => {
@@ -137,22 +141,74 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     return goals.filter((goal) => goal.category === category);
   }
 
-  const changeGoalTitle = (place: string, value: string) => {
-    setNewGoalTitle(prev => ({...prev, [place]: value}));
-  }
+  const handleConfirm = () => {
+    if(selectedCategory === ""){
+      return;
+    }
+
+    addNewGoal(selectedCategory);
+
+    setSelectedCategory("");
+    setModalVisible(false);
+    setCustomTitle('');
+    setCustomTime('');
+    setSelectedTemplate('');
+  };
+
+  const renderModal = () => (
+    <View>
+      <Modal visible={modalVisible} transparent animationType="fade">
+          <View style={styles.modalOverlay}>
+            <View style={styles.modalBox}>
+              <Text style={styles.modalTitle}>Add a Goal</Text>
+
+              {/* Template selection */}
+              <View style={styles.templateRow}>
+                {defaultGoals.map((goal) => (
+                  <TouchableOpacity
+                    key={goal}
+                    style={[
+                      styles.templateButton,
+                      selectedTemplate === goal && styles.selected,
+                    ]}
+                    onPress={() => setSelectedTemplate(goal)}
+                  >
+                    <Text style={styles.templateText}>{goal}</Text>
+                  </TouchableOpacity>
+                ))}
+              </View>
+
+              {/* Custom fields */}
+              <TextInput
+                placeholder="Custom title (optional)"
+                style={styles.input}
+                value={customTitle}
+                onChangeText={setCustomTitle}
+                placeholderTextColor="#aaa"
+              />
+              <TextInput
+                placeholder="Time (e.g. 5 PM)"
+                style={styles.input}
+                value={customTime}
+                onChangeText={setCustomTime}
+                placeholderTextColor="#aaa"
+              />
+
+              <View style={styles.modalButtons}>
+                <Button title="Cancel" onPress={() => setModalVisible(false)} />
+                <Button title="Confirm" onPress={() => handleConfirm()} />
+              </View>
+            </View>
+          </View>
+        </Modal>
+    </View>
+  );
 
   const renderCategoryBox = (title: string, color: string) => ( 
     <View style={[styles.categoryBox, {backgroundColor: color}]}>
       <Text style={styles.categoryTitle}>{title}</Text>
       <View style={styles.inputContainer}>
-          <TextInput
-            style={styles.input}
-            placeholder="New goal..."
-            placeholderTextColor="#aaa"
-            value={newGoalTitle[title] || ""}
-            onChangeText={(text) => changeGoalTitle(title, text)}
-          />
-          <Button title="Add Goal" onPress={() => addNewGoal(title)} />
+          <Button title="Add Goal" onPress={() => {setModalVisible(true); setSelectedCategory(title)}} />
       </View>
         <FlatList
           data={getGoalByCategory(title)}
@@ -167,7 +223,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
                 ]}
               >
                 <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
-                  {item.title + " : " + item.category}
+                  {item.title}
                 </Text>
               </TouchableOpacity>
             </Animated.View>
@@ -175,6 +231,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         />
     </View>
   );
+
   const completedCount = goals.filter((g) => g.isCompleted).length;
   const totalGoals = goals.length;
 
@@ -194,6 +251,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         {renderCategoryBox('Body', '#228B22')}
         {renderCategoryBox('Productivity', '#1e90ff')}
         {renderCategoryBox('Fun', '#ff8c00')}
+        {renderModal()}
       </View>
       <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
       <Text style={styles.progress}>
@@ -220,13 +278,22 @@ const styles = StyleSheet.create({
     backgroundColor: '#28a745',
   },
   grid: {
-    flex: 1,
     flexDirection: 'row',
-    gap: 15,
+    flexWrap: 'wrap',
+    justifyContent: 'center', // center boxes
+    alignItems: 'center',
+    paddingHorizontal: 20,     // spacing from screen edges
+    rowGap: 15,
+    columnGap: 15,
+    marginTop: 30,
   },
   categoryBox: {
-    padding: 15,
-    borderRadius: 10,
+    width: 140,               // fixed size for symmetry
+    height: 140,
+    borderRadius: 12,
+    padding: 10,
+    alignItems: 'center',
+    backgroundColor: '#444',  // default (can be overridden)
   },
   categoryTitle: {
     fontSize: 20,
@@ -261,5 +328,44 @@ const styles = StyleSheet.create({
     padding: 10,
     borderRadius: 8,
     marginRight: 10,
+  },
+  modalOverlay: {
+    flex: 1,
+    backgroundColor: 'rgba(0,0,0,0.5)',
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  modalBox: {
+    backgroundColor: '#333',
+    padding: 20,
+    borderRadius: 10,
+    width: '90%',
+  },
+  modalTitle: {
+    fontSize: 20,
+    color: '#fff',
+    marginBottom: 10,
+  },
+  templateRow: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    marginBottom: 10,
+  },
+  templateButton: {
+    backgroundColor: '#444',
+    padding: 10,
+    margin: 5,
+    borderRadius: 6,
+  },
+  selected: {
+    backgroundColor: '#28a745',
+  },
+  templateText: {
+    color: '#fff',
+  },
+  modalButtons: {
+    flexDirection: 'row',
+    justifyContent: 'space-between',
+    marginTop: 15,
   },
 });
