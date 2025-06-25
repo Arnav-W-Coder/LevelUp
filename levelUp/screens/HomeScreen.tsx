@@ -1,6 +1,6 @@
 // screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
@@ -69,22 +69,25 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     AsyncStorage.setItem(GOALS_KEY, JSON.stringify(goals)).catch(console.error);
   }, [goals]);
 
-  const toggleGoalCompleted = (id: string) => {
+  const toggleGoalCompleted = (id: string, place: string) => {
     setGoals((prevGoals) =>
       prevGoals.map((goal) => {
         if (goal.id === id) {
           const toggled = !goal.isCompleted
           const updatedGoal = { ...goal, isCompleted: toggled };
           if (toggled){
-            addXp(50);
+            if(place === "Mind"){addXp(50, 0)}
+            if(place === "Body"){addXp(50, 1)}
+            if(place === "Spirit"){addXp(50, 2)}
+            if(place === "Accountability"){addXp(50, 3)}
             //console.log("Goal completed");
           } // +10 XP
-          else{
-            if(xp > 0){
-              addXp(-50);
-            }
-            //console.log("Goal removed");
-          } // -10 XP if unchecked
+          // else{
+          //   if(xp > 0){
+          //     addXp(-50);
+          //   }
+          //   //console.log("Goal removed");
+          // } // -10 XP if unchecked
           return updatedGoal;
         }
         return goal;
@@ -98,8 +101,8 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 
   const addNewGoal = (place : string) => {
     let value = selectedTemplate;
-    if(customTitle != ""){value + " - " + customTitle}
-    if(customTime != ""){value + " - " + customTime}
+    if(customTitle != ""){value += " - " + customTitle}
+    if(customTime != ""){value += " - " + customTime}
 
     const newGoal: Goal = {
       id: generateId(),
@@ -157,7 +160,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 
   const renderModal = () => (
     <View>
-      <Modal visible={modalVisible} transparent animationType="fade">
+      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalBox}>
               <Text style={styles.modalTitle}>Add a Goal</Text>
@@ -165,7 +168,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
               {/* Template selection */}
               <View style={styles.templateRow}>
                 {defaultGoals.map((goal) => (
-                  <TouchableOpacity
+                  <Pressable
                     key={goal}
                     style={[
                       styles.templateButton,
@@ -174,13 +177,13 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
                     onPress={() => setSelectedTemplate(goal)}
                   >
                     <Text style={styles.templateText}>{goal}</Text>
-                  </TouchableOpacity>
+                  </Pressable>
                 ))}
               </View>
 
               {/* Custom fields */}
               <TextInput
-                placeholder="Custom title (optional)"
+                placeholder="Description (optional)"
                 style={styles.input}
                 value={customTitle}
                 onChangeText={setCustomTitle}
@@ -195,7 +198,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
               />
 
               <View style={styles.modalButtons}>
-                <Button title="Cancel" onPress={() => setModalVisible(false)} />
+                <Button title="Cancel" onPress={() => {setModalVisible(false); setSelectedTemplate(""); setCustomTime(""); setCustomTitle("")}} />
                 <Button title="Confirm" onPress={() => handleConfirm()} />
               </View>
             </View>
@@ -216,7 +219,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
           renderItem={({ item }) => (
             <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
               <TouchableOpacity
-                onPress={() => {toggleGoalCompleted(item.id); fadeAndRemoveGoal(item.id)}}
+                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id)}}
                 style={[
                   styles.goalItem,
                   item.isCompleted && styles.completedGoal,
@@ -249,8 +252,8 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
       <View style={styles.grid}>
         {renderCategoryBox('Mind', '#6a0dad')}
         {renderCategoryBox('Body', '#228B22')}
-        {renderCategoryBox('Productivity', '#1e90ff')}
-        {renderCategoryBox('Fun', '#ff8c00')}
+        {renderCategoryBox('Spirit', '#1e90ff')}
+        {renderCategoryBox('Accountability', '#ff8c00')}
         {renderModal()}
       </View>
       <Button title="Go to Dungeon Screen" onPress={goToDungeon} />

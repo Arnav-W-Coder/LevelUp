@@ -26,7 +26,7 @@ type Props = {
 // };
 
 export default function CharacterScreen( {onBack}: Props ) {
-  const { xp, level, addXp, changeLevel } = useXP();
+  const { xp, level, addXp, changeLevel, changeXp } = useXP();
 
   return (
     <View style={styles.container}>
@@ -34,17 +34,31 @@ export default function CharacterScreen( {onBack}: Props ) {
       <Button
       title="Reset XP/Level (Dev Only)"
       onPress={async () => {
-        addXp(xp * -1);
-        changeLevel(0);
+        changeXp([0, 0, 0, 0]);
+        changeLevel([0, 0, 0, 0]);
         await AsyncStorage.removeItem('levelup_xp');
         await AsyncStorage.removeItem('levelup_level');
         console.log('XP and level reset');
         }}/>
       <Text style={styles.title}>Your Character</Text>
       <Text style={styles.stat}>Level: {level}</Text>
-      <Text style={styles.stat}>XP: {xp} / {100}</Text>
-      <View style={styles.xpBarBackground}>
-        <View style={[styles.xpBarFill, { width: `${(xp / 100) * 100}%` }]} />
+      <View style={styles.grid}>
+        <Text style={styles.stat}>Mind XP: {xp[0]} / {100}</Text>
+        <View style={styles.xpBarBackground}>
+          <View style={[styles.xpBarFill, { width: `${(xp[0] / 100) * 100}%` }]} />
+        </View>
+        <Text style={styles.stat}>Body XP: {xp[1]} / {100}</Text>
+        <View style={styles.xpBarBackground}>
+          <View style={[styles.xpBarFill, { width: `${(xp[1] / 100) * 100}%` }]} />
+        </View>
+        <Text style={styles.stat}>Spirit XP: {xp[2]} / {100}</Text>
+        <View style={styles.xpBarBackground}>
+          <View style={[styles.xpBarFill, { width: `${(xp[2] / 100) * 100}%` }]} />
+        </View>
+        <Text style={styles.stat}>Accountability XP: {xp[3]} / {100}</Text>
+        <View style={styles.xpBarBackground}>
+          <View style={[styles.xpBarFill, { width: `${(xp[3] / 100) * 100}%` }]} />
+        </View>
       </View>
     </View>
   );
@@ -69,5 +83,16 @@ const styles = StyleSheet.create({
   },
   xpText: { color: '#aaa', marginTop: 5 },
   statsContainer: { marginTop: 30 },
-  stat: { color: '#fff', fontSize: 16, marginVertical: 5 },
+  stat: { color: '#fff', fontSize: 16, marginVertical: 5 
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center', // center boxes
+    alignItems: 'center',
+    paddingHorizontal: 20,     // spacing from screen edges
+    rowGap: 15,
+    columnGap: 15,
+    marginTop: 30,
+  },
 });

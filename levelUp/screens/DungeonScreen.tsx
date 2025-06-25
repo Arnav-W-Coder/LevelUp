@@ -11,7 +11,7 @@ export default function DungeonScreen({onBack}:Props) {
   const {level} = useXP();
 
   const [currentDungeon, setCurrentDungeon] = useState(1);
-  const characterLevel = level;
+  const characterLevel = level[0]; //temporary
 
   const advanceDungeon = () => {
     setCurrentDungeon((prev) => prev + 1);
