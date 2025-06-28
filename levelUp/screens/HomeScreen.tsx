@@ -1,11 +1,18 @@
 // screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+const boxSpacing = 40;
+const sideMargin = screenWidth * 0.2;
+const usableWidth = screenWidth - (sideMargin * 2);
+const usableHeight = screenHeight - sideMargin;
+const boxWidth = (usableWidth - boxSpacing) / 2; // Two boxes per row + spacing
+const boxHeight = (usableHeight - boxSpacing)/2;
+const categories = ['Mind', 'Body', 'Spirit', 'Accountability'];
 
 type Goal = {
   id: string;
@@ -35,7 +42,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
-  const defaultGoals = ['Drink Water', 'Meditate', 'Read a Book'];
+  const defaultGoals = ['Drink Water', 'Meditate', 'Read a Book', "Exercise", "Time With Friends", "Time with Family", "Cook", "Hobby", "Other"];
 
   // useFocusEffect(
   //   React.useCallback(() => {
@@ -50,7 +57,15 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         const storedGoals = await AsyncStorage.getItem(GOALS_KEY);
 
         if (storedGoals) {
-          setGoals(JSON.parse(storedGoals));
+          const parsed = JSON.parse(storedGoals);
+
+          // Reconstruct animation values
+          const updatedGoals = parsed.map((goal: Goal) => ({
+            ...goal,
+            fadeAnim: new Animated.Value(1),
+            scaleAnim: new Animated.Value(1),
+          }));
+          setGoals(updatedGoals);
         } else {
           // Default goals
           setGoals([
@@ -150,10 +165,19 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   }
 
   const handleConfirm = () => {
-    if(selectedCategory === ""){
+    if(selectedTemplate === ""){
       return;
     }
-    if( (customAM !== "" && customPM === "") || (customAM === "" && customPM !== "") || (time === "") || (customPM.length === 1) || (customPM.length > 2 || customAM.length > 2) ){
+    if((customAM !== "" && customPM === "") || (customAM === "" && customPM !== "")){
+      return;
+    }
+    if(time !== "" && (customAM === "" || customPM === "")){
+      return;
+    }
+    if(time === "" && (customAM !== "" || customPM !== "")){
+      return;
+    }
+    if(customPM.length === 1 || (customPM.length > 2 || customAM.length > 2)){
       return;
     }
 
@@ -178,7 +202,16 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
           <View style={styles.modalOverlay}>
             <View style={styles.modalBox}>
               <Text style={styles.modalTitle}>Add a Goal</Text>
-
+              <View style={{ 
+                position: 'absolute',
+                top: 10,
+                right: 10,
+                zIndex: 1,
+                padding: 10,
+              }
+              }>
+                <Button title="X" onPress={() => resetModal()}/>
+              </View>
               {/* Template selection */}
               <View style={styles.templateRow}>
                 {defaultGoals.map((goal) => (
@@ -244,7 +277,6 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
                   </View>
                 </View>
               <View style={styles.modalButtons}>
-                <Button title="Cancel" onPress={() => resetModal()} />
                 <Button title="Confirm" onPress={() => handleConfirm()} />
               </View>
             </View>
@@ -254,11 +286,16 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   );
 
   const renderCategoryBox = (title: string, color: string) => ( 
-    <View style={[styles.categoryBox, {backgroundColor: color}]}>
+    <TouchableOpacity onPress={() => {setModalVisible(true); setSelectedCategory(title)}} style={[
+              styles.box,
+              {
+                width: boxWidth,
+                height: boxHeight,
+                marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing : 0,
+                marginBottom: boxSpacing,
+              },
+            ]}>
       <Text style={styles.categoryTitle}>{title}</Text>
-      <View style={styles.inputContainer}>
-          <Button title="Add Goal" onPress={() => {setModalVisible(true); setSelectedCategory(title)}} />
-      </View>
         <FlatList
           data={getGoalByCategory(title)}
           keyExtractor={(item) => item.id}
@@ -278,7 +315,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
             </Animated.View>
           )}
         />
-    </View>
+    </TouchableOpacity>
   );
 
   const completedCount = goals.filter((g) => g.isCompleted).length;
@@ -286,8 +323,9 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.title}>Today's Goals</Text>
+      <Text style={styles.header}>Tomorrow's Goals</Text>
       <Button title="Go to Character Screen" onPress={goToCharacter} />
+      <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
       <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
@@ -302,28 +340,70 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
         {renderCategoryBox('Accountability', '#ff8c00')}
         {renderModal()}
       </View>
-      <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
-      <Text style={styles.progress}>
-        Completed {completedCount} / {totalGoals}
-      </Text>
-      {/* Placeholder for XP bar */}
-      <View style={styles.xpBarBackground}>
-        <View style={[styles.xpBarFill, { width: `${(completedCount / totalGoals) * 100}%` }]} />
-      </View>
     </View>
   );
 }
 
+// 'flex-start': Left
+
+// justifyContent: 'center': Center
+
+// justifyContent: 'flex-end': Right
+
+// alignItems: 'flex-start': Top
+
+// alignItems: 'center': Center
+
+// alignItems: 'flex-end': Bottom
+
+//  marginTop: height * 0.1, // 10% from top
+//  marginLeft: width * 0.05,
+
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: screenWidth * 0.05, backgroundColor: '#222' },
+  topSpace: {
+    height: '20%', // Leave this space open for visuals
+  },
   title: { fontSize: screenWidth * 0.06, fontWeight: 'bold', color: '#fff', marginBottom: screenHeight * 0.01 },
-  goalItem: { padding: screenWidth * 0.03, marginVertical: screenHeight * 0.005, backgroundColor: '#333', borderRadius: 8 },
+  goalItem: { height: screenHeight * 0.1, padding: screenWidth * 0.03, marginVertical: screenHeight * 0.0025, backgroundColor: '#333', borderRadius: 8 },
   completedGoal: { backgroundColor: '#28a745' },
-  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', paddingHorizontal: screenWidth * 0.05, rowGap: screenHeight * 0.015, columnGap: screenWidth * 0.05, marginTop: screenHeight * 0.03 },
-  categoryBox: { width: screenWidth * 0.4, height: screenHeight * 0.2, borderRadius: 12, padding: screenWidth * 0.03, alignItems: 'center', backgroundColor: '#444' },
-  categoryTitle: { fontSize: screenWidth * 0.05, fontWeight: 'bold', color: '#fff', marginBottom: screenHeight * 0.01 },
-  goalText: { color: '#fff', fontSize: screenWidth * 0.04 },
-  completedText: { color: '#ccc', fontSize: screenWidth * 0.045, textDecorationLine: 'line-through' },
+  container: {
+    flex: 1,
+    backgroundColor: '#1c1c1c', // Full gray background
+    alignItems: 'center',
+    justifyContent: 'flex-start',
+    paddingTop: 60, // Top padding for visual space
+  },
+  header: {
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    marginBottom: 20,
+  },
+  grid: {
+    flexDirection: 'row',
+    flexWrap: 'wrap',
+    justifyContent: 'center',
+    paddingHorizontal: screenWidth * 0.2, // Matches sideMargin
+    paddingBottom: screenHeight * 0.2
+  },
+  box: {
+    backgroundColor: '#222',
+    borderRadius: 12,
+    justifyContent: 'center',
+    alignItems: 'center',
+  },
+  boxText: {
+    color: '#fff',
+    fontSize: 13,
+    fontWeight: '400',
+  },
+  categoryTitle: { fontSize: 13, fontWeight: '100', color: '#fff', marginBottom: screenHeight * 0.01 },
+  goalText: {
+    color: '#fff',
+    fontSize: 16,
+    fontWeight: 'bold',
+  },
+  completedText: { color: '#ccc', fontSize: 16, textDecorationLine: 'line-through' },
   progress: { color: '#aaa', marginTop: screenHeight * 0.01, fontSize: screenWidth * 0.04 },
   xpBarBackground: { marginTop: screenHeight * 0.02, height: screenHeight * 0.02, width: '100%', backgroundColor: '#555', borderRadius: 10 },
   xpBarFill: { height: '100%', backgroundColor: '#0f0', borderRadius: 10 },
