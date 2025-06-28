@@ -1,10 +1,11 @@
 // screens/HomeScreen.tsx
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 
+const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 type Goal = {
   id: string;
@@ -28,7 +29,9 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
   const { xp, addXp } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
-  const [customTime, setCustomTime] = useState('');
+  const [customAM, setCustomAM] = useState('');
+  const [customPM, setCustomPM] = useState("");
+  const [time, setTime] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
 
@@ -101,6 +104,8 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 
   const addNewGoal = (place : string) => {
     let value = selectedTemplate;
+    if(customAM.substring(0, 1) === "0"){setCustomAM(customAM.substring(1))}
+    const customTime = customAM + ":" + customPM + " " + time;
     if(customTitle != ""){value += " - " + customTitle}
     if(customTime != ""){value += " - " + customTime}
 
@@ -148,15 +153,24 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     if(selectedCategory === ""){
       return;
     }
+    if( (customAM !== "" && customPM === "") || (customAM === "" && customPM !== "") || (time === "") || (customPM.length === 1) || (customPM.length > 2 || customAM.length > 2) ){
+      return;
+    }
 
     addNewGoal(selectedCategory);
 
+    resetModal();
+  };
+
+  const resetModal = () => {
     setSelectedCategory("");
     setModalVisible(false);
     setCustomTitle('');
-    setCustomTime('');
+    setCustomAM('');
+    setCustomPM("");
+    setTime("");
     setSelectedTemplate('');
-  };
+  }
 
   const renderModal = () => (
     <View>
@@ -189,16 +203,48 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
                 onChangeText={setCustomTitle}
                 placeholderTextColor="#aaa"
               />
-              <TextInput
-                placeholder="Time (e.g. 5 PM)"
-                style={styles.input}
-                value={customTime}
-                onChangeText={setCustomTime}
-                placeholderTextColor="#aaa"
-              />
-
+                <View style={styles.templateRow}>
+                  <Text style={styles.modalTitle}>Time</Text>
+                  <TextInput
+                    placeholder="00"
+                    style={styles.input}
+                    value={customAM}
+                    onChangeText={setCustomAM}
+                    placeholderTextColor="#aaa"
+                  />
+                  <Text style={styles.modalTitle}>:</Text>
+                  <TextInput
+                    placeholder="00"
+                    style={styles.input}
+                    value={customPM}
+                    onChangeText={setCustomPM}
+                    placeholderTextColor="#aaa"
+                  />
+                  <View style={styles.templateRow}>
+                    <Pressable
+                      key={"AM"}
+                      style={[
+                        styles.templateButton,
+                        time === "AM" && styles.selected,
+                      ]}
+                      onPress={() => setTime("AM")}
+                    >
+                      <Text style={styles.templateText}>{"AM"}</Text>
+                    </Pressable>
+                    <Pressable
+                      key={"PM"}
+                      style={[
+                        styles.templateButton,
+                        time === "PM" && styles.selected,
+                      ]}
+                      onPress={() => setTime("PM")}
+                    >
+                      <Text style={styles.templateText}>{"PM"}</Text>
+                    </Pressable>
+                  </View>
+                </View>
               <View style={styles.modalButtons}>
-                <Button title="Cancel" onPress={() => {setModalVisible(false); setSelectedTemplate(""); setCustomTime(""); setCustomTitle("")}} />
+                <Button title="Cancel" onPress={() => resetModal()} />
                 <Button title="Confirm" onPress={() => handleConfirm()} />
               </View>
             </View>
@@ -269,106 +315,26 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#222' },
-  title: { fontSize: 24, fontWeight: 'bold', color: '#fff', marginBottom: 10 },
-  goalItem: {
-    padding: 10,
-    marginVertical: 5,
-    backgroundColor: '#333',
-    borderRadius: 8,
-  },
-  completedGoal: {
-    backgroundColor: '#28a745',
-  },
-  grid: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    justifyContent: 'center', // center boxes
-    alignItems: 'center',
-    paddingHorizontal: 20,     // spacing from screen edges
-    rowGap: 15,
-    columnGap: 15,
-    marginTop: 30,
-  },
-  categoryBox: {
-    width: 140,               // fixed size for symmetry
-    height: 140,
-    borderRadius: 12,
-    padding: 10,
-    alignItems: 'center',
-    backgroundColor: '#444',  // default (can be overridden)
-  },
-  categoryTitle: {
-    fontSize: 20,
-    fontWeight: 'bold',
-    color: '#fff',
-    marginBottom: 10,
-  },
-  goalText: { color: '#fff', fontSize: 16 },
-  completedText: { color: '#ccc', fontSize: 18, textDecorationLine: 'line-through' },
-  progress: { color: '#aaa', marginTop: 10, fontSize: 16 },
-  xpBarBackground: {
-    marginTop: 20,
-    height: 20,
-    width: '100%',
-    backgroundColor: '#555',
-    borderRadius: 10,
-  },
-  xpBarFill: {
-    height: '100%',
-    backgroundColor: '#0f0',
-    borderRadius: 10,
-  },
-  inputContainer: {
-  flexDirection: 'row',
-  alignItems: 'center',
-  marginBottom: 10,
-  },
-  input: {
-    flex: 1,
-    backgroundColor: '#333',
-    color: '#fff',
-    padding: 10,
-    borderRadius: 8,
-    marginRight: 10,
-  },
-  modalOverlay: {
-    flex: 1,
-    backgroundColor: 'rgba(0,0,0,0.5)',
-    justifyContent: 'center',
-    alignItems: 'center',
-  },
-  modalBox: {
-    backgroundColor: '#333',
-    padding: 20,
-    borderRadius: 10,
-    width: '90%',
-  },
-  modalTitle: {
-    fontSize: 20,
-    color: '#fff',
-    marginBottom: 10,
-  },
-  templateRow: {
-    flexDirection: 'row',
-    flexWrap: 'wrap',
-    marginBottom: 10,
-  },
-  templateButton: {
-    backgroundColor: '#444',
-    padding: 10,
-    margin: 5,
-    borderRadius: 6,
-  },
-  selected: {
-    backgroundColor: '#28a745',
-  },
-  templateText: {
-    color: '#fff',
-  },
-  modalButtons: {
-    flexDirection: 'row',
-    justifyContent: 'space-between',
-    marginTop: 15,
-  },
+  container: { flex: 1, padding: screenWidth * 0.05, backgroundColor: '#222' },
+  title: { fontSize: screenWidth * 0.06, fontWeight: 'bold', color: '#fff', marginBottom: screenHeight * 0.01 },
+  goalItem: { padding: screenWidth * 0.03, marginVertical: screenHeight * 0.005, backgroundColor: '#333', borderRadius: 8 },
+  completedGoal: { backgroundColor: '#28a745' },
+  grid: { flexDirection: 'row', flexWrap: 'wrap', justifyContent: 'center', alignItems: 'center', paddingHorizontal: screenWidth * 0.05, rowGap: screenHeight * 0.015, columnGap: screenWidth * 0.05, marginTop: screenHeight * 0.03 },
+  categoryBox: { width: screenWidth * 0.4, height: screenHeight * 0.2, borderRadius: 12, padding: screenWidth * 0.03, alignItems: 'center', backgroundColor: '#444' },
+  categoryTitle: { fontSize: screenWidth * 0.05, fontWeight: 'bold', color: '#fff', marginBottom: screenHeight * 0.01 },
+  goalText: { color: '#fff', fontSize: screenWidth * 0.04 },
+  completedText: { color: '#ccc', fontSize: screenWidth * 0.045, textDecorationLine: 'line-through' },
+  progress: { color: '#aaa', marginTop: screenHeight * 0.01, fontSize: screenWidth * 0.04 },
+  xpBarBackground: { marginTop: screenHeight * 0.02, height: screenHeight * 0.02, width: '100%', backgroundColor: '#555', borderRadius: 10 },
+  xpBarFill: { height: '100%', backgroundColor: '#0f0', borderRadius: 10 },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015 },
+  input: { flex: 1, backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
+  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, width: '90%' },
+  modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01 },
+  templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
+  templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },
+  selected: { backgroundColor: '#28a745' },
+  templateText: { color: '#fff' },
+  modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
 });
