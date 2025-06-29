@@ -122,7 +122,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     if(customAM.substring(0, 1) === "0"){setCustomAM(customAM.substring(1))}
     const customTime = customAM + ":" + customPM + " " + time;
     if(customTitle != ""){value += " - " + customTitle}
-    if(customTime != ""){value += " - " + customTime}
+    if(customAM != ""){value += " - " + customTime}
 
     const newGoal: Goal = {
       id: generateId(),
@@ -397,7 +397,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '400',
   },
-  categoryTitle: { fontSize: 13, fontWeight: '100', color: '#fff', marginBottom: screenHeight * 0.01 },
+  categoryTitle: { fontSize: screenHeight * 0.03, fontWeight: '200', color: '#fff', marginBottom: screenHeight * 0.01 },
   goalText: {
     color: '#fff',
     fontSize: 16,
