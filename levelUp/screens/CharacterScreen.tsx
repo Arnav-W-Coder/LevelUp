@@ -5,30 +5,11 @@ import { useXP } from '../context/XPContext';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-
 type Props = {
-  onBack: () => void;
+  goToHome: () => void;
 };
 
-//const XP_KEY = 'levelup_xp';
-
-// const getLevelFromXp = (xp: number, level: number) => {
-//   let requiredXp = 100;
-//   let newLevel = level;
-
-//   while (xp >= requiredXp) {
-//     xp -= requiredXp;
-//     requiredXp = newLevel * 100;
-//     newLevel++;
-//   }
-
-//   const xpToNextLevel = requiredXp - xp;
-//   const xpInLevel = xp;
-
-//   return { xpInLevel, xpToNextLevel };
-// };
-
-export default function CharacterScreen({ onBack }: Props) {
+export default function CharacterScreen({ goToHome }: Props) {
   const { xp, level, addXp, changeLevel, changeXp } = useXP();
   const [sideBarVisibility, setSideBarVisibility] = useState(true);
 
@@ -73,7 +54,7 @@ export default function CharacterScreen({ onBack }: Props) {
             await AsyncStorage.removeItem('levelup_level');
             console.log('XP and level reset');
           }} style={styles.resetXp} />
-          <TouchableOpacity onPress={onBack} style={styles.sideButton}>
+          <TouchableOpacity onPress={goToHome} style={styles.sideButton}>
             <Text style={styles.sideLabel}>Homescreen</Text>
           </TouchableOpacity>
           {/* Menu lines */}

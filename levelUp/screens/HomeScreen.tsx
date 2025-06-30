@@ -12,6 +12,7 @@ const usableWidth = screenWidth - (sideMargin * 2);
 const usableHeight = screenHeight - sideMargin;
 const boxWidth = (usableWidth - boxSpacing) / 2; // Two boxes per row + spacing
 const boxHeight = (usableHeight - boxSpacing)/2;
+
 const categories = ['Mind', 'Body', 'Spirit', 'Accountability'];
 
 type Goal = {
@@ -26,14 +27,14 @@ type Goal = {
 type Props = {
   goToCharacter: () => void;
   goToDungeon: () => void;
+  goToGoal: () => void;
 };
 
 const GOALS_KEY = 'levelup_goals';
-//const XP_KEY = 'levelup_xp';
 
-export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
+export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const { xp, addXp } = useXP();
+  const { xp, savedGoals, addXp, changeGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
   const [customAM, setCustomAM] = useState('');
@@ -44,13 +45,6 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 
   const defaultGoals = ['Drink Water', 'Meditate', 'Read a Book', "Exercise", "Time With Friends", "Time with Family", "Cook", "Hobby", "Other"];
 
-  // useFocusEffect(
-  //   React.useCallback(() => {
-  //     setNewGoalTitle({});
-  //   }, [])
-  // );
-
-  // Load goals from storage
   useEffect(() => {
     const loadData = async () => {
       try {
@@ -98,14 +92,7 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
             if(place === "Body"){addXp(50, 1)}
             if(place === "Spirit"){addXp(50, 2)}
             if(place === "Accountability"){addXp(50, 3)}
-            //console.log("Goal completed");
-          } // +10 XP
-          // else{
-          //   if(xp > 0){
-          //     addXp(-50);
-          //   }
-          //   //console.log("Goal removed");
-          // } // -10 XP if unchecked
+          } 
           return updatedGoal;
         }
         return goal;
@@ -134,6 +121,11 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     }
 
     setGoals((prev) => [...prev, newGoal]);
+  }
+
+  const saveGoals = () => {
+    changeGoals(goals);
+    setGoals([]);
   }
 
   const removeGoal = (id: String) => {
@@ -182,7 +174,6 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
     }
 
     addNewGoal(selectedCategory);
-
     resetModal();
   };
 
@@ -326,6 +317,8 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
       <Text style={styles.header}>Tomorrow's Goals</Text>
       <Button title="Go to Character Screen" onPress={goToCharacter} />
       <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
+      <Button title="Go to Goals Screen" onPress={goToGoal} />
+      <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
@@ -345,17 +338,11 @@ export default function HomeScreen({goToCharacter, goToDungeon}: Props) {
 }
 
 // 'flex-start': Left
-
 // justifyContent: 'center': Center
-
 // justifyContent: 'flex-end': Right
-
 // alignItems: 'flex-start': Top
-
 // alignItems: 'center': Center
-
 // alignItems: 'flex-end': Bottom
-
 //  marginTop: height * 0.1, // 10% from top
 //  marginLeft: width * 0.05,
 

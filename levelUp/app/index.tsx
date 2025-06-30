@@ -9,6 +9,7 @@ export default function app() {
   return (
     <HomeScreen 
     goToCharacter={() => router.push('./character')} 
-    goToDungeon={() => router.push("./dungeon")} />
+    goToDungeon={() => router.push("./dungeon")} 
+    goToGoal={() => router.push("./goals")} />
   );
 }
