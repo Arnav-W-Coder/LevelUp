@@ -3,6 +3,7 @@ import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
+import { getYesterday } from '../utils/Date';
 
 type Props = {
   goToCharacter: () => void;
@@ -33,6 +34,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToHome}: Props
   const { savedGoals, changeGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
+  const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
 
   useEffect(() => {
     setGoals(savedGoals);
@@ -84,7 +86,23 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToHome}: Props
   };
 
   const getGoalByCategory = (category: string) => {
-    return goals?.filter((goal) => goal.category === category) || [];
+    loadGoals();
+    return loadGoal?.filter((goal) => goal.category === category) || [];
+  }
+
+  const loadGoals = async () => {
+    const YESTERDAY = getYesterday();
+    const stored = await AsyncStorage.getItem(YESTERDAY);
+    if (stored) {
+      const parsed = JSON.parse(stored);
+      const updatedGoals = parsed.map((goal: Goal) => ({
+          ...goal,
+          fadeAnim: new Animated.Value(1),
+          scaleAnim: new Animated.Value(1),
+        }));
+      setLoadGoals(updatedGoals);
+    }
+    setLoadGoals([]);
   }
 
   const renderCategoryBox = (title: string, color: string) => ( 

@@ -1,6 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { getDateKey, getToday, getYesterday } from '../utils/Date';
 
 type XPContextType = {
   xp: number[];
@@ -40,6 +41,21 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [xp, setXp] = useState([0, 0, 0, 0]);
   const [level, setLevel] = useState([0, 0, 0, 0]);
   const [savedGoals, setSavedGoals] = useState<Goal[]>([]);
+  const [currentDate, setCurrentDate] = useState<string>(getToday());
+  
+  useEffect(() => {
+    const now = new Date();
+    const millisTillMidnight =
+      new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
+      now.getTime();
+
+    const timeout = setTimeout(() => {
+      const today = getToday();
+      setCurrentDate(today);
+    }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
+
+    return () => clearTimeout(timeout);
+  }, []);
 
   useEffect(() => {
     const loadProgress = async () => {
@@ -103,12 +119,13 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const changeXp = async (newXp: number[]) => {
     setXp(newXp);
-    await AsyncStorage.setItem(LEVEL_KEY, JSON.stringify(newXp));
+    await AsyncStorage.setItem(XP_KEY, JSON.stringify(newXp));
   }
 
   const changeGoals = async (newGoals: Goal[]) => {
     setSavedGoals(newGoals);
     await AsyncStorage.setItem(GOALS_KEY, JSON.stringify(newGoals));
+    await AsyncStorage.setItem(currentDate, JSON.stringify(newGoals));
   }
 
   return (

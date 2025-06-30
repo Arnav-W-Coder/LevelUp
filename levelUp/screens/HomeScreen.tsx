@@ -4,6 +4,7 @@ import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
+import { getDateKey } from '../utils/Date';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const boxSpacing = 40;
@@ -42,8 +43,14 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
   const [time, setTime] = useState("");
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [ defaultTemplates, setDefaultTemplates] = useState<string[]>([]);
 
-  const defaultGoals = ['Drink Water', 'Meditate', 'Read a Book', "Exercise", "Time With Friends", "Time with Family", "Cook", "Hobby", "Other"];
+  const defaultMGoals = ['Read a Nonfication Book', 'Learn a New Skill', 'Improve in School/College', 'Improve in Job', 'Other'];
+  const defaultBGoals = ['Exercise', 'Diet', 'Sports', 'Drink Water', 'Other'];
+  const defaultSGoals = ['Meditate', 'Read a Book', 'Time with Friends', 'Time with Family', 'Religion', 'Non-VideoGame/TV Hobby'];
+  const defaultAGoals = ['Journal', 'Self Reflection', 'Plan Improvement', 'Other'];
+  const defaultGoals = [defaultMGoals, defaultBGoals, defaultSGoals, defaultAGoals];
+
 
   useEffect(() => {
     const loadData = async () => {
@@ -62,11 +69,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
           setGoals(updatedGoals);
         } else {
           // Default goals
-          setGoals([
-            { id: '1', title: 'Finish React Native tutorial', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1), category: "Mind"},
-            { id: '2', title: 'Meditate for 10 minutes', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1), category: "Spirit"},
-            { id: '3', title: 'Read a chapter of a book', isCompleted: false, fadeAnim: new Animated.Value(1), scaleAnim: new Animated.Value(1), category: "Mind"},
-          ]);
+          setGoals([]);
         }
       } catch (e) {
         console.error('Failed to load data', e);
@@ -177,6 +180,14 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
     resetModal();
   };
 
+  const activateModal = (title: string) => {
+    setModalVisible(true);
+    if(title === 'Mind'){setDefaultTemplates(defaultGoals[0])}
+    if(title === 'Body'){setDefaultTemplates(defaultGoals[1])}
+    if(title === 'Spirit'){setDefaultTemplates(defaultGoals[2])}
+    if(title === 'Accountability'){setDefaultTemplates(defaultGoals[3])}
+  }
+
   const resetModal = () => {
     setSelectedCategory("");
     setModalVisible(false);
@@ -205,7 +216,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
               </View>
               {/* Template selection */}
               <View style={styles.templateRow}>
-                {defaultGoals.map((goal) => (
+                {defaultTemplates.map((goal) => (
                   <Pressable
                     key={goal}
                     style={[
@@ -277,7 +288,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
   );
 
   const renderCategoryBox = (title: string, color: string) => ( 
-    <TouchableOpacity onPress={() => {setModalVisible(true); setSelectedCategory(title)}} style={[
+    <TouchableOpacity onPress={() => {activateModal(title); setSelectedCategory(title)}} style={[
               styles.box,
               {
                 width: boxWidth,
@@ -292,8 +303,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
-              <TouchableOpacity
-                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id)}}
+              <View
                 style={[
                   styles.goalItem,
                   item.isCompleted && styles.completedGoal,
@@ -302,7 +312,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
                 <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
                   {item.title}
                 </Text>
-              </TouchableOpacity>
+              </View>
             </Animated.View>
           )}
         />
