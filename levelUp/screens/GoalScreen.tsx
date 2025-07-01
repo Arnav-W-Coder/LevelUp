@@ -3,7 +3,7 @@ import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
-import { getYesterday } from '../utils/Date';
+import { getYesterday, getToday } from '../utils/Date';
 
 type Props = {
   goToCharacter: () => void;
@@ -30,15 +30,44 @@ type Goal = {
   category: string;
 };
 
-export default function HomeScreen({goToCharacter, goToDungeon, goToHome}: Props) {
+export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props) {
   const { savedGoals, changeGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
+  const [goalsByCategory, setGoalsByCategory] = useState<Record<string, Goal[]>>({});
+
 
   useEffect(() => {
     setGoals(savedGoals);
   }, [savedGoals]);
+
+  useEffect(() => {
+    const loadGoals = async () => {
+      const YESTERDAY = getYesterday();
+      const stored = await AsyncStorage.getItem(YESTERDAY);
+      if (stored) {
+        const parsed: Goal[] = JSON.parse(stored);
+        const updated = parsed.map((goal: Goal) => ({
+          ...goal,
+          fadeAnim: new Animated.Value(1),
+          scaleAnim: new Animated.Value(1),
+        }));
+
+        // categorize
+        const byCategory: Record<string, Goal[]> = {};
+        categories.forEach((cat) => {
+          byCategory[cat] = updated.filter((goal) => goal.category === cat);
+        });
+
+        setGoalsByCategory(byCategory);
+      } else {
+        setGoalsByCategory({});
+      }
+    };
+
+    loadGoals();
+  }, []);
 
   const toggleGoalCompleted = (id: string, place: string) => {
     setGoals((prevGoals) =>
@@ -85,25 +114,25 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToHome}: Props
     });
   };
 
-  const getGoalByCategory = (category: string) => {
-    loadGoals();
-    return loadGoal?.filter((goal) => goal.category === category) || [];
-  }
+  // const getGoalByCategory = (category: string) => {
+  //   loadGoals();
+  //   return loadGoal?.filter((goal) => goal.category === category) || [];
+  // }
 
-  const loadGoals = async () => {
-    const YESTERDAY = getYesterday();
-    const stored = await AsyncStorage.getItem(YESTERDAY);
-    if (stored) {
-      const parsed = JSON.parse(stored);
-      const updatedGoals = parsed.map((goal: Goal) => ({
-          ...goal,
-          fadeAnim: new Animated.Value(1),
-          scaleAnim: new Animated.Value(1),
-        }));
-      setLoadGoals(updatedGoals);
-    }
-    setLoadGoals([]);
-  }
+  // const loadGoals = async () => {
+  //   const YESTERDAY = getYesterday();
+  //   const stored = await AsyncStorage.getItem(YESTERDAY);
+  //   if (stored) {
+  //     const parsed = JSON.parse(stored);
+  //     const updatedGoals = parsed.map((goal: Goal) => ({
+  //         ...goal,
+  //         fadeAnim: new Animated.Value(1),
+  //         scaleAnim: new Animated.Value(1),
+  //       }));
+  //     setLoadGoals(updatedGoals);
+  //   }
+  //   setLoadGoals([]);
+  // }
 
   const renderCategoryBox = (title: string, color: string) => ( 
     <View style={[
@@ -117,7 +146,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToHome}: Props
             ]}>
       <Text style={styles.categoryTitle}>{title}</Text>
         <FlatList
-          data={getGoalByCategory(title)}
+          data={goalsByCategory[title] || []}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>

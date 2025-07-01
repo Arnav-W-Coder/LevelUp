@@ -1,7 +1,7 @@
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Animated } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { getDateKey, getToday, getYesterday } from '../utils/Date';
+import { getToday, getYesterday } from '../utils/Date';
 
 type XPContextType = {
   xp: number[];

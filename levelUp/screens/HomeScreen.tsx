@@ -84,6 +84,19 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
     AsyncStorage.setItem(GOALS_KEY, JSON.stringify(goals)).catch(console.error);
   }, [goals]);
 
+  useEffect(() => {
+      const now = new Date();
+      const millisTillMidnight =
+        new Date(now.getFullYear(), now.getMonth(), now.getDate() + 1).getTime() -
+        now.getTime();
+  
+      const timeout = setTimeout(() => {
+        setGoals([]);
+      }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
+  
+      return () => clearTimeout(timeout);
+    }, []);
+
   const toggleGoalCompleted = (id: string, place: string) => {
     setGoals((prevGoals) =>
       prevGoals.map((goal) => {
@@ -107,7 +120,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
     return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
   };
 
-  const addNewGoal = (place : string) => {
+  const addNewGoal = async (place : string) => {
     let value = selectedTemplate;
     if(customAM.substring(0, 1) === "0"){setCustomAM(customAM.substring(1))}
     const customTime = customAM + ":" + customPM + " " + time;
@@ -124,11 +137,11 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
     }
 
     setGoals((prev) => [...prev, newGoal]);
+    await AsyncStorage.setItem(GOALS_KEY, JSON.stringify(goals));
   }
 
   const saveGoals = () => {
     changeGoals(goals);
-    setGoals([]);
   }
 
   const removeGoal = (id: String) => {
