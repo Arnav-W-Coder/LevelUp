@@ -5,9 +5,9 @@ export default function SecondPage() {
   const router = useRouter();
 
   return <GoalScreen 
-    goToHome={() => router.back()} 
-    goToDungeon={() => router.push("./dungeon")}   
-    goToCharacter={() => router.push("./character")} 
+    goToHome={() => router.replace('/')} 
+    goToDungeon={() => router.replace("/dungeon")}   
+    goToCharacter={() => router.replace("/character")} 
   />;
   
 }

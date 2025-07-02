@@ -31,12 +31,10 @@ type Goal = {
 };
 
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props) {
-  const { savedGoals, changeGoals} = useXP();
+  const { savedGoals, changeGoals, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
-  const [goalsByCategory, setGoalsByCategory] = useState<Record<string, Goal[]>>({});
-
 
   useEffect(() => {
     setGoals(savedGoals);
@@ -54,15 +52,9 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props
           scaleAnim: new Animated.Value(1),
         }));
 
-        // categorize
-        const byCategory: Record<string, Goal[]> = {};
-        categories.forEach((cat) => {
-          byCategory[cat] = updated.filter((goal) => goal.category === cat);
-        });
-
-        setGoalsByCategory(byCategory);
+        setGoals(updated);
       } else {
-        setGoalsByCategory({});
+        setGoals([]);
       }
     };
 
@@ -70,28 +62,36 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props
   }, []);
 
   const toggleGoalCompleted = (id: string, place: string) => {
-    setGoals((prevGoals) =>
-      prevGoals.map((goal) => {
+    setGoals((prevGoals) => {
+      const updatedGoals = prevGoals.map((goal) => {
         if (goal.id === id) {
-          const toggled = !goal.isCompleted
+          const toggled = !goal.isCompleted;
           const updatedGoal = { ...goal, isCompleted: toggled };
-          if (toggled){
-            if(place === "Mind"){addXp(50, 0)}
-            if(place === "Body"){addXp(50, 1)}
-            if(place === "Spirit"){addXp(50, 2)}
-            if(place === "Accountability"){addXp(50, 3)}
-          } 
+          if (toggled) {
+            console.log("Toggled");
+            if (place === "Mind") addXp(50, 0);
+            if (place === "Body") addXp(50, 1);
+            if (place === "Spirit") addXp(50, 2);
+            if (place === "Accountability") addXp(50, 3);
+          }
           return updatedGoal;
+        }else{
+          console.log("Already Toggled");
         }
         return goal;
-      })
-    );
+      });
+      changeGoals(updatedGoals); 
+      return updatedGoals;
+    });
 
-    changeGoals(goals);
   };
 
   const removeGoal = (id: String) => {
-    setGoals((prevGoals) => prevGoals.filter(goal => goal.id !== id));
+    setGoals((prevGoals) => {
+      const updatedGoals = prevGoals.filter(goal => goal.id !== id);
+      changeYesterdayGoals(updatedGoals);
+      return updatedGoals;
+    });
   }
 
   const fadeAndRemoveGoal = (id: string) => {
@@ -114,10 +114,9 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props
     });
   };
 
-  // const getGoalByCategory = (category: string) => {
-  //   loadGoals();
-  //   return loadGoal?.filter((goal) => goal.category === category) || [];
-  // }
+  const getGoalsByCategory = (category: string) => {
+    return goals.filter((goal) => goal.category === category);
+  }
 
   // const loadGoals = async () => {
   //   const YESTERDAY = getYesterday();
@@ -146,7 +145,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props
             ]}>
       <Text style={styles.categoryTitle}>{title}</Text>
         <FlatList
-          data={goalsByCategory[title] || []}
+          data={getGoalsByCategory(title)}
           keyExtractor={(item) => item.id}
           renderItem={({ item }) => (
             <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>

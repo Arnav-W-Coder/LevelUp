@@ -8,8 +8,8 @@ export default function app() {
 
   return (
     <HomeScreen 
-    goToCharacter={() => router.push('./character')} 
-    goToDungeon={() => router.push("./dungeon")} 
-    goToGoal={() => router.push("./goals")} />
+    goToCharacter={() => router.replace('/character')} 
+    goToDungeon={() => router.replace("/dungeon")} 
+    goToGoal={() => router.replace("/goals")} />
   );
 }

@@ -11,6 +11,7 @@ type XPContextType = {
   changeLevel: (newLevel: number[]) => void;
   changeXp: (newXp: number[]) => void;
   changeGoals: (newGoals: Goal[]) => void;
+  changeYesterdayGoals: (newGoals: Goal[]) => void;
 };
 
 type Goal = {
@@ -30,7 +31,8 @@ const XPContext = createContext<XPContextType>({
   addXp: () => {},
   changeLevel: () => {},
   changeXp: () => {},
-  changeGoals: () => {}
+  changeGoals: () => {},
+  changeYesterdayGoals: () => {}
 });
 
 const XP_KEY = 'levelup_xp';
@@ -62,7 +64,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       try {
         const storedXp = await AsyncStorage.getItem(XP_KEY);
         const storedLevel = await AsyncStorage.getItem(LEVEL_KEY);
-        const storedGoals = await AsyncStorage.getItem(GOALS_KEY);
+        const storedGoals = await AsyncStorage.getItem(getYesterday());
 
         if (storedXp) {
           const parsedXp = JSON.parse(storedXp);
@@ -123,13 +125,15 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   const changeGoals = async (newGoals: Goal[]) => {
-    setSavedGoals(newGoals);
-    await AsyncStorage.setItem(GOALS_KEY, JSON.stringify(newGoals));
     await AsyncStorage.setItem(currentDate, JSON.stringify(newGoals));
   }
 
+  const changeYesterdayGoals = async (newGoals: Goal[]) => {
+    await AsyncStorage.setItem(getYesterday(), JSON.stringify(newGoals));
+  }
+
   return (
-    <XPContext.Provider value={{ xp, level, savedGoals, addXp, changeLevel, changeXp, changeGoals }}>
+    <XPContext.Provider value={{ xp, level, savedGoals, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals }}>
       {children}
     </XPContext.Provider>
   );

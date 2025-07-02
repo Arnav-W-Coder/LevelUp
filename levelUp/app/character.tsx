@@ -6,6 +6,6 @@ import CharacterScreen from '../screens/CharacterScreen';
 export default function SecondPage() {
   const router = useRouter();
 
-  return <CharacterScreen goToHome={() => router.back()} />;
+  return <CharacterScreen goToHome={() => router.replace('/')} />;
   
 }
