@@ -5,6 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 import { getDateKey } from '../utils/Date';
+import SlidingMenu from '../utils/menu';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const boxSpacing = 40;
@@ -29,11 +30,12 @@ type Props = {
   goToCharacter: () => void;
   goToDungeon: () => void;
   goToGoal: () => void;
+  goToHome: () => void;
 };
 
 const GOALS_KEY = 'levelup_goals';
 
-export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props) {
+export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHome}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, savedGoals, addXp, changeGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
@@ -349,6 +351,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal}: Props
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
         }}/>
+      <SlidingMenu goToHome={goToHome} goToGoal={goToHome} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
       <View style={styles.grid}>
         {renderCategoryBox('Mind', '#6a0dad')}
         {renderCategoryBox('Body', '#228B22')}

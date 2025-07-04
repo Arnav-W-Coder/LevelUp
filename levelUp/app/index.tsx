@@ -10,6 +10,7 @@ export default function app() {
     <HomeScreen 
     goToCharacter={() => router.replace('/character')} 
     goToDungeon={() => router.replace("/dungeon")} 
-    goToGoal={() => router.replace("/goals")} />
+    goToGoal={() => router.replace("/goals")}
+    goToHome={() => router.replace('/')} />
   );
 }
