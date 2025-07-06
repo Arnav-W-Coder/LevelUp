@@ -7,7 +7,8 @@ export default function SecondPage() {
   return <GoalScreen 
     goToHome={() => router.replace('/')} 
     goToDungeon={() => router.replace("/dungeon")}   
-    goToCharacter={() => router.replace("/character")} 
+    goToCharacter={() => router.replace("/character")}
+    goToGoal={() => router.replace('/goals')} 
   />;
   
 }

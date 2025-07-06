@@ -11,67 +11,48 @@ type Props = {
 };
 
 export default function menu({ goToHome, goToGoal, goToDungeon, goToCharacter }: Props) {
-    const [menuVisible, setMenuVisible] = useState(false);
-    const slideAnim = useRef(new Animated.Value(-screenWidth*0.5)).current;
-
-    const toggleMenu = () => {
-        Animated.timing(slideAnim, {
-            toValue: menuVisible ? -screenWidth*0.5 : 0,
-            duration: 300,
-            useNativeDriver: false,
-        }).start();
-        setMenuVisible(!menuVisible);
-    };
 
     return (
-        <View style={styles.sideBar}>
-            {/* Menu Button */}
-            <TouchableOpacity style={styles.menuButton} onPress={toggleMenu}>
-                <Image source={require('../assets/images/MenuButton.png')} />
+        <View style={styles.menu}>
+            <TouchableOpacity onPress={goToHome} style={styles.menuButton}>
+                <Text style={styles.menuText}>🏠</Text>
             </TouchableOpacity>
-
-            {/* Sliding Menu */}
-            <Animated.View style={[styles.sideBar, { left: slideAnim }]}>
-                <TouchableOpacity onPress={goToHome}>
-                    <Image source={require('../assets/images/HomescreenButton.png')} style={styles.image} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={goToCharacter}>
-                    <Image source={require('../assets/images/CharacterscreenButton.png')} style={styles.image} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={goToGoal}>
-                    <Image source={require('../assets/images/GoalscreenButton.png')} style={styles.image} />
-                </TouchableOpacity>
-                <TouchableOpacity onPress={goToDungeon}>
-                    <Image source={require('../assets/images/DungeonscreenButton.png')} style={styles.image} />
-                </TouchableOpacity>
-            </Animated.View>
+            <TouchableOpacity onPress={goToCharacter} style={styles.menuButton}>
+                <Text style={styles.menuText}>🧍</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={goToGoal} style={styles.menuButton}>
+                <Text style={styles.menuText}>🎯</Text>
+            </TouchableOpacity>
+            <TouchableOpacity onPress={goToDungeon} style={styles.menuButton}>
+                <Text style={styles.menuText}>🧱</Text>
+            </TouchableOpacity>
         </View>
     );
 }
 
 const styles = StyleSheet.create({
-    sideBar: {
+    menu: {
         position: 'absolute',
-        width: screenWidth * 0.5,
-        height: screenHeight,
-        backgroundColor: 'rgb(17, 35, 66)',
+        width: screenWidth,
+        height: screenHeight * 0.08,
+        backgroundColor: 'rgb(11, 22, 41)',
+        //marginTop: screenHeight * 0.8,
+        bottom: 0,
         left: 0,
-        top: 0,
-        borderWidth: screenWidth * 0.001,
-        borderColor: 'rgb(0, 0, 0)',
-        alignItems: 'center',
-        marginBottom: screenHeight * 0.05
+        right: 0,
+        justifyContent: 'space-between',
+        flexDirection: 'row',
     },
     image: {
-        position: 'absolute',
-        width: screenWidth * 0.25,
-        height: screenHeight * 0.125,
+        width: screenHeight * 0.1,
+        height: screenHeight * 0.05,
     },
     menuButton: {
-        position: 'absolute',
-        top: 0,
-        left: screenWidth * 0.9,
-        width: screenWidth * 0.01,
-        height: screenWidth * 0.01
+        width: screenHeight * 0.1,
+        height: screenHeight * 0.1,
+    },
+    menuText: {
+        fontSize: screenHeight * 0.05,
+        color: 'rgb(0, 0, 0)'
     }
 });

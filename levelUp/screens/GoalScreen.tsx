@@ -4,11 +4,13 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 import { getYesterday, getToday } from '../utils/Date';
+import Menu from '../utils/menu'
 
 type Props = {
   goToCharacter: () => void;
   goToDungeon: () => void;
   goToHome: () => void;
+  goToGoal: () => void;
 };
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -30,7 +32,7 @@ type Goal = {
   category: string;
 };
 
-export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props) {
+export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
   const { savedGoals, changeGoals, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
@@ -171,10 +173,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props
 
   return (
     <View style={styles.container}>
-      <Text style={styles.header}>Tomorrow's Goals</Text>
-      <Button title="Go to Character Screen" onPress={goToCharacter} />
-      <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
-      <Button title="Go to Home Screen" onPress={goToHome} />
+      <Text style={styles.header}>Today's Goals</Text>
       <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
@@ -189,6 +188,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome}: Props
         {renderCategoryBox('Spirit', '#1e90ff')}
         {renderCategoryBox('Accountability', '#ff8c00')}
       </View>
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
   );
 }

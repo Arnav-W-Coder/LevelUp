@@ -1,13 +1,18 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet, Button, Image } from 'react-native';
 import { useXP } from '../context/XPContext';
+import Menu from '../utils/menu'
 
 type Props = {
-  onBack: () => void;
+  goToHome: () => void;
+  goToCharacter: () => void;
+  goToGoal: () => void;
+  goToDungeon: () => void;
+
 };
 
 
-export default function DungeonScreen({onBack}:Props) {
+export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }:Props) {
   const {level} = useXP();
 
   const [currentDungeon, setCurrentDungeon] = useState(1);
@@ -24,7 +29,6 @@ export default function DungeonScreen({onBack}:Props) {
   return (
     <View style={styles.container}>
       <Text style={styles.title}>Dungeon Level {currentDungeon}</Text>
-      <Button title="Go back to homescreen" onPress={onBack} />
       {/* Dungeon sprite placeholder */}
       <Image
         source={require('../assets/images/testMap.png')} // add pixel-style dungeon image
@@ -43,6 +47,7 @@ export default function DungeonScreen({onBack}:Props) {
       ) : (
         <Text style={styles.locked}>You can access the next level!!</Text>
       )}
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
   );
 }

@@ -5,7 +5,7 @@ import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 import { getDateKey } from '../utils/Date';
-import SlidingMenu from '../utils/menu';
+import Menu from '../utils/menu';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const boxSpacing = 40;
@@ -340,9 +340,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   return (
     <View style={styles.container}>
       <Text style={styles.header}>Tomorrow's Goals</Text>
-      <Button title="Go to Character Screen" onPress={goToCharacter} />
-      <Button title="Go to Dungeon Screen" onPress={goToDungeon} />
-      <Button title="Go to Goals Screen" onPress={goToGoal} />
       <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
       title="Reset Goals (Dev Only)"
@@ -351,7 +348,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
         }}/>
-      <SlidingMenu goToHome={goToHome} goToGoal={goToHome} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
       <View style={styles.grid}>
         {renderCategoryBox('Mind', '#6a0dad')}
         {renderCategoryBox('Body', '#228B22')}
@@ -359,6 +355,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         {renderCategoryBox('Accountability', '#ff8c00')}
         {renderModal()}
       </View>
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
   );
 }
