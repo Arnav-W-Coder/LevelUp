@@ -71,10 +71,10 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
           const updatedGoal = { ...goal, isCompleted: toggled };
           if (toggled) {
             console.log("Toggled");
-            if (place === "Mind") addXp(50, 0);
-            if (place === "Body") addXp(50, 1);
-            if (place === "Spirit") addXp(50, 2);
-            if (place === "Accountability") addXp(50, 3);
+            if (place === "Mind") addXp(10, 0);
+            if (place === "Body") addXp(10, 1);
+            if (place === "Spirit") addXp(10, 2);
+            if (place === "Accountability") addXp(10, 3);
           }
           return updatedGoal;
         }else{

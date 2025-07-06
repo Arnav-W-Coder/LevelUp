@@ -13,18 +13,22 @@ type Props = {
 
 
 export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }:Props) {
-  const {level} = useXP();
-
-  const [currentDungeon, setCurrentDungeon] = useState(1);
-  const characterLevel = level[0]; //temporary
+  const { xp, level } = useXP();
+  const [currentDungeon, setCurrentDungeon] = useState(0);
 
   const advanceDungeon = () => {
     setCurrentDungeon((prev) => prev + 1);
   };
 
-  const levelRequired = currentDungeon * 2;
-
-  const canEnter = characterLevel >= levelRequired;
+  const canEnterDungeonLevel = () => {
+    const requiredLevel = 2 * currentDungeon;
+    return (
+      level[0] >= requiredLevel &&
+      level[1] >= requiredLevel &&
+      level[2] >= requiredLevel &&
+      level[3] >= requiredLevel
+    );
+  }
 
   return (
     <View style={styles.container}>
@@ -36,16 +40,13 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
       />
 
       <Text style={styles.levelInfo}>
-        Required Level: {levelRequired}
-      </Text>
-      <Text style={styles.playerInfo}>
-        Your Level: {characterLevel}
+        Required Level: {currentDungeon * 2}
       </Text>
 
-      {canEnter ? (
+      {canEnterDungeonLevel() ? (
         <Button title="Advance to Next Dungeon" onPress={advanceDungeon} />
       ) : (
-        <Text style={styles.locked}>You can access the next level!!</Text>
+        <Text style={styles.locked}>You're too low level!!</Text>
       )}
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>

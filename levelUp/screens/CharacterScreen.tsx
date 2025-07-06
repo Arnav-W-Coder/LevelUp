@@ -15,7 +15,6 @@ type Props = {
 
 export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }: Props) {
   const { xp, level, addXp, changeLevel, changeXp } = useXP();
-  const [sideBarVisibility, setSideBarVisibility] = useState(true);
 
   return (
     <View style={styles.screen}>
@@ -23,26 +22,26 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
 
       {/* Left XP Bars */}
       <View style={[styles.xpBar, styles.xpLeft1]}>
-        <View style={[styles.xpBarFill, { width: `${(xp[0] / 100) * 100}%` }]}/>
+        <View style={[styles.xpBarFill, { width: `${(xp[0] / (10 + 2 * Math.pow(level[0] - 1, 2))) * 100}%` }]}/>
       </View>
       <Text style={[styles.label, styles.labelMind]}>Mind</Text>
       <Text style={[styles.label, styles.labelMindLevel]}>Level:{level[0]}</Text>
 
       <View style={[styles.xpBar, styles.xpLeft2]}>
-        <View style={[styles.xpBarFill, { width: `${(xp[1] / 100) * 100}%` }]}/>
+        <View style={[styles.xpBarFill, { width: `${(xp[1] / (10 + 2 * Math.pow(level[1] - 1, 2))) * 100}%` }]}/>
       </View>
       <Text style={[styles.label, styles.labelSpirit]}>Spirit</Text>
       <Text style={[styles.label, styles.labelSpiritLevel]}>Level:{level[1]}</Text>
 
       {/* Right XP Bars */}
       <View style={[styles.xpBar, styles.xpRight1]}>
-        <View style={[styles.xpBarFill, { width: `${(xp[2] / 100) * 100}%` }]}/>
+        <View style={[styles.xpBarFill, { width: `${(xp[2] / (10 + 2 * Math.pow(level[2] - 1, 2))) * 100}%` }]}/>
       </View>
       <Text style={[styles.label, styles.labelBody]}>Body</Text>
       <Text style={[styles.label, styles.labelBodyLevel]}>Level:{level[2]}</Text>
 
       <View style={[styles.xpBar, styles.xpRight2]}> 
-        <View style={[styles.xpBarFill, { width: `${(xp[3] / 100) * 100}%` }]}/>
+        <View style={[styles.xpBarFill, { width: `${(xp[3] / (10 + 2 * Math.pow(level[3] - 1, 2))) * 100}%` }]}/>
       </View>
       <Text style={[styles.label, styles.labelAccountability]}>Accountability</Text>
       <Text style={[styles.label, styles.labelAccountabilityLevel]}>Level:{level[3]}</Text>

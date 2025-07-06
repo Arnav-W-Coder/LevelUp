@@ -95,6 +95,16 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     loadProgress();
   }, []);
 
+  const getRequiredXP = (place: number) => {
+    if (level[place] <= 25) {
+      return 10 + level[place] * 2;             // Fast early game
+    } else if (level[place] <= 50) {
+      return 60 + (level[place] - 25) * 4;      // Slower, rewarding
+    } else {
+      return 160 + (level[place] - 50) * 5;     // Flattened late game
+    }
+  }
+
   const addXp = async (amount: number, i: number) => {
     let newXp = [...xp];
     let newLevel = [...level];
@@ -102,8 +112,8 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     newXp[i] += amount;
 
     // Assume: every 100 XP = level up
-    while (newXp[i] >= 100) {
-      newXp[i] -= 100;
+    while (newXp[i] >= getRequiredXP(i)) {
+      newXp[i] -= getRequiredXP(i);
       newLevel[i] += 1;
     }
 
