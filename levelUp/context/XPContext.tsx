@@ -7,11 +7,13 @@ type XPContextType = {
   xp: number[];
   level: number[];
   savedGoals: Goal[];
+  dungeonLevel: number;
   addXp: (amount: number, i: number) => void;
   changeLevel: (newLevel: number[]) => void;
   changeXp: (newXp: number[]) => void;
   changeGoals: (newGoals: Goal[]) => void;
   changeYesterdayGoals: (newGoals: Goal[]) => void;
+  changeDungeon: (newLevel: number) => void;
 };
 
 type Goal = {
@@ -28,22 +30,26 @@ const XPContext = createContext<XPContextType>({
   xp: [0, 0, 0, 0],
   level: [0, 0, 0, 0],
   savedGoals: [],
+  dungeonLevel: 0,
   addXp: () => {},
   changeLevel: () => {},
   changeXp: () => {},
   changeGoals: () => {},
-  changeYesterdayGoals: () => {}
+  changeYesterdayGoals: () => {},
+  changeDungeon: () => {}
 });
 
 const XP_KEY = 'levelup_xp';
 const LEVEL_KEY = 'levelup_level';
 const GOALS_KEY = 'levelup_savedGoals';
+const DUNGEON_KEY = 'levelup_dungeon';
 
 export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }) => {
   const [xp, setXp] = useState([0, 0, 0, 0]);
   const [level, setLevel] = useState([0, 0, 0, 0]);
   const [savedGoals, setSavedGoals] = useState<Goal[]>([]);
   const [currentDate, setCurrentDate] = useState<string>(getToday());
+  const [dungeonLevel, setDungeonLevel] = useState(0);
   
   useEffect(() => {
     const now = new Date();
@@ -65,6 +71,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         const storedXp = await AsyncStorage.getItem(XP_KEY);
         const storedLevel = await AsyncStorage.getItem(LEVEL_KEY);
         const storedGoals = await AsyncStorage.getItem(getYesterday());
+        const storedDungeon = await AsyncStorage.getItem(DUNGEON_KEY);
 
         if (storedXp) {
           const parsedXp = JSON.parse(storedXp);
@@ -87,6 +94,11 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         }else{
           setSavedGoals([]);
         }
+
+        if(storedDungeon){
+          setDungeonLevel(Number(storedDungeon));
+        }
+
       } catch (err) {
         console.error('Failed to load XP or level from storage:', err);
       }
@@ -142,8 +154,13 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     await AsyncStorage.setItem(getYesterday(), JSON.stringify(newGoals));
   }
 
+  const changeDungeon = async (newLevel: number) => {
+    setDungeonLevel(newLevel);
+    await AsyncStorage.setItem(DUNGEON_KEY, JSON.stringify(newLevel));
+  }
+
   return (
-    <XPContext.Provider value={{ xp, level, savedGoals, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals }}>
+    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
       {children}
     </XPContext.Provider>
   );

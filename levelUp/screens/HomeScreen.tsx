@@ -8,6 +8,7 @@ import { getDateKey } from '../utils/Date';
 import Menu from '../utils/menu';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
+
 const boxSpacing = 40;
 const sideMargin = screenWidth * 0.2;
 const usableWidth = screenWidth - (sideMargin * 2);
