@@ -38,7 +38,7 @@ const GOALS_KEY = 'levelup_goals';
 
 export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHome}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const { xp, savedGoals, addXp, changeGoals } = useXP();
+  const { xp, savedGoals, changeAction, changeStreak, addXp, changeGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
   const [customAM, setCustomAM] = useState('');
@@ -193,6 +193,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     }
 
     addNewGoal(selectedCategory);
+    changeAction; 
+    changeStreak(1);
     resetModal();
   };
 

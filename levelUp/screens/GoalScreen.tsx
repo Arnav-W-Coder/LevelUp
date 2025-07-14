@@ -33,7 +33,7 @@ type Goal = {
 };
 
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
-  const { savedGoals, changeGoals, changeYesterdayGoals} = useXP();
+  const { savedGoals, changeGoals, changeStreak, changeAction, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, addXp } = useXP();
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
@@ -152,7 +152,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
           renderItem={({ item }) => (
             <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
               <TouchableOpacity
-                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id)}}
+                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id); changeAction; changeStreak(1)}}
                 style={[
                   styles.goalItem,
                   item.isCompleted && styles.completedGoal,

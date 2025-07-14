@@ -14,11 +14,15 @@ type Props = {
 };
 
 export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }: Props) {
-  const { xp, level, addXp, changeLevel, changeXp } = useXP();
+  const { xp, level, streak, addXp, changeLevel, changeXp } = useXP();
 
   return (
     <View style={styles.screen}>
       <Image source={require('../assets/images/testCharacter.png')} style={styles.characterImage} />
+      
+      <View style={styles.streak}>
+        <Text style={{width: '100%', height: '100%', color: 'rgb(255, 255, 255)'}}>Streak: {streak}</Text>
+      </View>
 
       {/* Left XP Bars */}
       <View style={[styles.xpBar, styles.xpLeft1]}>
@@ -109,6 +113,13 @@ const styles = StyleSheet.create({
   labelBodyLevel: { top: screenHeight * 0.45, left: screenWidth * 0.745 },
   labelAccountability: { top: screenHeight * 0.66, left: screenWidth * 0.57 },
   labelAccountabilityLevel: { top: screenHeight * 0.66, left: screenWidth * 0.75 },
+
+  streak: {
+    position: 'absolute',
+    left: screenWidth * 0.8,
+    width: screenWidth * 0.3,
+    height: screenHeight * 0.2
+  }
 });
 
 
