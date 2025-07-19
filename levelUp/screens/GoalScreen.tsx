@@ -152,7 +152,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
           renderItem={({ item }) => (
             <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
               <TouchableOpacity
-                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id); changeAction; changeStreak(1)}}
+                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id); changeStreak(1)}}
                 style={[
                   styles.goalItem,
                   item.isCompleted && styles.completedGoal,

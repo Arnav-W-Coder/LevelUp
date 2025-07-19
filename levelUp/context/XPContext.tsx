@@ -10,7 +10,7 @@ type XPContextType = {
   dungeonLevel: number;
   streak: number;
   action: boolean;
-  changeAction: () => void;
+  changeAction: (val: boolean) => void;
   changeStreak: (amount: number) => void;
   addXp: (amount: number, i: number) => void;
   changeLevel: (newLevel: number[]) => void;
@@ -188,16 +188,17 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   const changeStreak = async (amount: number) => {
+    console.log(action)
     if(!action){ 
       const newStreak = streak + amount;
       setStreak(newStreak);
       await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(newStreak));
-      changeAction();
+      changeAction(true);
     }
   }
 
-  const changeAction = async () => {
-    setAction(true); 
+  const changeAction = async (val: boolean) => {
+    setAction(val); 
     await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(true));
   }
 
