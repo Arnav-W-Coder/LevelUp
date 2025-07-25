@@ -72,12 +72,6 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const timeout = setTimeout(async () => {
       const today = getToday();
       setCurrentDate(today);
-      if(!action){
-        setStreak(0);
-        await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
-      }
-      setAction(false);
-      await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
     }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
 
     return () => clearTimeout(timeout);
@@ -92,6 +86,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         const storedDungeon = await AsyncStorage.getItem(DUNGEON_KEY);
         const storedStreak = await AsyncStorage.getItem(STREAK_KEY);
         const storedAction = await AsyncStorage.getItem(ACTION_KEY);
+        const lastActionDate = await AsyncStorage.getItem('levelup_lastActiveDate');
 
         if (storedXp) {
           const parsedXp = JSON.parse(storedXp);
@@ -119,12 +114,30 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           setDungeonLevel(Number(storedDungeon));
         }
 
-        if(storedStreak){
-          setStreak(Number(storedStreak));
-        }
-
         if(storedAction){
           setAction(Boolean(storedAction));
+        }
+
+        if(storedStreak){
+          setStreak(Number(storedStreak));
+          if(lastActionDate){
+            const lastAction = Number(lastActionDate)
+            if(lastAction !== Number(getToday())){
+              if(!action){ 
+                setStreak(0);
+                await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
+              }
+              setAction(false);
+              await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
+            }
+          }else{
+            if(!action){ 
+              setStreak(0);
+              await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
+            }
+            setAction(false);
+            await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
+          }
         }
 
       } catch (err) {
@@ -199,7 +212,8 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
 
   const changeAction = async (val: boolean) => {
     setAction(val); 
-    await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(true));
+    await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(val));
+    await AsyncStorage.setItem('levelup_lastActiveDate', JSON.stringify(getToday()));
   }
 
   return (

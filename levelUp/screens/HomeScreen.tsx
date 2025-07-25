@@ -25,6 +25,8 @@ type Goal = {
   fadeAnim: Animated.Value;
   scaleAnim: Animated.Value;
   category: string;
+  description: string;
+  time: string;
 };
 
 type Props = {
@@ -124,19 +126,23 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   };
 
   const addNewGoal = async (place : string) => {
-    let value = selectedTemplate;
+    let value = "";
+    let writtenTime = ""
     if(customAM.substring(0, 1) === "0"){setCustomAM(customAM.substring(1))}
-    const customTime = customAM + ":" + customPM + " " + time;
-    if(customTitle != ""){value += " - " + customTitle}
-    if(customAM != ""){value += " - " + customTime}
+  
+    if(customTitle != ""){value = customTitle}
+
+    if(customAM != ""){writtenTime = customAM + ":" + customPM + " " + time;}
 
     const newGoal: Goal = {
       id: generateId(),
-      title: value,
+      title: selectedTemplate,
       isCompleted: false,
       fadeAnim: new Animated.Value(1),
       scaleAnim: new Animated.Value(1),
-      category: place
+      category: place,
+      description: value,
+      time: writtenTime
     }
 
     setGoals((prev) => [...prev, newGoal]);
@@ -193,7 +199,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     }
 
     addNewGoal(selectedCategory);
-    changeAction; 
     changeStreak(1);
     resetModal();
   };
@@ -381,7 +386,7 @@ const styles = StyleSheet.create({
   completedGoal: { backgroundColor: '#28a745' },
   container: {
     flex: 1,
-    backgroundColor: '#1c1c1c', // Full gray background
+    backgroundColor: 'rgb(13, 17, 23)', // Full gray background
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: 60, // Top padding for visual space
