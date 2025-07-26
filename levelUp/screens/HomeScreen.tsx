@@ -1,20 +1,21 @@
 // screens/HomeScreen.tsx
-import React, { useState, useEffect } from 'react';
+import React, { useRef, useMemo, useState, useEffect } from 'react';
 import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 import { getDateKey } from '../utils/Date';
 import Menu from '../utils/menu';
+import BottomSheet from '@gorhom/bottom-sheet';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-const boxSpacing = 40;
-const sideMargin = screenWidth * 0.2;
+const boxSpacing = screenWidth * 0.1;
+const sideMargin = screenWidth * 0.1;
 const usableWidth = screenWidth - (sideMargin * 2);
-const usableHeight = screenHeight - sideMargin;
+const usableHeight = screenHeight - (screenHeight * 0.5);
 const boxWidth = (usableWidth - boxSpacing) / 2; // Two boxes per row + spacing
-const boxHeight = (usableHeight - boxSpacing)/2;
+const boxHeight = boxWidth/2
 
 const categories = ['Mind', 'Body', 'Spirit', 'Accountability'];
 
@@ -42,6 +43,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const [goals, setGoals] = useState<Goal[]>([]);
   const { xp, savedGoals, changeAction, changeStreak, addXp, changeGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
+  const [goalsVisible, setGoalsVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
   const [customAM, setCustomAM] = useState('');
   const [customPM, setCustomPM] = useState("");
@@ -157,26 +159,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     setGoals((prevGoals) => prevGoals.filter(goal => goal.id !== id));
   }
 
-  const fadeAndRemoveGoal = (id: string) => {
-    const goal = goals.find((g) => g.id === id);
-    if (!goal) return;
-
-    Animated.parallel([
-      Animated.timing(goal.fadeAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(goal.scaleAnim, {
-        toValue: 0.8,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      removeGoal(id);
-    });
-  };
-
   const getGoalByCategory = (category: string) => {
     return goals.filter((goal) => goal.category === category);
   }
@@ -211,8 +193,20 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     if(title === 'Accountability'){setDefaultTemplates(defaultGoals[3])}
   }
 
-  const resetModal = () => {
+  const activateGoals = (title: string) => {
+    setGoalsVisible(true);
+    if(title === 'Mind'){setDefaultTemplates(defaultGoals[0])}
+    if(title === 'Body'){setDefaultTemplates(defaultGoals[1])}
+    if(title === 'Spirit'){setDefaultTemplates(defaultGoals[2])}
+    if(title === 'Accountability'){setDefaultTemplates(defaultGoals[3])}
+  }
+
+  const resetGoalsModal = () => {
     setSelectedCategory("");
+    setGoalsVisible(false);
+  }
+
+  const resetModal = () => {
     setModalVisible(false);
     setCustomTitle('');
     setCustomAM('');
@@ -221,9 +215,75 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     setSelectedTemplate('');
   }
 
+  const goalsModal = () => ( 
+    <View style={{alignContent: 'center'}}>
+      <Modal visible={goalsVisible} transparent animationType="fade" onRequestClose={() => resetGoalsModal}>
+        <View style={{ 
+            position: 'absolute',
+            top: 10,
+            right: 10,
+            zIndex: 1,
+            padding: 10,
+          }
+          }>
+          <Button title="+" onPress={() => activateModal(selectedCategory)}/>
+        </View>
+        <Pressable onPress={() => {openSheet(), openBottomSheet()}} style={({pressed}) => [pressed && styles.buttonPressed]}>
+          <FlatList
+            data={getGoalByCategory(selectedCategory)}
+            keyExtractor={(item) => item.id}
+            renderItem={({ item }) => (
+              <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
+                <View
+                  style={[
+                    styles.goalItem,
+                    item.isCompleted && styles.completedGoal,
+                  ]}
+                >
+                  <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
+                    {item.title}
+                  </Text>
+                </View>
+              </Animated.View>
+            )}
+          />
+        </Pressable>
+      </Modal>
+    </View>
+  )
+
+  const bottomSheetRef = useRef<BottomSheet>(null);
+
+  // Snap points define how tall the sheet opens
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+  // Handle open
+  const openSheet = () => {
+    bottomSheetRef.current?.snapToIndex(0); // Open to 25%
+  };
+
+  const openBottomSheet = () => {
+    return (
+      <View style={{ flex: 1 }}>
+
+        <BottomSheet
+          ref={bottomSheetRef}
+          index={-1} // Initially hidden
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+        >
+          <View style={{flex: 1,padding: 16,backgroundColor: '#111827'}}>
+            <Text style={{color: 'white',fontSize: 16,marginBottom: 12}}>🗑 Delete Goal</Text>
+            <Text style={{color: 'white',fontSize: 16,marginBottom: 12}}>📄 View Details</Text>
+          </View>
+        </BottomSheet>
+      </View>
+    );
+  }
+
   const renderModal = () => (
     <View>
-      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => setModalVisible(false)}>
+      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => resetModal}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalBox}>
               <Text style={styles.modalTitle}>Add a Goal</Text>
@@ -311,7 +371,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   );
 
   const renderCategoryBox = (title: string, color: string) => ( 
-    <TouchableOpacity onPress={() => {activateModal(title); setSelectedCategory(title)}} style={[
+    <TouchableOpacity onPress={() => {activateGoals; setSelectedCategory(title)}} style={[
               styles.box,
               {
                 width: boxWidth,
@@ -319,26 +379,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                 marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing : 0,
                 marginBottom: boxSpacing,
               },
-            ]}>
+            ]}> 
       <Text style={styles.categoryTitle}>{title}</Text>
-        <FlatList
-          data={getGoalByCategory(title)}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
-              <View
-                style={[
-                  styles.goalItem,
-                  item.isCompleted && styles.completedGoal,
-                ]}
-              >
-                <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
-                  {item.title}
-                </Text>
-              </View>
-            </Animated.View>
-          )}
-        />
     </TouchableOpacity>
   );
 
@@ -362,6 +404,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         {renderCategoryBox('Spirit', '#1e90ff')}
         {renderCategoryBox('Accountability', '#ff8c00')}
         {renderModal()}
+        {goalsModal()}
       </View>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
@@ -435,4 +478,5 @@ const styles = StyleSheet.create({
   selected: { backgroundColor: '#28a745' },
   templateText: { color: '#fff' },
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
+  buttonPressed: {transform: [{ scale: 0.9 }],},
 });

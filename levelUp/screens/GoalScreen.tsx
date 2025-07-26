@@ -211,7 +211,7 @@ const styles = StyleSheet.create({
   completedGoal: { backgroundColor: '#28a745' },
   container: {
     flex: 1,
-    backgroundColor: '#1c1c1c', // Full gray background
+    backgroundColor: 'rgb(13, 17, 23)', // Full gray background
     alignItems: 'center',
     justifyContent: 'flex-start',
     paddingTop: 60, // Top padding for visual space

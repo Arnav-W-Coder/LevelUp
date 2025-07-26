@@ -1,0 +1,13 @@
+{
+  "dependencies": {
+    "@gorhom/bottom-sheet": "^5.1.6",
+    "expo": "^53.0.20",
+    "glob": "^11.0.3",
+    "react-native-gesture-handler": "~2.24.0",
+    "react-native-modal": "^14.0.0-rc.1",
+    "react-native-reanimated": "~3.17.4",
+    "react-native-safe-area-context": "5.4.0",
+    "rimraf": "^6.0.1",
+    "react-native-svg": "15.11.2"
+  }
+}

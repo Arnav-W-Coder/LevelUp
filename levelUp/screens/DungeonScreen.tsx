@@ -68,11 +68,11 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 
   const renderLevels = (level: dungeon) => {
     const verticalSpacing = screenHeight * 0.12;
-    const topOffset = screenHeight * 0.2 + verticalSpacing * level.id;
+    const topOffset = screenHeight * 0.1 + verticalSpacing * level.id;
 
     // Use sine wave: vary left position smoothly
     const waveAmplitude = screenWidth * 0.1;
-    const waveCenter = screenWidth * 0.5;
+    const waveCenter = screenWidth * 0.4;
     const waveFrequency = 0.5; // Lower = more stretched waves
 
     const leftOffset = waveCenter + waveAmplitude * Math.sin(waveFrequency * level.id);
@@ -86,7 +86,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 
   return (
     <View style={styles.container}>
-      <ScrollView contentContainerStyle={styles.container}>
+      <ScrollView contentContainerStyle={styles.scrollContent}>
         <Text style={styles.title}>Dungeon Level {dungeonLevel}</Text>
         <Button title="Reset Dungeon" onPress={() => changeDungeon(0)}/>
 
@@ -106,7 +106,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: '#1b1b1b', alignItems: 'center', height: screenHeight * 3 },
+  container: { flex: 1, padding: 20, backgroundColor: 'rgb(13, 17, 23)', alignItems: 'center', height: screenHeight * 3},
   title: { fontSize: 28, color: '#fff', marginBottom: 20 },
   image: { width: 150, height: 150, marginBottom: 20 },
   levelInfo: { fontSize: 16, color: '#aaa' },
@@ -119,7 +119,8 @@ const styles = StyleSheet.create({
     height: screenHeight * 0.1,             
     borderRadius: screenHeight * 0.05,        
   },
-  completedLevel: {
-
-  }
+  scrollContent: {
+    alignItems: 'center',
+    height: screenHeight * 3
+  },
 });

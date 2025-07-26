@@ -43,14 +43,17 @@ const styles = StyleSheet.create({
         right: 0,
         justifyContent: 'space-between',
         flexDirection: 'row',
+        paddingBottom: screenHeight * 0.01,
+        paddingHorizontal: screenWidth * 0.05,
+        paddingVertical: screenHeight * 0.005           
     },
     image: {
-        width: screenWidth * 0.05,
+        width: '100%',
         height: '100%',
     },
     menuButton: {
-        width: screenWidth * 0.05,
-        height: '100%',
+        width: screenWidth * 0.12,
+        height: screenWidth * 0.12,
     },
     menuText: {
         fontSize: screenHeight * 0.05,
