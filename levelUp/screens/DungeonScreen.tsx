@@ -96,7 +96,9 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 
         <View style={{ position: 'relative', height: screenHeight * 2, width: screenWidth }}>
           {dungeonLevels.map((level) => ( 
-            renderLevels(level)
+            <React.Fragment key={level.id}>
+              {renderLevels(level)}
+            </React.Fragment>
           ))}
         </View>
       </ScrollView>

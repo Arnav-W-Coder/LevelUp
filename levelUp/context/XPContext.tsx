@@ -10,6 +10,8 @@ type XPContextType = {
   dungeonLevel: number;
   streak: number;
   action: boolean;
+  todayMode: boolean;
+  changeTodayMode: (val: boolean) => void;
   changeAction: (val: boolean) => void;
   changeStreak: (amount: number) => void;
   addXp: (amount: number, i: number) => void;
@@ -37,6 +39,8 @@ const XPContext = createContext<XPContextType>({
   dungeonLevel: 0,
   streak: 0,
   action: false,
+  todayMode: false,
+  changeTodayMode: () => {},
   changeAction: () => {},
   changeStreak: () => {},
   addXp: () => {},
@@ -62,6 +66,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [dungeonLevel, setDungeonLevel] = useState(0);
   const [streak, setStreak] = useState(0);
   const [action, setAction] = useState(false);
+  const [todayMode, setTodayMode] = useState(false);
   
   useEffect(() => {
     const now = new Date();
@@ -87,6 +92,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         const storedStreak = await AsyncStorage.getItem(STREAK_KEY);
         const storedAction = await AsyncStorage.getItem(ACTION_KEY);
         const lastActionDate = await AsyncStorage.getItem('levelup_lastActiveDate');
+        const storedTodayMode = await AsyncStorage.getItem('levelup_todaymode');
 
         if (storedXp) {
           const parsedXp = JSON.parse(storedXp);
@@ -122,7 +128,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           setStreak(Number(storedStreak));
           if(lastActionDate){
             const lastAction = Number(lastActionDate)
-            if(lastAction !== Number(getToday())){
+            if(lastAction !== Number(getYesterday()) || lastAction !== Number(getToday())){
               if(!action){ 
                 setStreak(0);
                 await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
@@ -130,6 +136,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
               setAction(false);
               await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
             }
+
           }else{
             if(!action){ 
               setStreak(0);
@@ -138,6 +145,10 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
             setAction(false);
             await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
           }
+        }
+
+        if(storedTodayMode){
+          setTodayMode(Boolean(storedTodayMode));
         }
 
       } catch (err) {
@@ -187,6 +198,11 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     await AsyncStorage.setItem(XP_KEY, JSON.stringify(newXp));
   }
 
+  const changeTodayMode = async (val: boolean) => {
+    setTodayMode(val);
+    await AsyncStorage.setItem('levelup_todaymode', JSON.stringify(val));
+  }
+
   const changeGoals = async (newGoals: Goal[]) => {
     await AsyncStorage.setItem(currentDate, JSON.stringify(newGoals));
   }
@@ -217,7 +233,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   return (
-    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, streak, action, changeAction, changeStreak, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
+    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, streak, action, todayMode, changeTodayMode, changeAction, changeStreak, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
       {children}
     </XPContext.Provider>
   );

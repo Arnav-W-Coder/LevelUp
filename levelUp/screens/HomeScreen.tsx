@@ -4,10 +4,11 @@ import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, 
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
-import { getDateKey } from '../utils/Date';
+import { getToday, getYesterday } from '../utils/Date';
 import Menu from '../utils/menu';
-import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
+import CustomBottomSheetModal from '../utils/bottomScreenModal';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -42,7 +43,7 @@ const GOALS_KEY = 'levelup_goals';
 
 export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHome}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const { xp, savedGoals, changeAction, changeStreak, addXp, changeGoals } = useXP();
+  const { todayMode, changeTodayMode, changeAction, changeStreak, addXp, changeGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
@@ -58,7 +59,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const defaultSGoals = ['Meditate', 'Read a Book', 'Time with Friends', 'Time with Family', 'Religion', 'Non-VideoGame/TV Hobby'];
   const defaultAGoals = ['Journal', 'Self Reflection', 'Plan Improvement', 'Other'];
   const defaultGoals = [defaultMGoals, defaultBGoals, defaultSGoals, defaultAGoals];
-
 
   useEffect(() => {
     const loadData = async () => {
@@ -79,6 +79,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
           // Default goals
           setGoals([]);
         }
+
       } catch (e) {
         console.error('Failed to load data', e);
       }
@@ -384,28 +385,22 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
 
   // Handle open
   const openSheet = () => {
-    console.log("Opened Sheet")
+    console.log("Opened Sheet");
     bottomSheetRef.current?.present(); // Open to 25%
   };
   
   const closeSheet = () => {
+    console.log("Closed Sheet");
     bottomSheetRef.current?.dismiss();
   }
 
   return (
     <View style={styles.container}>
+      <CustomBottomSheetModal
+          ref={bottomSheetRef}/>
       <Button title="Open" onPress={() => openSheet()}/>
-      <BottomSheetModal
-          ref={bottomSheetRef}
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-        >
-          <View style={{ flex: 1, padding: 16, backgroundColor: '#ffffffff' }}>
-            <Text style={{ color: 'black', fontSize: 16, marginBottom: 12 }}>🗑 Delete Goal</Text>
-            <Text style={{ color: 'black', fontSize: 16, marginBottom: 12 }}>📄 View Details</Text>
-          </View>
-        </BottomSheetModal>
-      <Text style={styles.header}>Tomorrow's Goals</Text>
+      <Button title="Close" onPress={() => closeSheet()}/>      
+      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrows's Goals</Text>}
       <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
       title="Reset Goals (Dev Only)"
@@ -414,6 +409,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
         }}/>
+      <Button title="Today" onPress={() => changeTodayMode(true)}/>
+      <Button title="Tomorrow" onPress={() => changeTodayMode(false)}/>
       <View style={styles.grid}>
         {/* {renderCategoryBox('Mind', '#6a0dad')}
         {renderCategoryBox('Body', '#228B22')}

@@ -33,9 +33,8 @@ type Goal = {
 };
 
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
-  const { savedGoals, changeGoals, changeStreak, changeAction, changeYesterdayGoals} = useXP();
+  const { todayMode, savedGoals, addXp, changeGoals, changeStreak, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
-  const { xp, addXp } = useXP();
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
 
   useEffect(() => {
@@ -45,7 +44,12 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   useEffect(() => {
     const loadGoals = async () => {
       const YESTERDAY = getYesterday();
-      const stored = await AsyncStorage.getItem(YESTERDAY);
+      let stored;
+      if(todayMode){
+        stored = await AsyncStorage.getItem(getToday());
+      }else{
+        stored = await AsyncStorage.getItem(YESTERDAY);
+      }
       if (stored) {
         const parsed: Goal[] = JSON.parse(stored);
         const updated = parsed.map((goal: Goal) => ({
