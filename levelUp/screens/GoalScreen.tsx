@@ -5,21 +5,23 @@ import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 import { getYesterday, getToday } from '../utils/Date';
 import Menu from '../utils/menu'
+import { BlurView } from 'expo-blur';
 
 type Props = {
   goToCharacter: () => void;
   goToDungeon: () => void;
   goToHome: () => void;
-  goToGoal: () => void;
+  goToGoal: () => void; 
 };
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
-const boxSpacing = 40;
-const sideMargin = screenWidth * 0.2;
+
+const boxSpacing = screenWidth * 0.1;
+const sideMargin = screenWidth * 0.1;
 const usableWidth = screenWidth - (sideMargin * 2);
-const usableHeight = screenHeight - sideMargin;
+const usableHeight = screenHeight - (screenHeight * 0.5);
 const boxWidth = (usableWidth - boxSpacing) / 2; // Two boxes per row + spacing
-const boxHeight = (usableHeight - boxSpacing)/2;
+const boxHeight = boxWidth/2
 
 const categories = ['Mind', 'Body', 'Spirit', 'Accountability'];
 
@@ -36,6 +38,9 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   const { todayMode, savedGoals, addXp, changeGoals, changeStreak, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
+  const [goalsVisible, setGoalsVisible] = useState(false);
+  const [selectedCategory, setSelectedCategory] = useState("");
+  
 
   useEffect(() => {
     setGoals(savedGoals);
@@ -124,23 +129,75 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     return goals.filter((goal) => goal.category === category);
   }
 
-  // const loadGoals = async () => {
-  //   const YESTERDAY = getYesterday();
-  //   const stored = await AsyncStorage.getItem(YESTERDAY);
-  //   if (stored) {
-  //     const parsed = JSON.parse(stored);
-  //     const updatedGoals = parsed.map((goal: Goal) => ({
-  //         ...goal,
-  //         fadeAnim: new Animated.Value(1),
-  //         scaleAnim: new Animated.Value(1),
-  //       }));
-  //     setLoadGoals(updatedGoals);
-  //   }
-  //   setLoadGoals([]);
-  // }
+  const activateGoals = (title: string) => {
+    setGoalsVisible(true);
+    if(title === 'Mind'){setSelectedCategory("Mind")}
+    if(title === 'Body'){setSelectedCategory("Body")}
+    if(title === 'Spirit'){setSelectedCategory("Spirit")}
+    if(title === 'Accountability'){setSelectedCategory("Accountability")}
+  }
 
-  const renderCategoryBox = (title: string, color: string) => ( 
-    <View style={[
+  const resetGoalsModal = () => {
+    setSelectedCategory("");
+    setGoalsVisible(false);
+  }
+
+  const goalsModal = () => ( 
+      <Modal
+        visible={goalsVisible}
+        transparent
+        animationType="fade"
+        onRequestClose={resetGoalsModal}
+      >
+        <View style={{position: 'absolute', top: 10, right: 10, zIndex: 1, padding: 10,}}>
+        </View>
+        {/* Fullscreen container */}
+        <View style={{height: screenHeight - (screenHeight*0.11)}}>
+          <BlurView intensity={50} style={StyleSheet.absoluteFill} />
+  
+          {/* Background pressable (closes modal) */}
+          <Pressable
+            style={StyleSheet.absoluteFill}
+            onPress={resetGoalsModal}
+          />
+  
+          {/* Foreground content (ignores background press) */}
+          <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, top: screenHeight*0.2, width: screenWidth*0.5}}>
+            <FlatList
+              data={getGoalsByCategory(selectedCategory)}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <Pressable onPress={() => {}} style={({pressed}) => [pressed && styles.buttonPressed]}>
+                  <Animated.View
+                    style={[
+                      { opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] },
+                    ]}
+                  >
+                    <View
+                      style={[
+                        styles.goalItem,
+                        item.isCompleted && styles.completedGoal,
+                      ]}
+                    >
+                      <Text
+                        style={item.isCompleted ? styles.completedText : styles.goalText}
+                      >
+                        {item.title}
+                      </Text>
+                    </View>
+                  </Animated.View>
+                </Pressable>
+              )}
+              scrollEnabled={false} 
+              
+            />
+          </View>
+        </View>
+      </Modal>
+    ) 
+
+  const renderCategoryBox = (title: string) => ( 
+    <TouchableOpacity onPress={() => {activateGoals(title)}} style={[
               styles.box,
               {
                 width: boxWidth,
@@ -150,26 +207,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
               },
             ]}>
       <Text style={styles.categoryTitle}>{title}</Text>
-        <FlatList
-          data={getGoalsByCategory(title)}
-          keyExtractor={(item) => item.id}
-          renderItem={({ item }) => (
-            <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
-              <TouchableOpacity
-                onPress={() => {toggleGoalCompleted(item.id, title); fadeAndRemoveGoal(item.id); changeStreak(1)}}
-                style={[
-                  styles.goalItem,
-                  item.isCompleted && styles.completedGoal,
-                ]}
-              >
-                <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
-                  {item.title}
-                </Text>
-              </TouchableOpacity>
-            </Animated.View>
-          )}
-        />
-    </View>
+    </TouchableOpacity>
   );
 
   const completedCount = goals.filter((g) => g.isCompleted).length;
@@ -187,10 +225,11 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         console.log('Goals reset');
         }}/>
       <View style={styles.grid}>
-        {renderCategoryBox('Mind', '#6a0dad')}
-        {renderCategoryBox('Body', '#228B22')}
-        {renderCategoryBox('Spirit', '#1e90ff')}
-        {renderCategoryBox('Accountability', '#ff8c00')}
+        {renderCategoryBox('Mind')}
+        {renderCategoryBox('Body')}
+        {renderCategoryBox('Spirit')}
+        {renderCategoryBox('Accountability')}
+        {goalsModal()}
       </View>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
@@ -230,8 +269,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    paddingHorizontal: screenWidth * 0.2, // Matches sideMargin
-    paddingBottom: screenHeight * 0.2
+    paddingHorizontal: screenWidth * 0.1, // Matches sideMargin
+    paddingBottom: screenHeight * 0.2,
+    paddingTop: screenHeight * 0.1
   },
   box: {
     backgroundColor: '#222',
@@ -264,4 +304,5 @@ const styles = StyleSheet.create({
   selected: { backgroundColor: '#28a745' },
   templateText: { color: '#fff' },
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
+  buttonPressed: {transform: [{ scale: 0.9 }],},
 });

@@ -104,7 +104,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
   
       return () => clearTimeout(timeout);
-    }, []);
+  }, []);
 
   const toggleGoalCompleted = (id: string, place: string) => {
     setGoals((prevGoals) =>
@@ -361,7 +361,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     </View>
   );
 
-  const renderCategoryBox = (title: string, color: string) => ( 
+  const renderCategoryBox = (title: string) => ( 
     <TouchableOpacity onPress={() => {activateGoals(title); setSelectedCategory(title)}} style={[
               styles.box,
               {
@@ -400,7 +400,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
           ref={bottomSheetRef}/>
       <Button title="Open" onPress={() => openSheet()}/>
       <Button title="Close" onPress={() => closeSheet()}/>      
-      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrows's Goals</Text>}
+      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
       <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
       title="Reset Goals (Dev Only)"
@@ -409,16 +409,17 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
         }}/>
-      <Button title="Today" onPress={() => changeTodayMode(true)}/>
-      <Button title="Tomorrow" onPress={() => changeTodayMode(false)}/>
       <View style={styles.grid}>
-        {/* {renderCategoryBox('Mind', '#6a0dad')}
-        {renderCategoryBox('Body', '#228B22')}
-        {renderCategoryBox('Spirit', '#1e90ff')}
-        {renderCategoryBox('Accountability', '#ff8c00')}
+        {renderCategoryBox('Mind')}
+        {renderCategoryBox('Body')}
+        {renderCategoryBox('Spirit')}
+        {renderCategoryBox('Accountability')}
         {renderModal()}
-        {goalsModal()} */}
+        {goalsModal()}
       </View>
+      <TouchableOpacity onPress={() => changeTodayMode(!todayMode)} style={styles.todayButton}>
+        {!todayMode? <Text style={{color: 'white'}}>Today</Text>: <Text style={{color: 'white'}}>Tomorrow</Text>}
+      </TouchableOpacity>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
   );
@@ -457,8 +458,9 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    paddingHorizontal: screenWidth * 0.2, // Matches sideMargin
-    paddingBottom: screenHeight * 0.2
+    paddingHorizontal: screenWidth * 0.1, // Matches sideMargin
+    paddingBottom: screenHeight * 0.2,
+    paddingTop: screenHeight * 0.1
   },
   box: {
     backgroundColor: '#222',
@@ -470,6 +472,17 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 13,
     fontWeight: '400',
+  },
+  todayButton: {
+    position: 'absolute',
+    width: screenWidth*0.2,
+    height: screenWidth*0.1,
+    borderRadius: 12,
+    left: (screenWidth * 0.5) - (screenWidth*0.2)/2,
+    top: screenHeight * 0.8,
+    backgroundColor: '#222',
+    justifyContent: 'center',
+    alignItems: 'center'
   },
   categoryTitle: { fontSize: screenHeight * 0.03, fontWeight: '200', color: '#fff', marginBottom: screenHeight * 0.01 },
   goalText: {
