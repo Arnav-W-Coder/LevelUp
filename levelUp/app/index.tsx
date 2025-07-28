@@ -7,10 +7,10 @@ export default function app() {
   const router = useRouter();
 
   return (
-    <HomeScreen 
-    goToCharacter={() => router.replace('/character')} 
-    goToDungeon={() => router.replace("/dungeon")} 
-    goToGoal={() => router.replace("/goals")}
-    goToHome={() => router.replace('/')} />
+      <HomeScreen 
+        goToCharacter={() => router.replace('/character')} 
+        goToDungeon={() => router.replace("/dungeon")} 
+        goToGoal={() => router.replace("/goals")}
+        goToHome={() => router.replace('/')} />
   );
 }

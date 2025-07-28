@@ -6,7 +6,8 @@ import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
 import { getDateKey } from '../utils/Date';
 import Menu from '../utils/menu';
-import BottomSheet from '@gorhom/bottom-sheet';
+import { BottomSheetModal } from '@gorhom/bottom-sheet';
+import { BlurView } from 'expo-blur';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -216,70 +217,59 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   }
 
   const goalsModal = () => ( 
-    <View style={{alignContent: 'center'}}>
-      <Modal visible={goalsVisible} transparent animationType="fade" onRequestClose={() => resetGoalsModal}>
-        <View style={{ 
-            position: 'absolute',
-            top: 10,
-            right: 10,
-            zIndex: 1,
-            padding: 10,
-          }
-          }>
-          <Button title="+" onPress={() => activateModal(selectedCategory)}/>
-        </View>
-        <Pressable onPress={() => {openSheet(), openBottomSheet()}} style={({pressed}) => [pressed && styles.buttonPressed]}>
+    <Modal
+      visible={goalsVisible}
+      transparent
+      animationType="fade"
+      onRequestClose={resetGoalsModal}
+    >
+      <View style={{position: 'absolute', top: 10, right: 10, zIndex: 1, padding: 10,}}>
+        <Button title="+" onPress={() => activateModal(selectedCategory)}/>
+      </View>
+      {/* Fullscreen container */}
+      <View style={{height: screenHeight - (screenHeight*0.11)}}>
+        <BlurView intensity={50} style={StyleSheet.absoluteFill} />
+
+        {/* Background pressable (closes modal) */}
+        <Pressable
+          style={StyleSheet.absoluteFill}
+          onPress={resetGoalsModal}
+        />
+
+        {/* Foreground content (ignores background press) */}
+        <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, top: screenHeight*0.2, width: screenWidth*0.5}}>
           <FlatList
             data={getGoalByCategory(selectedCategory)}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Animated.View style={[{ opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] }]}>
-                <View
+              <Pressable onPress={() => {openSheet()}} style={({pressed}) => [pressed && styles.buttonPressed]}>
+                <Animated.View
                   style={[
-                    styles.goalItem,
-                    item.isCompleted && styles.completedGoal,
+                    { opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] },
                   ]}
                 >
-                  <Text style={item.isCompleted ? styles.completedText : styles.goalText}>
-                    {item.title}
-                  </Text>
-                </View>
-              </Animated.View>
+                  <View
+                    style={[
+                      styles.goalItem,
+                      item.isCompleted && styles.completedGoal,
+                    ]}
+                  >
+                    <Text
+                      style={item.isCompleted ? styles.completedText : styles.goalText}
+                    >
+                      {item.title}
+                    </Text>
+                  </View>
+                </Animated.View>
+              </Pressable>
             )}
+            scrollEnabled={false} 
+            
           />
-        </Pressable>
-      </Modal>
-    </View>
-  )
-
-  const bottomSheetRef = useRef<BottomSheet>(null);
-
-  // Snap points define how tall the sheet opens
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
-
-  // Handle open
-  const openSheet = () => {
-    bottomSheetRef.current?.snapToIndex(0); // Open to 25%
-  };
-
-  const openBottomSheet = () => {
-    return (
-      <View style={{ flex: 1 }}>
-
-        <BottomSheet
-          ref={bottomSheetRef}
-          index={-1} // Initially hidden
-          snapPoints={snapPoints}
-          enablePanDownToClose={true}
-        >
-          <View style={{flex: 1,padding: 16,backgroundColor: '#111827'}}>
-            <Text style={{color: 'white',fontSize: 16,marginBottom: 12}}>🗑 Delete Goal</Text>
-            <Text style={{color: 'white',fontSize: 16,marginBottom: 12}}>📄 View Details</Text>
-          </View>
-        </BottomSheet>
+        </View>
       </View>
-    );
-  }
+    </Modal>
+  ) 
 
   const renderModal = () => (
     <View>
@@ -371,7 +361,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   );
 
   const renderCategoryBox = (title: string, color: string) => ( 
-    <TouchableOpacity onPress={() => {activateGoals; setSelectedCategory(title)}} style={[
+    <TouchableOpacity onPress={() => {activateGoals(title); setSelectedCategory(title)}} style={[
               styles.box,
               {
                 width: boxWidth,
@@ -387,8 +377,34 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const completedCount = goals.filter((g) => g.isCompleted).length;
   const totalGoals = goals.length;
 
+  const bottomSheetRef = useRef<BottomSheetModal>(null);
+
+  // Snap points define how tall the sheet opens
+  const snapPoints = useMemo(() => ['25%', '50%'], []);
+
+  // Handle open
+  const openSheet = () => {
+    console.log("Opened Sheet")
+    bottomSheetRef.current?.present(); // Open to 25%
+  };
+  
+  const closeSheet = () => {
+    bottomSheetRef.current?.dismiss();
+  }
+
   return (
     <View style={styles.container}>
+      <Button title="Open" onPress={() => openSheet()}/>
+      <BottomSheetModal
+          ref={bottomSheetRef}
+          snapPoints={snapPoints}
+          enablePanDownToClose={true}
+        >
+          <View style={{ flex: 1, padding: 16, backgroundColor: '#ffffffff' }}>
+            <Text style={{ color: 'black', fontSize: 16, marginBottom: 12 }}>🗑 Delete Goal</Text>
+            <Text style={{ color: 'black', fontSize: 16, marginBottom: 12 }}>📄 View Details</Text>
+          </View>
+        </BottomSheetModal>
       <Text style={styles.header}>Tomorrow's Goals</Text>
       <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
@@ -399,12 +415,12 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         console.log('Goals reset');
         }}/>
       <View style={styles.grid}>
-        {renderCategoryBox('Mind', '#6a0dad')}
+        {/* {renderCategoryBox('Mind', '#6a0dad')}
         {renderCategoryBox('Body', '#228B22')}
         {renderCategoryBox('Spirit', '#1e90ff')}
         {renderCategoryBox('Accountability', '#ff8c00')}
         {renderModal()}
-        {goalsModal()}
+        {goalsModal()} */}
       </View>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
