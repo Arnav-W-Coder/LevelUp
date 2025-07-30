@@ -224,9 +224,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       animationType="fade"
       onRequestClose={resetGoalsModal}
     >
-      <View style={{position: 'absolute', top: 10, right: 10, zIndex: 1, padding: 10,}}>
-        <Button title="+" onPress={() => activateModal(selectedCategory)}/>
-      </View>
       {/* Fullscreen container */}
       <View style={{height: screenHeight - (screenHeight*0.11)}}>
         <BlurView intensity={50} style={StyleSheet.absoluteFill} />
@@ -239,6 +236,12 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
 
         {/* Foreground content (ignores background press) */}
         <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, top: screenHeight*0.2, width: screenWidth*0.5}}>
+          <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
+            {position: 'absolute', left: screenWidth * 0.5, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
+              alignItems: 'center', justifyContent: 'center', backgroundColor: '#222'
+            }}>
+              <Text style={{color: 'white', fontSize: screenWidth * 0.05}}>add +</Text>
+          </TouchableOpacity>
           <FlatList
             data={getGoalByCategory(selectedCategory)}
             keyExtractor={(item) => item.id}

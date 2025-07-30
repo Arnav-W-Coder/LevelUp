@@ -21,7 +21,7 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       <Image source={require('../assets/images/testCharacter.png')} style={styles.characterImage} />
       
       <View style={styles.streak}>
-        <Text style={{width: '100%', height: '100%', color: 'rgb(255, 255, 255)'}}>Streak: {streak}</Text>
+        <Text style={{width: '100%', height: '100%', color: 'rgb(255, 255, 255)'}}>Streak {streak}</Text>
       </View>
 
       {/* Left XP Bars */}
@@ -29,26 +29,26 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
         <View style={[styles.xpBarFill, { width: `${(xp[0] / (10 + 2 * Math.pow(level[0] - 1, 2))) * 100}%` }]}/>
       </View>
       <Text style={[styles.label, styles.labelMind]}>Mind</Text>
-      <Text style={[styles.label, styles.labelMindLevel]}>Level:{level[0]}</Text>
+      <Text style={[styles.label, styles.labelMindLevel]}>{level[0]}</Text>
 
       <View style={[styles.xpBar, styles.xpLeft2]}>
         <View style={[styles.xpBarFill, { width: `${(xp[1] / (10 + 2 * Math.pow(level[1] - 1, 2))) * 100}%` }]}/>
       </View>
-      <Text style={[styles.label, styles.labelSpirit]}>Body</Text>
-      <Text style={[styles.label, styles.labelSpiritLevel]}>Level:{level[1]}</Text>
+      <Text style={[styles.label, styles.labelSpirit]}>Spirit</Text>
+      <Text style={[styles.label, styles.labelSpiritLevel]}>{level[1]}</Text>
 
       {/* Right XP Bars */}
       <View style={[styles.xpBar, styles.xpRight1]}>
         <View style={[styles.xpBarFill, { width: `${(xp[2] / (10 + 2 * Math.pow(level[2] - 1, 2))) * 100}%` }]}/>
       </View>
-      <Text style={[styles.label, styles.labelBody]}>Spirit</Text>
-      <Text style={[styles.label, styles.labelBodyLevel]}>Level:{level[2]}</Text>
+      <Text style={[styles.label, styles.labelBody]}>Body</Text>
+      <Text style={[styles.label, styles.labelBodyLevel]}>{level[2]}</Text>
 
       <View style={[styles.xpBar, styles.xpRight2]}> 
         <View style={[styles.xpBarFill, { width: `${(xp[3] / (10 + 2 * Math.pow(level[3] - 1, 2))) * 100}%` }]}/>
       </View>
-      <Text style={[styles.label, styles.labelAccountability]}>Accountability</Text>
-      <Text style={[styles.label, styles.labelAccountabilityLevel]}>Level:{level[3]}</Text>
+      <Text style={[styles.label, styles.labelAccountability, {fontSize: screenWidth*0.04}]}>Accountability</Text>
+      <Text style={[styles.label, styles.labelAccountabilityLevel]}>{level[3]}</Text>
 
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
     </View>
@@ -72,7 +72,7 @@ const styles = StyleSheet.create({
   },
   xpBar: {
     position: 'absolute',
-    width: screenWidth * 0.25,
+    width: screenWidth * 0.4,
     height: screenHeight * 0.015,
     backgroundColor: '#fff',
     borderColor: '#000',
@@ -85,40 +85,47 @@ const styles = StyleSheet.create({
   },
   characterImage: {
     position: 'absolute',
-    width: screenWidth * 0.22,
-    height: screenWidth * 0.22,
-    top: screenHeight * 0.06,
-    left: screenWidth * 0.5 - (screenWidth * 0.22) / 2,
+    width: screenWidth * 0.3,
+    height: screenWidth * 0.6,
+    top: screenHeight * 0.15,
+    left: screenWidth * 0.5 - (screenWidth * 0.3) / 2,
     resizeMode: 'contain',
+    backgroundColor: 'black',
+    borderRadius: 12
   },
   label: {
     position: 'absolute',
-    fontSize: screenWidth * 0.02,
+    fontSize: screenWidth * 0.05,
     color: '#fff',
     textShadowColor: 'rgba(0, 0, 0, 0.25)',
     textShadowOffset: { width: 0, height: 4 },
     textShadowRadius: 4,
   },
   // Positioning labels and bars
-  xpLeft1: { top: screenHeight * 0.5, left: screenWidth * 0.115 },
-  xpLeft2: { top: screenHeight * 0.71, left: screenWidth * 0.115 },
-  xpRight1: { top: screenHeight * 0.5, left: screenWidth * 0.57 },
-  xpRight2: { top: screenHeight * 0.71, left: screenWidth * 0.57 },
+  xpLeft1: { top: screenHeight * 0.5, left: screenWidth * 0.05 },
+  xpLeft2: { top: screenHeight * 0.71, left: screenWidth * 0.05 },
+  xpRight1: { top: screenHeight * 0.5, left: screenWidth * 0.55 },
+  xpRight2: { top: screenHeight * 0.71, left: screenWidth * 0.55 },
 
-  labelMind: { top: screenHeight * 0.45, left: screenWidth * 0.115 },
-  labelMindLevel: { top: screenHeight * 0.45, left: screenWidth * 0.29 },
-  labelSpirit: { top: screenHeight * 0.66, left: screenWidth * 0.115 },
-  labelSpiritLevel: { top: screenHeight * 0.66, left: screenWidth * 0.29 },
-  labelBody: { top: screenHeight * 0.45, left: screenWidth * 0.57 },
-  labelBodyLevel: { top: screenHeight * 0.45, left: screenWidth * 0.745 },
-  labelAccountability: { top: screenHeight * 0.66, left: screenWidth * 0.57 },
-  labelAccountabilityLevel: { top: screenHeight * 0.66, left: screenWidth * 0.75 },
+  labelMind: { top: screenHeight * 0.47, left: screenWidth * 0.05 },
+  labelMindLevel: { top: screenHeight * 0.47, left: screenWidth * 0.35 },
+  labelBody: { top: screenHeight * 0.68, left: screenWidth * 0.05 },
+  labelBodyLevel: { top: screenHeight * 0.68, left: screenWidth * 0.35 },
+  labelSpirit: { top: screenHeight * 0.47, left: screenWidth * 0.55 },
+  labelSpiritLevel: { top: screenHeight * 0.47, left: screenWidth * 0.85 },
+  labelAccountability: { top: screenHeight * 0.685, left: screenWidth * 0.55 },
+  labelAccountabilityLevel: { top: screenHeight * 0.68, left: screenWidth * 0.85 },
 
   streak: {
     position: 'absolute',
-    left: screenWidth * 0.8,
-    width: screenWidth * 0.3,
-    height: screenHeight * 0.2
+    top: screenHeight * 0.15, 
+    left: screenWidth * 0.75,
+    width: screenWidth * 0.2,
+    height: screenWidth * 0.1,
+    backgroundColor: 'black',
+    alignItems: 'center',
+    justifyContent: 'center',
+    borderRadius: 12
   }
 });
 
