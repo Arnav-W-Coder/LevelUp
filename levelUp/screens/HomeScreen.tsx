@@ -231,7 +231,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     >
       {/* Fullscreen container */}
       <View style={{height: screenHeight - (screenHeight*0.11)}}>
-        <BlurView intensity={70} tint={'dark'} style={StyleSheet.absoluteFill} />
+        <BlurView intensity={80} tint={'dark'} style={StyleSheet.absoluteFill} />
 
         {/* Background pressable (closes modal) */}
         <Pressable
@@ -256,7 +256,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                   goal={item}
                   activeGoal={activeGoal}
                   setActiveGoal={setActiveGoal}
-                  removeGoal={() => removeGoal}
+                  removeGoal={() => removeGoal(item.id)}
                 />
               )}
               scrollEnabled={false}

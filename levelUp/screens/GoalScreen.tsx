@@ -45,6 +45,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [activeGoal, setActiveGoal] = useState<string | null>(null);
+  const [lastToggled, setLastToggled] = useState("");
   
 
   useEffect(() => {
@@ -77,35 +78,27 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     loadGoals();
   }, []);
 
-  const toggleGoalCompleted = (id: string, place: string) => {
-    setGoals((prevGoals) => {
-      const updatedGoals = prevGoals.map((goal) => {
-        if (goal.id === id) {
-          const toggled = !goal.isCompleted;
-          const updatedGoal = { ...goal, isCompleted: toggled };
-          if (toggled) {
-            console.log("Toggled");
-            if (place === "Mind") addXp(10, 0);
-            if (place === "Body") addXp(10, 1);
-            if (place === "Spirit") addXp(10, 2);
-            if (place === "Accountability") addXp(10, 3);
-          }
-          return updatedGoal;
-        }else{
-          console.log("Already Toggled");
-        }
-        return goal;
-      });
-      changeGoals(updatedGoals); 
-      return updatedGoals;
-    });
+  useEffect(() => {
+    if (lastToggled) {
+      const place = lastToggled;
+      if (place === "Mind") addXp(10, 0);
+      if (place === "Body") addXp(10, 1);
+      if (place === "Spirit") addXp(10, 2);
+      if (place === "Accountability") addXp(10, 3);
+      setLastToggled(""); // reset
+    }
+    }, [lastToggled]);
+  
 
-  };
-
-  const removeGoal = (id: String) => {
+  const removeGoal = (id: string) => {
     setGoals((prevGoals) => {
       const updatedGoals = prevGoals.filter(goal => goal.id !== id);
-      changeYesterdayGoals(updatedGoals);
+      if(todayMode){
+        changeGoals(updatedGoals);
+      }else{
+        changeYesterdayGoals(updatedGoals);
+      }
+      setLastToggled(selectedCategory);
       return updatedGoals;
     });
   }
@@ -178,6 +171,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
                   goal={item}
                   activeGoal={activeGoal}
                   setActiveGoal={setActiveGoal}
+                  removeGoal={() => removeGoal(item.id)}
                 />
               )}
               scrollEnabled={false}

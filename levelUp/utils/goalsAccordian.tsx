@@ -69,7 +69,9 @@ return (
           {goal.time !== "" && <Text style={styles.overlayTime}>⏰ {goal.time}</Text>}
           {goal.description !== "" && <Text style={styles.overlayDesc}>Description: {goal.description}</Text>}
         </View> 
-        <TouchableOpacity onPress={() => removeGoal(goal.id)} style={styles.overlayDelete}/>
+        <Portal>
+          <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}} style={styles.overlayDelete}/>
+        </Portal>
       </Portal>
     )}
   </View>
