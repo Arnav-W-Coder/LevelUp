@@ -50,7 +50,7 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       <Text style={[styles.label, styles.labelAccountability, {fontSize: screenWidth*0.04}]}>Accountability</Text>
       <Text style={[styles.label, styles.labelAccountabilityLevel]}>{level[3]}</Text>
 
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Character"}/>
     </View>
 
   );

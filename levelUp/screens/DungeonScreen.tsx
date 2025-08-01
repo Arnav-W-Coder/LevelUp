@@ -102,7 +102,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
           ))}
         </View>
       </ScrollView>
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Dungeon"}/>
     </View>
   );
 }

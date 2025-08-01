@@ -29,6 +29,8 @@ type Goal = {
   fadeAnim: Animated.Value;
   scaleAnim: Animated.Value;
   category: string;
+  description: string;
+  time: string;
 };
 
 const XPContext = createContext<XPContextType>({

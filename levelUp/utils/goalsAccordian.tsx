@@ -23,19 +23,24 @@ type GoalDropdownProps = {
   goal: Goal;
   activeGoal: string | null;
   setActiveGoal: React.Dispatch<React.SetStateAction<string | null>>;
+  removeGoal: (id: String) => void;
 };
 
-export default function GoalDropdown({ goal, activeGoal, setActiveGoal }: GoalDropdownProps) {
+export default function GoalDropdown({ goal, activeGoal, setActiveGoal, removeGoal }: GoalDropdownProps) {
   const cardRef = useRef<View>(null);
   const [cardY, setCardY] = useState(0);
+  const [cardX, setCardX] = useState(0);
   const [cardHeight, setCardHeight] = useState(0);
+  const [cardWidth, setCardWidth] = useState(0);
   const isActive = activeGoal === goal.id;
 
   const toggle = () => {
     if (!isActive) {
       cardRef.current?.measureInWindow((x, y, width, height) => {
         setCardY(y);
+        setCardX(x);
         setCardHeight(height);
+        setCardWidth(width);
         setActiveGoal(goal.id);
       });
     } else {
@@ -53,17 +58,18 @@ return (
     {isActive && (
       <Portal>
         <TouchableWithoutFeedback onPress={() => setActiveGoal(null)}>
-        <View style={styles.backdrop} />
-    </TouchableWithoutFeedback>
+          <View style={styles.backdrop} />
+        </TouchableWithoutFeedback>
         <View
           style={[
             styles.overlay,
             { top: cardY + cardHeight + 8, left: screenWidth * 0.04 },
           ]}
         >
-          <Text style={styles.overlayTime}>⏰ {goal.time}</Text>
-          <Text style={styles.overlayDesc}>{goal.description}</Text>
-        </View>
+          {goal.time !== "" && <Text style={styles.overlayTime}>⏰ {goal.time}</Text>}
+          {goal.description !== "" && <Text style={styles.overlayDesc}>Description: {goal.description}</Text>}
+        </View> 
+        <TouchableOpacity onPress={() => removeGoal(goal.id)} style={styles.overlayDelete}/>
       </Portal>
     )}
   </View>
@@ -104,6 +110,7 @@ const styles = StyleSheet.create({
   overlay: {
     position: "absolute",
     width: screenWidth - screenWidth * 0.08, // ~width - 32
+    maxHeight: screenHeight * 0.6, // flexible height with cap
     backgroundColor: "#fff",
     borderRadius: screenWidth * 0.03,
     padding: screenWidth * 0.04,
@@ -121,4 +128,13 @@ const styles = StyleSheet.create({
     color: "#333",
     zIndex: 3,
   },
+  overlayDelete: {
+    position: 'absolute',
+    backgroundColor: 'rgba(75, 75, 76, 1)',
+    borderRadius: 10,
+    left: screenWidth * 0.75,
+    top: screenHeight * 0.75,
+    width: screenWidth * 0.2,
+    height: screenHeight * 0.1
+  }
 });

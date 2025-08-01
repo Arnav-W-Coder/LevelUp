@@ -6,6 +6,8 @@ import { useFocusEffect } from 'expo-router';
 import { getYesterday, getToday } from '../utils/Date';
 import Menu from '../utils/menu'
 import { BlurView } from 'expo-blur';
+import { Portal } from 'react-native-paper'
+import GoalDropdown from '../utils/goalsAccordian';
 
 type Props = {
   goToCharacter: () => void;
@@ -32,6 +34,8 @@ type Goal = {
   fadeAnim: Animated.Value;
   scaleAnim: Animated.Value;
   category: string;
+  description: string;
+  time: string;
 };
 
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
@@ -40,6 +44,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
+  const [activeGoal, setActiveGoal] = useState<string | null>(null);
   
 
   useEffect(() => {
@@ -153,7 +158,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         </View>
         {/* Fullscreen container */}
         <View style={{height: screenHeight - (screenHeight*0.11)}}>
-          <BlurView intensity={50} style={StyleSheet.absoluteFill} />
+          <BlurView intensity={70} tint={'dark'} style={StyleSheet.absoluteFill} />
   
           {/* Background pressable (closes modal) */}
           <Pressable
@@ -161,37 +166,26 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
             onPress={resetGoalsModal}
           />
   
+          <Portal.Host>
           {/* Foreground content (ignores background press) */}
-          <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, top: screenHeight*0.2, width: screenWidth*0.5}}>
+          <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
+            <View style={{top: screenHeight * 0.2}}>
             <FlatList
               data={getGoalsByCategory(selectedCategory)}
               keyExtractor={(item) => item.id}
               renderItem={({ item }) => (
-                <Pressable onPress={() => {}} style={({pressed}) => [pressed && styles.buttonPressed]}>
-                  <Animated.View
-                    style={[
-                      { opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] },
-                    ]}
-                  >
-                    <View
-                      style={[
-                        styles.goalItem,
-                        item.isCompleted && styles.completedGoal,
-                      ]}
-                    >
-                      <Text
-                        style={item.isCompleted ? styles.completedText : styles.goalText}
-                      >
-                        {item.title}
-                      </Text>
-                    </View>
-                  </Animated.View>
-                </Pressable>
+                <GoalDropdown
+                  goal={item}
+                  activeGoal={activeGoal}
+                  setActiveGoal={setActiveGoal}
+                />
               )}
-              scrollEnabled={false} 
-              
+              scrollEnabled={false}
+              contentContainerStyle={{overflow: 'visible'}} 
             />
+            </View>
           </View>
+        </Portal.Host>
         </View>
       </Modal>
     ) 
@@ -231,7 +225,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         {renderCategoryBox('Accountability')}
         {goalsModal()}
       </View>
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Goal"}/>
     </View>
   );
 }

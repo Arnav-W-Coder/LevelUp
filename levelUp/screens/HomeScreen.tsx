@@ -239,30 +239,31 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
           onPress={resetGoalsModal}
         />
         <Portal.Host>
-        {/* Foreground content (ignores background press) */}
-        <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
-          <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
-            {position: 'absolute', left: screenWidth * 0.5, top: screenHeight * 0.1, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
-              alignItems: 'center', justifyContent: 'center', backgroundColor: '#222'
-            }}>
-              <Text style={{color: 'white', fontSize: screenWidth * 0.05}}>add +</Text>
-          </TouchableOpacity>
-          <View style={{top: screenHeight * 0.2}}>
-          <FlatList
-            data={getGoalByCategory(selectedCategory)}
-            keyExtractor={(item) => item.id}
-            renderItem={({ item }) => (
-              <GoalDropdown
-                goal={item}
-                activeGoal={activeGoal}
-                setActiveGoal={setActiveGoal}
-              />
-            )}
-            scrollEnabled={false}
-            contentContainerStyle={{overflow: 'visible'}} 
-          />
+          {/* Foreground content (ignores background press) */}
+          <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
+            <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
+              {position: 'absolute', left: screenWidth * 0.5, top: screenHeight * 0.1, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
+                alignItems: 'center', justifyContent: 'center', backgroundColor: '#222'
+              }}>
+                <Text style={{color: 'white', fontSize: screenWidth * 0.05}}>add +</Text>
+            </TouchableOpacity>
+            <View style={{top: screenHeight * 0.2}}>
+            <FlatList
+              data={getGoalByCategory(selectedCategory)}
+              keyExtractor={(item) => item.id}
+              renderItem={({ item }) => (
+                <GoalDropdown
+                  goal={item}
+                  activeGoal={activeGoal}
+                  setActiveGoal={setActiveGoal}
+                  removeGoal={() => removeGoal}
+                />
+              )}
+              scrollEnabled={false}
+              contentContainerStyle={{overflow: 'visible'}} 
+            />
+            </View>
           </View>
-        </View>
         </Portal.Host>
       </View>
     </Modal>
@@ -396,7 +397,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       <TouchableOpacity onPress={() => changeTodayMode(!todayMode)} style={styles.todayButton}>
         {!todayMode? <Text style={{color: 'white'}}>Today</Text>: <Text style={{color: 'white'}}>Tomorrow</Text>}
       </TouchableOpacity>
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} />
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Home"}/>
     </View>
   );
 }
@@ -473,7 +474,7 @@ const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015 },
   input: { flex: 1, backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, width: '90%' },
+  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, width: '90%', height: '60%' },
   modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01 },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },
