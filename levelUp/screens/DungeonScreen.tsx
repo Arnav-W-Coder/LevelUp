@@ -78,9 +78,13 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
     const leftOffset = waveCenter + waveAmplitude * Math.sin(waveFrequency * level.id);
 
     if(level.id === dungeonLevel + 1){ 
-      return <TouchableOpacity onPress={advanceDungeon} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}/>
+      return <TouchableOpacity onPress={advanceDungeon} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}>
+        <Text style={{color:'white', fontSize: 20}}>{level.id}</Text>
+        </TouchableOpacity>
     }else{
-      return <View style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}/>
+      return <View style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}>
+      <Text style={{color:'white', fontSize: 20}}>{level.id}</Text>
+        </View>
     }
   }
 
@@ -94,7 +98,9 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
           Required Level: {(dungeonLevel + 1) * 2}
         </Text>
 
-        <View style={{ position: 'relative', height: screenHeight * 2, width: screenWidth }}>
+        <View style={{ position: 'relative', width: screenWidth, height: screenHeight * 0.1 + 
+            screenHeight * 0.12 * dungeonLevels.length + 
+            screenHeight * 0.1}}>
           {dungeonLevels.map((level) => ( 
             <React.Fragment key={level.id}>
               {renderLevels(level)}
@@ -123,6 +129,5 @@ const styles = StyleSheet.create({
   },
   scrollContent: {
     alignItems: 'center',
-    height: screenHeight * 3
   },
 });

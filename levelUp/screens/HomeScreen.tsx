@@ -240,6 +240,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         />
         <Portal.Host>
           {/* Foreground content (ignores background press) */}
+          <Text style={{top: screenHeight * 0.001, left: screenWidth * 0.1, color: 'white', fontSize: screenWidth * 0.15}}>{selectedCategory}</Text>
           <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
             <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
               {position: 'absolute', left: screenWidth * 0.5, top: screenHeight * 0.1, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
