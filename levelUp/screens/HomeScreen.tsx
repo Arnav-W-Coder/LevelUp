@@ -9,6 +9,8 @@ import Menu from '../utils/menu';
 import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
 import CustomBottomSheetModal from '../utils/bottomScreenModal';
+import GoalDropdown from '../utils/goalsAccordian';
+import {Portal} from 'react-native-paper'
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -53,6 +55,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const [selectedTemplate, setSelectedTemplate] = useState("");
   const [selectedCategory, setSelectedCategory] = useState("");
   const [ defaultTemplates, setDefaultTemplates] = useState<string[]>([]);
+  const [activeGoal, setActiveGoal] = useState<string | null>(null);
 
   const defaultMGoals = ['Read a Nonfication Book', 'Learn a New Skill', 'Improve in School/College', 'Improve in Job', 'Other'];
   const defaultBGoals = ['Exercise', 'Diet', 'Sports', 'Drink Water', 'Other'];
@@ -204,8 +207,10 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   }
 
   const resetGoalsModal = () => {
-    setSelectedCategory("");
-    setGoalsVisible(false);
+    if(activeGoal === null){ 
+      setSelectedCategory("");
+      setGoalsVisible(false);
+    }
   }
 
   const resetModal = () => {
@@ -226,51 +231,39 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     >
       {/* Fullscreen container */}
       <View style={{height: screenHeight - (screenHeight*0.11)}}>
-        <BlurView intensity={50} style={StyleSheet.absoluteFill} />
+        <BlurView intensity={70} tint={'dark'} style={StyleSheet.absoluteFill} />
 
         {/* Background pressable (closes modal) */}
         <Pressable
           style={StyleSheet.absoluteFill}
           onPress={resetGoalsModal}
         />
-
+        <Portal.Host>
         {/* Foreground content (ignores background press) */}
-        <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, top: screenHeight*0.2, width: screenWidth*0.5}}>
+        <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
           <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
-            {position: 'absolute', left: screenWidth * 0.5, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
+            {position: 'absolute', left: screenWidth * 0.5, top: screenHeight * 0.1, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
               alignItems: 'center', justifyContent: 'center', backgroundColor: '#222'
             }}>
               <Text style={{color: 'white', fontSize: screenWidth * 0.05}}>add +</Text>
           </TouchableOpacity>
+          <View style={{top: screenHeight * 0.2}}>
           <FlatList
             data={getGoalByCategory(selectedCategory)}
             keyExtractor={(item) => item.id}
             renderItem={({ item }) => (
-              <Pressable onPress={() => {openSheet()}} style={({pressed}) => [pressed && styles.buttonPressed]}>
-                <Animated.View
-                  style={[
-                    { opacity: item.fadeAnim, transform: [{ scale: item.scaleAnim }] },
-                  ]}
-                >
-                  <View
-                    style={[
-                      styles.goalItem,
-                      item.isCompleted && styles.completedGoal,
-                    ]}
-                  >
-                    <Text
-                      style={item.isCompleted ? styles.completedText : styles.goalText}
-                    >
-                      {item.title}
-                    </Text>
-                  </View>
-                </Animated.View>
-              </Pressable>
+              <GoalDropdown
+                goal={item}
+                activeGoal={activeGoal}
+                setActiveGoal={setActiveGoal}
+              />
             )}
-            scrollEnabled={false} 
-            
+            scrollEnabled={false}
+            contentContainerStyle={{overflow: 'visible'}} 
           />
+          </View>
         </View>
+        </Portal.Host>
       </View>
     </Modal>
   ) 
@@ -381,28 +374,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const completedCount = goals.filter((g) => g.isCompleted).length;
   const totalGoals = goals.length;
 
-  const bottomSheetRef = useRef<BottomSheetModal>(null);
-
-  // Snap points define how tall the sheet opens
-  const snapPoints = useMemo(() => ['25%', '50%'], []);
-
-  // Handle open
-  const openSheet = () => {
-    console.log("Opened Sheet");
-    bottomSheetRef.current?.present(); // Open to 25%
-  };
-  
-  const closeSheet = () => {
-    console.log("Closed Sheet");
-    bottomSheetRef.current?.dismiss();
-  }
-
   return (
-    <View style={styles.container}>
-      <CustomBottomSheetModal
-          ref={bottomSheetRef}/>
-      <Button title="Open" onPress={() => openSheet()}/>
-      <Button title="Close" onPress={() => closeSheet()}/>      
+    <View style={styles.container}>     
       {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
       <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
