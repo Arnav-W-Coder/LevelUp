@@ -1,6 +1,6 @@
 // screens/HomeScreen.tsx
 import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
@@ -17,7 +17,6 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const boxSpacing = screenWidth * 0.1;
 const sideMargin = screenWidth * 0.1;
 const usableWidth = screenWidth - (sideMargin * 2);
-const usableHeight = screenHeight - (screenHeight * 0.5);
 const boxWidth = (usableWidth - boxSpacing) / 2; // Two boxes per row + spacing
 const boxHeight = boxWidth/2
 
@@ -360,25 +359,32 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   );
 
   const renderCategoryBox = (title: string) => ( 
-    <TouchableOpacity onPress={() => {activateGoals(title); setSelectedCategory(title)}} style={[
-              styles.box,
+    <Pressable onPress={() => {activateGoals(title); setSelectedCategory(title)}} style={({pressed}) => [
+              styles.box, pressed && styles.buttonPressed,
               {
                 width: boxWidth,
                 height: boxHeight,
                 marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing : 0,
                 marginBottom: boxSpacing,
               },
-            ]}> 
-      <Text style={styles.categoryTitle}>{title}</Text>
-    </TouchableOpacity>
+            ]}>
+      {title==="Mind" ? <Image source={require('../assets/images/MindButton2.png')} style={styles.categoryImage} />
+        : title==="Body" ? <Image source={require('../assets/images/BodyButton.png')} style={styles.categoryImage} />
+        : title==="Spirit" ? <Image source={require('../assets/images/SpiritButton.png')} style={styles.categoryImage} />
+        : <Image source={require('../assets/images/AccountabilityButton.png')} style={styles.categoryImage} />
+      } 
+      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.02}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
+    </Pressable>
   );
 
   const completedCount = goals.filter((g) => g.isCompleted).length;
   const totalGoals = goals.length;
 
   return (
-    <View style={styles.container}>     
-      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
+    <View style={styles.container}>
+      <View style={styles.topSpace}>
+        <Image source={require('../assets/images/HomescreenImage.png')} style={styles.backgroundImage}/>     
+      </View>      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
       <Button title="Save Goals" onPress={() => saveGoals()} />
       <Button
       title="Reset Goals (Dev Only)"
@@ -395,9 +401,10 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         {renderModal()}
         {goalsModal()}
       </View>
-      <TouchableOpacity onPress={() => changeTodayMode(!todayMode)} style={styles.todayButton}>
-        {!todayMode? <Text style={{color: 'white'}}>Today</Text>: <Text style={{color: 'white'}}>Tomorrow</Text>}
-      </TouchableOpacity>
+      <Pressable onPress={() => changeTodayMode(!todayMode)} style={({pressed}) => [styles.todayButton, pressed && styles.buttonPressed]}>
+        {/* <Image source={require('../assets/images/TodayButton.png')} style={styles.todayImage}/> */}
+        {!todayMode? <Text style={{position: 'absolute', color: 'white'}}>Today</Text>: <Text style={{position: 'absolute', color: 'white'}}>Tomorrow</Text>}
+      </Pressable>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Home"}/>
     </View>
   );
@@ -414,7 +421,11 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
 
 const styles = StyleSheet.create({
   topSpace: {
-    height: '20%', // Leave this space open for visuals
+    position: 'absolute',
+    top: screenHeight * 0.04,
+    left: 0,
+    height: screenHeight * 0.2, // Leave this space open for visuals
+    width: screenWidth
   },
   title: { fontSize: screenWidth * 0.06, fontWeight: 'bold', color: '#fff', marginBottom: screenHeight * 0.01 },
   goalItem: { height: screenHeight * 0.1, padding: screenWidth * 0.03, marginVertical: screenHeight * 0.0025, backgroundColor: '#333', borderRadius: 8 },
@@ -424,7 +435,7 @@ const styles = StyleSheet.create({
     backgroundColor: 'rgb(13, 17, 23)', // Full gray background
     alignItems: 'center',
     justifyContent: 'flex-start',
-    paddingTop: 60, // Top padding for visual space
+    paddingTop: screenHeight * 0.2, // Top padding for visual space
   },
   header: {
     color: '#fff',
@@ -453,16 +464,16 @@ const styles = StyleSheet.create({
   },
   todayButton: {
     position: 'absolute',
-    width: screenWidth*0.2,
-    height: screenWidth*0.1,
+    width: screenWidth*0.25,
+    height: screenWidth*0.125,
     borderRadius: 12,
-    left: (screenWidth * 0.5) - (screenWidth*0.2)/2,
+    left: (screenWidth * 0.5) - (screenWidth*0.25)/2,
     top: screenHeight * 0.8,
     backgroundColor: '#222',
     justifyContent: 'center',
-    alignItems: 'center'
+    alignItems: 'center',
   },
-  categoryTitle: { fontSize: screenHeight * 0.03, fontWeight: '200', color: '#fff', marginBottom: screenHeight * 0.01 },
+  categoryTitle: { position: 'absolute', fontSize: screenHeight * 0.03, fontWeight: '500', color: 'black'},
   goalText: {
     color: '#fff',
     fontSize: 16,
@@ -482,5 +493,17 @@ const styles = StyleSheet.create({
   selected: { backgroundColor: '#28a745' },
   templateText: { color: '#fff' },
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
-  buttonPressed: {transform: [{ scale: 0.9 }],},
+  buttonPressed: {transform: [{ scale: 0.9 }]},
+  categoryImage: {
+    width: 170,
+    height: 100,
+    //resizeMode: 'cover'
+  },
+  todayImage: {
+    width: 100,
+    height: 50
+  },
+  backgroundImage: {
+    width: '100%',
+  }
 });
