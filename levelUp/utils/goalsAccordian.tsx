@@ -8,6 +8,7 @@ import {
   StyleSheet,
   Dimensions,
   LayoutAnimation,
+  Image,
 } from "react-native";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -24,9 +25,10 @@ type GoalDropdownProps = {
   activeGoal: string | null;
   setActiveGoal: React.Dispatch<React.SetStateAction<string | null>>;
   removeGoal: (id: String) => void;
+  isGoal: Boolean
 };
 
-export default function GoalDropdown({ goal, activeGoal, setActiveGoal, removeGoal }: GoalDropdownProps) {
+export default function GoalDropdown({ goal, activeGoal, setActiveGoal, removeGoal, isGoal }: GoalDropdownProps) {
   const cardRef = useRef<View>(null);
   const [cardY, setCardY] = useState(0);
   const [cardX, setCardX] = useState(0);
@@ -70,7 +72,9 @@ return (
           {goal.description !== "" && <Text style={styles.overlayDesc}>Description: {goal.description}</Text>}
         </View> 
         <Portal>
-          <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}} style={styles.overlayDelete}/>
+          <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}} style={styles.overlayDelete}>
+            {isGoal ? <Image source={require('../assets/images/CheckButton.png')} style={styles.deleteButton}/> : <Image source={require('../assets/images/DeleteButton.png')} style={styles.deleteButton}/>}
+          </TouchableOpacity>
         </Portal>
       </Portal>
     )}
@@ -132,11 +136,15 @@ const styles = StyleSheet.create({
   },
   overlayDelete: {
     position: 'absolute',
-    backgroundColor: 'rgba(75, 75, 76, 1)',
+    //backgroundColor: 'rgba(75, 75, 76, 1)',
     borderRadius: 10,
-    left: screenWidth * 0.75,
-    top: screenHeight * 0.75,
+    left: screenWidth * 0.7,
+    top: screenHeight * 0.7,
     width: screenWidth * 0.2,
     height: screenHeight * 0.1
+  },
+  deleteButton: {
+    width: 100,
+    height: 140
   }
 });

@@ -172,6 +172,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
                   activeGoal={activeGoal}
                   setActiveGoal={setActiveGoal}
                   removeGoal={() => removeGoal(item.id)}
+                  isGoal={true}
                 />
               )}
               scrollEnabled={false}
