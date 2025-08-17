@@ -1,5 +1,5 @@
 import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView } from 'react-native';
+import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import { useFocusEffect } from 'expo-router';
@@ -186,17 +186,22 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     ) 
 
   const renderCategoryBox = (title: string) => ( 
-    <TouchableOpacity onPress={() => {activateGoals(title)}} style={[
+    <Pressable onPress={() => {activateGoals(title)}} style={({pressed}) => [
               styles.box,
               {
                 width: boxWidth,
                 height: boxHeight,
                 marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing : 0,
                 marginBottom: boxSpacing,
-              },
+              }, pressed && styles.buttonPressed
             ]}>
-      <Text style={styles.categoryTitle}>{title}</Text>
-    </TouchableOpacity>
+      {title==="Mind" ? <Image source={require('../assets/images/MindButton2.png')} style={styles.categoryImage} />
+              : title==="Body" ? <Image source={require('../assets/images/BodyButton.png')} style={styles.categoryImage} />
+              : title==="Spirit" ? <Image source={require('../assets/images/SpiritButton.png')} style={styles.categoryImage} />
+              : <Image source={require('../assets/images/AccountabilityButton.png')} style={styles.categoryImage} />
+            } 
+      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.02}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
+    </Pressable>
   );
 
   const completedCount = goals.filter((g) => g.isCompleted).length;
@@ -273,7 +278,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '400',
   },
-  categoryTitle: { fontSize: screenHeight * 0.03, fontWeight: '200', color: '#fff', marginBottom: screenHeight * 0.01 },
+  categoryTitle: { position: 'absolute', fontSize: screenHeight * 0.03, fontWeight: '500', color: '#000000ff', marginBottom: screenHeight * 0.01 },
   goalText: {
     color: '#fff',
     fontSize: 16,
@@ -294,4 +299,9 @@ const styles = StyleSheet.create({
   templateText: { color: '#fff' },
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
   buttonPressed: {transform: [{ scale: 0.9 }],},
+  categoryImage: {
+    width: 170,
+    height: 100,
+    //resizeMode: 'cover'
+  },
 });

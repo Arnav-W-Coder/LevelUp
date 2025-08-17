@@ -92,6 +92,8 @@ const styles = StyleSheet.create({
     elevation: 2,
     zIndex: 3,
     overflow: 'visible',
+    borderWidth: 2,
+    borderColor: 'rgb(0, 0, 0)'
   },
   header: {
     flexDirection: "row",
@@ -120,7 +122,7 @@ const styles = StyleSheet.create({
     backgroundColor: "#fff",
     borderRadius: screenWidth * 0.03,
     padding: screenWidth * 0.04,
-    zIndex: 1,
+    zIndex: 1
   },
   overlayTime: {
     fontSize: screenWidth * 0.04,

@@ -285,7 +285,11 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                 padding: 10,
               }
               }>
-                <Button title="X" onPress={() => resetModal()}/>
+                <Pressable onPress={() => resetModal()} style={({pressed}) => [{backgroundColor: 'rgba(73, 152, 237, 1)', 
+                  width: screenWidth * 0.08, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5}, 
+                  pressed && styles.buttonPressed]}>
+                  <Text style={{fontSize: screenWidth * 0.06, color: 'white', fontWeight: 'bold'}}>x</Text>
+                </Pressable>
               </View>
               {/* Template selection */}
               <View style={styles.templateRow}>
@@ -352,7 +356,11 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                   </View>
                 </View>
               <View style={styles.modalButtons}>
-                <Button title="Confirm" onPress={() => handleConfirm()} />
+                <Pressable onPress={() => handleConfirm()} style={({pressed}) => [{backgroundColor: 'rgba(73, 152, 237, 1)', 
+                  width: screenWidth * 0.24, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5}, 
+                  pressed && styles.buttonPressed]}>
+                  <Text style={{fontSize: screenWidth * 0.06, color: 'white', fontWeight: '500'}}>Confirm</Text>
+                </Pressable>
               </View>
             </View>
           </View>
@@ -387,14 +395,20 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       <View style={styles.topSpace}>
         <Image source={require('../assets/images/HomescreenImage.png')} style={styles.backgroundImage}/>     
       </View>      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
-      <Button title="Save Goals" onPress={() => saveGoals()} />
-      <Button
+      {/* <Button title="Save Goals" onPress={() => saveGoals()} /> */}
+      <Pressable style={({pressed}) => [{position: 'absolute', top: screenHeight * 0.2, left: screenWidth * 0.5 - (75), resizeMode: 'cover', 
+        paddingTop: screenHeight*0.1, paddingBottom: screenHeight*0.1}, pressed && styles.buttonPressed]}
+          onPress={() => saveGoals()}
+        >
+        <Image source={require('../assets/images/SaveButton.png')} style={{width: 150, height: 75}}/>
+      </Pressable>
+      {/* <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
         setGoals([]);
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
-        }}/>
+        }}/> */}
       <View style={styles.grid}>
         {renderCategoryBox('Mind')}
         {renderCategoryBox('Body')}
@@ -451,7 +465,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: screenWidth * 0.1, // Matches sideMargin
     paddingBottom: screenHeight * 0.2,
-    paddingTop: screenHeight * 0.1
+    paddingTop: screenHeight * 0.2
   },
   box: {
     backgroundColor: '#222',
@@ -486,10 +500,10 @@ const styles = StyleSheet.create({
   xpBarBackground: { marginTop: screenHeight * 0.02, height: screenHeight * 0.02, width: '100%', backgroundColor: '#555', borderRadius: 10 },
   xpBarFill: { height: '100%', backgroundColor: '#0f0', borderRadius: 10 },
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015 },
-  input: { flex: 1, backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02 },
+  input: { backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02, fontSize: screenHeight*0.02 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, width: '90%', height: '60%' },
-  modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01 },
+  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, width: '90%', height: '50%' },
+  modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, fontWeight: 'bold' },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },
   selected: { backgroundColor: '#28a745' },
