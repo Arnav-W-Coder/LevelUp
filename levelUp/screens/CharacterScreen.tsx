@@ -3,6 +3,7 @@ import { View, Text, StyleSheet, TouchableOpacity, Pressable, Button, Image, Dim
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
 import Menu from '../utils/menu';
+import CharacterImage from '@/utils/character';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -18,7 +19,8 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
 
   return (
     <View style={styles.screen}>
-      <Image source={require('../assets/images/testCharacter.png')} style={styles.characterImage} />
+      {/* <Image source={require('../assets/images/testCharacter.png')} style={styles.characterImage} /> */}
+      
       
       <View style={styles.streak}>
         <Text style={{width: '100%', height: '100%', color: 'rgb(255, 255, 255)'}}>Streak {streak}</Text>
@@ -50,6 +52,10 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       <Text style={[styles.label, styles.labelAccountability, {fontSize: screenWidth*0.04}]}>Accountability</Text>
       <Text style={[styles.label, styles.labelAccountabilityLevel]}>{level[3]}</Text>
       <Button title="Reset" onPress={() => {changeXp([0, 0, 0, 0]), changeLevel([0, 0, 0, 0])}} />
+        <View style={{ position: 'absolute', top: screenHeight * 0.05, left: screenWidth * (0.5 - (0.35/2)), width: screenWidth * 0.35, height: screenHeight * 0.4, backgroundColor: 'white', borderRadius: 12}}>
+            <CharacterImage topOffset={0} leftOffset={0}/>
+        </View>
+            <View style={{ position: 'absolute', top: screenHeight * 0.04, left: screenWidth * (0.5 - (0.38/2)), width: screenWidth * 0.38, height: screenHeight * 0.45, borderRadius: 12, borderWidth: 10, borderColor: 'rgb(28, 28, 28)'}}/>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Character"}/>
     </View>
 

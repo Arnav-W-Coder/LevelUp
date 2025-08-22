@@ -8,6 +8,7 @@ import Menu from '../utils/menu'
 import { BlurView } from 'expo-blur';
 import { Portal } from 'react-native-paper'
 import GoalDropdown from '../utils/goalsAccordian';
+import TopImage from '../utils/goalTopImage'
 
 type Props = {
   goToCharacter: () => void;
@@ -209,6 +210,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
 
   return (
     <View style={styles.container}>
+      <TopImage/>
       <Text style={styles.header}>Today's Goals</Text>
       <Button
       title="Reset Goals (Dev Only)"
@@ -243,7 +245,7 @@ const styles = StyleSheet.create({
   topSpace: {
     height: '20%', // Leave this space open for visuals
   },
-  title: { fontSize: screenWidth * 0.06, fontWeight: 'bold', color: '#fff', marginBottom: screenHeight * 0.01 },
+  title: { fontSize: screenWidth * 0.06, fontWeight: 'bold', color: '#fff', paddingTop: screenHeight * 0.2 },
   goalItem: { height: screenHeight * 0.1, padding: screenWidth * 0.03, marginVertical: screenHeight * 0.0025, backgroundColor: '#333', borderRadius: 8 },
   completedGoal: { backgroundColor: '#28a745' },
   container: {
@@ -257,7 +259,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginTop: screenHeight*0.3,
   },
   grid: {
     flexDirection: 'row',

@@ -11,6 +11,10 @@ import { BlurView } from 'expo-blur';
 import CustomBottomSheetModal from '../utils/bottomScreenModal';
 import GoalDropdown from '../utils/goalsAccordian';
 import {Portal} from 'react-native-paper'
+import TopImage from '../utils/homeTopImage'
+import { Canvas, Image as SkiaImage, useImage, Fit, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import SaveButton from '../utils/saveButton'
+
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -392,16 +396,10 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
 
   return (
     <View style={styles.container}>
-      <View style={styles.topSpace}>
-        <Image source={require('../assets/images/HomescreenImage.png')} style={styles.backgroundImage}/>     
-      </View>      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
+      <TopImage/>    
+      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
       {/* <Button title="Save Goals" onPress={() => saveGoals()} /> */}
-      <Pressable style={({pressed}) => [{position: 'absolute', top: screenHeight * 0.2, left: screenWidth * 0.5 - (75), resizeMode: 'cover', 
-        paddingTop: screenHeight*0.1, paddingBottom: screenHeight*0.1}, pressed && styles.buttonPressed]}
-          onPress={() => saveGoals()}
-        >
-        <Image source={require('../assets/images/SaveButton.png')} style={{width: 150, height: 75}}/>
-      </Pressable>
+      <SaveButton saveGoals={() => saveGoals()}/>
       {/* <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
@@ -457,7 +455,7 @@ const styles = StyleSheet.create({
     color: '#fff',
     fontSize: 24,
     fontWeight: 'bold',
-    marginBottom: 20,
+    marginTop: screenHeight*0.15,
   },
   grid: {
     flexDirection: 'row',
@@ -465,7 +463,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: screenWidth * 0.1, // Matches sideMargin
     paddingBottom: screenHeight * 0.2,
-    paddingTop: screenHeight * 0.2
+    paddingTop: screenHeight * 0.15
   },
   box: {
     backgroundColor: '#222',
