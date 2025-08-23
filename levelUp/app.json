@@ -11,6 +11,11 @@
     "ios": {
       "supportsTablet": true
     },
+    "splash": {
+      "image": "./assets/splash.png",
+      "resizeMode": "contain",
+      "backgroundColor": "#ffffff"
+    },
     "android": {
       "package": "com.arnav.levelup",
       "adaptiveIcon": {
