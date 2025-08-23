@@ -1,5 +1,5 @@
 🌟 **LevelUp** – Turn Your Self-Growth Into a Game 🎮
-📖 **Overview**
+📖 #**Overview**
 
 LevelUp is a gamified self-improvement app that makes personal growth fun, visual, and rewarding.
 Instead of just checking off tasks, you’ll earn XP, level up, and track progress in the four core areas of life:
@@ -24,7 +24,7 @@ Instead of just checking off tasks, you’ll earn XP, level up, and track progre
 
 📱 Cross-Platform – Built with React Native & Expo
 
-🔄 **How It Works**
+🔄 # **How It Works**
 flowchart TD
     [Plan Goals 📝] --> [Complete Tasks ✅]
      --> [Earn XP ⭐]
@@ -32,7 +32,7 @@ flowchart TD
      --> [Visualize Growth 📊]
      --> [Stay Motivated 🚀]
 
-🛠️ **Tech Stack**
+🛠️ # **Tech Stack**
 
 Language: TypeScript
 
@@ -49,34 +49,31 @@ Node.js >= 18
 
 Expo CLI
 
-**Installation**
-# Clone the repository
+# **Installation**
+### Clone the repository
 git clone https://github.com/Arnav-W-Coder/LevelUp.git
 
-# Navigate into the project folder
+### Navigate into the project folder
 cd LevelUp
 
-# Install dependencies
+### Install dependencies
 npm install
 
 Run the App
-# Start the Expo development server
+### Start the Expo development server
 npx expo start
 
 
 Use the Expo Go app on iOS/Android to preview instantly.
 
-📌 **Roadmap**
+📌 #**Roadmap**
 
  Add streaks & rewards for consistent habits
 
  Pixel-style dungeon progression visuals
 
- Cloud sync for cross-device progress
 
- Social features to share progress with friends
-
-🤝 **Contributing**
+🤝 #**Contributing**
 
 Contributions, ideas, and feedback are welcome!
 Open an issue or submit a pull request to help improve LevelUp.
