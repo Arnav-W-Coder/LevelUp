@@ -210,14 +210,14 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     <View style={styles.container}>
       <TopImage/>
       <Text style={styles.header}>Today's Goals</Text>
-      <Button
+      {/* <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
         setGoals([]);
         changeGoals([]);
         await AsyncStorage.removeItem('levelup_goals');
         console.log('Goals reset');
-        }}/>
+        }}/> */}
       <View style={styles.grid}>
         {renderCategoryBox('Mind')}
         {renderCategoryBox('Body')}
@@ -265,7 +265,7 @@ const styles = StyleSheet.create({
     justifyContent: 'center',
     paddingHorizontal: screenWidth * 0.1, // Matches sideMargin
     paddingBottom: screenHeight * 0.2,
-    paddingTop: screenHeight * 0.1
+    paddingTop: screenHeight * 0.05
   },
   box: {
     backgroundColor: '#222',

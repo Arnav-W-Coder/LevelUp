@@ -51,7 +51,7 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       </View>
       <Text style={[styles.label, styles.labelAccountability, {fontSize: screenWidth*0.04}]}>Accountability</Text>
       <Text style={[styles.label, styles.labelAccountabilityLevel]}>{level[3]}</Text>
-      <Button title="Reset" onPress={() => {changeXp([0, 0, 0, 0]), changeLevel([0, 0, 0, 0])}} />
+      {/* <Button title="Reset" onPress={() => {changeXp([0, 0, 0, 0]), changeLevel([0, 0, 0, 0])}} /> */}
         <View style={{ position: 'absolute', top: screenHeight * 0.05, left: screenWidth * (0.5 - (0.35/2)), width: screenWidth * 0.35, 
           height: screenHeight * 0.41, borderRadius: 12, // Android 
           elevation: 8, // iOS

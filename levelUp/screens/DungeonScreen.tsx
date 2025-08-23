@@ -115,7 +115,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <TopImage topOffset={20} leftOffset={0} />
-        <Button title="Reset Dungeon" onPress={() => changeDungeon(0)}/>
+        {/* <Button title="Reset Dungeon" onPress={() => changeDungeon(0)}/> */}
         <Text style={styles.title}>Dungeon Level {dungeonLevel}</Text>
 
         <Text style={styles.levelInfo}>
