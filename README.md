@@ -1,5 +1,5 @@
 🌟 **LevelUp** – Turn Your Self-Growth Into a Game 🎮
-📖 #**Overview**
+📖 **#Overview**
 
 LevelUp is a gamified self-improvement app that makes personal growth fun, visual, and rewarding.
 Instead of just checking off tasks, you’ll earn XP, level up, and track progress in the four core areas of life:
