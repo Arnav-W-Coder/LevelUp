@@ -52,7 +52,10 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       <Text style={[styles.label, styles.labelAccountability, {fontSize: screenWidth*0.04}]}>Accountability</Text>
       <Text style={[styles.label, styles.labelAccountabilityLevel]}>{level[3]}</Text>
       <Button title="Reset" onPress={() => {changeXp([0, 0, 0, 0]), changeLevel([0, 0, 0, 0])}} />
-        <View style={{ position: 'absolute', top: screenHeight * 0.05, left: screenWidth * (0.5 - (0.35/2)), width: screenWidth * 0.35, height: screenHeight * 0.4, backgroundColor: 'white', borderRadius: 12}}>
+        <View style={{ position: 'absolute', top: screenHeight * 0.05, left: screenWidth * (0.5 - (0.35/2)), width: screenWidth * 0.35, 
+          height: screenHeight * 0.41, borderRadius: 12, // Android 
+          elevation: 8, // iOS
+          shadowColor: "#000",}}>
             <CharacterImage topOffset={0} leftOffset={0}/>
         </View>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Character"}/>
@@ -107,17 +110,17 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   // Positioning labels and bars
-  xpLeft1: { top: screenHeight * 0.5, left: screenWidth * 0.05 },
+  xpLeft1: { top: screenHeight * 0.55, left: screenWidth * 0.05 },
   xpLeft2: { top: screenHeight * 0.71, left: screenWidth * 0.05 },
-  xpRight1: { top: screenHeight * 0.5, left: screenWidth * 0.55 },
+  xpRight1: { top: screenHeight * 0.55, left: screenWidth * 0.55 },
   xpRight2: { top: screenHeight * 0.71, left: screenWidth * 0.55 },
 
-  labelMind: { top: screenHeight * 0.47, left: screenWidth * 0.05 },
-  labelMindLevel: { top: screenHeight * 0.47, left: screenWidth * 0.35 },
+  labelMind: { top: screenHeight * 0.52, left: screenWidth * 0.05 },
+  labelMindLevel: { top: screenHeight * 0.52, left: screenWidth * 0.35 },
   labelBody: { top: screenHeight * 0.68, left: screenWidth * 0.05 },
   labelBodyLevel: { top: screenHeight * 0.68, left: screenWidth * 0.35 },
-  labelSpirit: { top: screenHeight * 0.47, left: screenWidth * 0.55 },
-  labelSpiritLevel: { top: screenHeight * 0.47, left: screenWidth * 0.85 },
+  labelSpirit: { top: screenHeight * 0.52, left: screenWidth * 0.55 },
+  labelSpiritLevel: { top: screenHeight * 0.52, left: screenWidth * 0.85 },
   labelAccountability: { top: screenHeight * 0.685, left: screenWidth * 0.55 },
   labelAccountabilityLevel: { top: screenHeight * 0.68, left: screenWidth * 0.85 },
 

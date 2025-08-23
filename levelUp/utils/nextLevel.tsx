@@ -11,7 +11,10 @@ type LevelProps = {
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 function NextLevelBase({ topOffset, leftOffset, image }: LevelProps){
-
+  if(!image){
+    return null;
+  }
+  
   return (
     <View
       style={[

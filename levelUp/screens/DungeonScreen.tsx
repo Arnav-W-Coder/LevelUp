@@ -29,7 +29,10 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }:Props) {
   const { xp, level, dungeonLevel, changeDungeon } = useXP();
-  const [dungeonLevels, setDungeonLevels] = useState<dungeon[]>([]);
+  const [dungeonLevels, setDungeonLevels] = useState<dungeon[]>(Array.from({ length: 50 }, (_, i) => ({
+    id: i,
+    completed: false
+  })));
   const nextBadge = useImage(require("../assets/images/NextLevel.png"));
   const currBadge = useImage(require("../assets/images/CurrentLevel.png"));
   const doneBadge = useImage(require("../assets/images/CompletedLevel.png"));
@@ -76,32 +79,37 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
     );
   }
 
-  const renderLevels = (level: dungeon) => {
+  const renderLevels = useMemo(() => {
+    const items = [];
+    for(let i = 0; i < dungeonLevels.length; i++){ 
+      const level = dungeonLevels[i];
 
-    const verticalSpacing = screenHeight * 0.12;
-    const topOffset = screenHeight * 0.1 + verticalSpacing * level.id;
+      const verticalSpacing = screenHeight * 0.12;
+      const topOffset = screenHeight * 0.1 + verticalSpacing * level.id;
 
-    // Use sine wave: vary left position smoothly
-    const waveAmplitude = screenWidth * 0.1;
-    const waveCenter = screenWidth * 0.4;
-    const waveFrequency = 0.5; // Lower = more stretched waves
+      // Use sine wave: vary left position smoothly
+      const waveAmplitude = screenWidth * 0.1;
+      const waveCenter = screenWidth * 0.4;
+      const waveFrequency = 0.5; // Lower = more stretched waves
 
-    const leftOffset = waveCenter + waveAmplitude * Math.sin(waveFrequency * level.id);
+      const leftOffset = waveCenter + waveAmplitude * Math.sin(waveFrequency * level.id);
 
-    if(level.id === dungeonLevel + 1){ 
-      return <TouchableOpacity onPress={advanceDungeon} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}>
-          <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>
-        </TouchableOpacity>
-    }else if(level.id < dungeonLevel){
-      return <View style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
-        <CompletedLevel topOffset={-10} leftOffset={-10} image={doneBadge} /> 
-        </View>
-    }else{
-      return <View style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
-      {level.id === dungeonLevel ? <CurrentLevel topOffset={20} leftOffset={20} image={currBadge}/> : <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>}
-        </View>
+      if(level.id === dungeonLevel + 1){ 
+        items.push( <TouchableOpacity key={level.id} onPress={advanceDungeon} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}>
+            <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>
+          </TouchableOpacity>);
+      }else if(level.id < dungeonLevel){
+        items.push( <View key={level.id} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
+          <CompletedLevel topOffset={-10} leftOffset={-10} image={doneBadge} /> 
+          </View>);
+      }else{
+        items.push( <View key={level.id} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
+        {level.id === dungeonLevel ? <CurrentLevel topOffset={20} leftOffset={20} image={currBadge}/> : <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>}
+          </View>);
+      }
     }
-  }
+    return items;
+  }, [dungeonLevel, nextBadge, currBadge, doneBadge]);
 
   return (
     <View style={styles.container}>
@@ -117,11 +125,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
         <View style={{ position: 'relative', width: screenWidth, height: screenHeight * 0.1 + 
             screenHeight * 0.12 * dungeonLevels.length + 
             screenHeight * 0.1}}>
-          {dungeonLevels.map((level) => ( 
-            <React.Fragment key={level.id}>
-              {renderLevels(level)}
-            </React.Fragment>
-          ))}
+          {renderLevels}
         </View>
       </ScrollView>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Dungeon"}/>

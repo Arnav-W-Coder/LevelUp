@@ -17,9 +17,9 @@ export default function CharacterImage({ topOffset, leftOffset }: LevelProps) {
 
   // Decide which asset to load
   const spriteSource = useMemo(() => {
-    if (dungeonLevel <= 25) {
+    if (dungeonLevel <= 10) {
       return require("../assets/images/StageOneCharacter.png");
-    } else if (dungeonLevel <= 50) {
+    } else if (dungeonLevel <= 25) {
       return require("../assets/images/StageTwoCharacter.png");
     } else {
       return require("../assets/images/StageThreeCharacter.png");
@@ -43,7 +43,7 @@ export default function CharacterImage({ topOffset, leftOffset }: LevelProps) {
   const frameHeight = spriteSheet.height();
 
   return (
-    <Canvas style={{flex: 1, borderRadius:12}}>
+    <Canvas style={{flex: 1, borderRadius: 12}}>
         <SkiaImage
           image={spriteSheet}
           x={-50}
