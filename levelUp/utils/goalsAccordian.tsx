@@ -72,8 +72,10 @@ return (
           {goal.description !== "" && <Text style={styles.overlayDesc}>Description: {goal.description}</Text>}
         </View> 
         <Portal>
-          <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}} style={styles.overlayDelete}>
-            {isGoal ? <Image source={require('../assets/images/CheckButton.png')} style={styles.deleteButton}/> : <Image source={require('../assets/images/DeleteButton.png')} style={styles.deleteButton}/>}
+          <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}}>
+            {isGoal ? <View><View style={[styles.checkButton, {left: screenWidth*0.72, top: screenHeight*0.765, 
+              width: 80, height: 75, backgroundColor:'#EDEDED'}]}></View><Image source={require('../assets/images/CheckButton.png')} 
+              style={styles.checkButton}/></View> : <Image source={require('../assets/images/DeleteButton.png')} style={styles.deleteButton}/>}
           </TouchableOpacity>
         </Portal>
       </Portal>
@@ -93,7 +95,7 @@ const styles = StyleSheet.create({
     zIndex: 3,
     overflow: 'visible',
     borderWidth: 2,
-    borderColor: 'rgb(0, 0, 0)'
+    borderColor: 'rgb(0, 0, 0)',
   },
   header: {
     flexDirection: "row",
@@ -138,15 +140,25 @@ const styles = StyleSheet.create({
   },
   overlayDelete: {
     position: 'absolute',
-    //backgroundColor: 'rgba(75, 75, 76, 1)',
+    backgroundColor: 'rgba(75, 75, 76, 1)',
     borderRadius: 10,
     left: screenWidth * 0.7,
     top: screenHeight * 0.7,
-    width: screenWidth * 0.2,
-    height: screenHeight * 0.1
+    width: screenWidth * 0.15,
+    height: screenHeight * 0.05
   },
   deleteButton: {
+    position: 'absolute',
+    left: screenWidth*0.7,
+    top: screenHeight*0.75,
     width: 100,
     height: 140
+  },
+  checkButton: {
+    position: 'absolute',
+    left: screenWidth*0.7,
+    top: screenHeight*0.75,
+    width: 100,
+    height: 100
   }
 });

@@ -243,16 +243,13 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         />
         <Portal.Host>
           {/* Foreground content (ignores background press) */}
-          <Text style={{top: screenHeight * 0.001, left: screenWidth * 0.1, color: 'white', fontSize: screenWidth * 0.15}}>{selectedCategory}</Text>
+          {/* <Text style={{top: screenHeight * 0.001, left: screenWidth * 0.1, color: 'white', fontSize: screenWidth * 0.15}}>{selectedCategory}</Text> */}
           <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
             <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
-              {position: 'absolute', left: screenWidth * 0.55, top: screenHeight * 0.1, borderRadius: 12, width: screenWidth * 0.2, height: (screenWidth*0.2)/2,
-                alignItems: 'center', justifyContent: 'center', backgroundColor: '#222'
-              }}>
-                {/* <Text style={{color: 'white', fontSize: screenWidth * 0.05}}>add +</Text> */}
-                <Image source={require('../assets/images/AddButton.png')} style={{width: 100, height: 100}}/>
+              {position: 'absolute', left: screenWidth * 0.45, top: screenHeight * 0.05, width: 100, height: 100}}>
+                <Image source={require('../assets/images/AddButton.png')} style={{width: 150, height: 150}}/>
             </TouchableOpacity>
-            <View style={{top: screenHeight * 0.2}}>
+            <View style={{top: screenHeight * 0.2, left: screenWidth*0.05}}>
             <FlatList
               data={getGoalByCategory(selectedCategory)}
               keyExtractor={(item) => item.id}
@@ -359,7 +356,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                     </Pressable>
                   </View>
                 </View>
-              <View style={styles.modalButtons}>
                 <Pressable onPress={() => handleConfirm()} style={({pressed}) => [{backgroundColor: 'rgba(73, 152, 237, 1)', 
                   width: screenWidth * 0.24, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5}, 
                   pressed && styles.buttonPressed]}>
@@ -367,7 +363,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                 </Pressable>
               </View>
             </View>
-          </View>
         </Modal>
     </View>
   );
@@ -500,7 +495,7 @@ const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015 },
   input: { backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02, fontSize: screenHeight*0.02 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, width: '90%', height: '50%' },
+  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, marginBottom: screenHeight*0.2, marginHorizontal: screenWidth*0.05, marginTop: screenHeight*0.15 },
   modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, fontWeight: 'bold' },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },

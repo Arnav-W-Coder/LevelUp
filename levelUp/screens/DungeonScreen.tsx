@@ -1,4 +1,4 @@
-import React, { useState, useEffect } from 'react';
+import React, { useState, useEffect, useMemo, useCallback } from 'react';
 import { View, Text, StyleSheet, Button, Image, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { useXP } from '../context/XPContext';
@@ -8,6 +8,8 @@ import CurrentLevel from '../utils/currentLevel';
 import TopImage from '../utils/topImage';
 import NextLevel from '../utils/nextLevel';
 import CompletedLevel from '../utils/completedLevel';
+import {Portal} from 'react-native-paper'
+
 
 type Props = {
   goToHome: () => void;
@@ -28,6 +30,9 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }:Props) {
   const { xp, level, dungeonLevel, changeDungeon } = useXP();
   const [dungeonLevels, setDungeonLevels] = useState<dungeon[]>([]);
+  const nextBadge = useImage(require("../assets/images/NextLevel.png"));
+  const currBadge = useImage(require("../assets/images/CurrentLevel.png"));
+  const doneBadge = useImage(require("../assets/images/CompletedLevel.png"));
 
   useEffect(() => {
     const loadProgress = async () => {
@@ -72,6 +77,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
   }
 
   const renderLevels = (level: dungeon) => {
+
     const verticalSpacing = screenHeight * 0.12;
     const topOffset = screenHeight * 0.1 + verticalSpacing * level.id;
 
@@ -84,18 +90,15 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 
     if(level.id === dungeonLevel + 1){ 
       return <TouchableOpacity onPress={advanceDungeon} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}>
-        <Text style={{color:'white', fontSize: 20}}>{level.id}</Text>
-          <NextLevel topOffset={-10} leftOffset={-10} />
+          <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>
         </TouchableOpacity>
     }else if(level.id < dungeonLevel){
       return <View style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
-      <Text style={{color:'white', fontSize: 20}}>{level.id}</Text>
-        <CompletedLevel topOffset={-10} leftOffset={-10} /> 
+        <CompletedLevel topOffset={-10} leftOffset={-10} image={doneBadge} /> 
         </View>
     }else{
       return <View style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
-      <Text style={{color:'white', fontSize: 20}}>{level.id}</Text>
-      {level.id === dungeonLevel ? <CurrentLevel topOffset={20} leftOffset={20} /> : <NextLevel topOffset={-10} leftOffset={-10} />}
+      {level.id === dungeonLevel ? <CurrentLevel topOffset={20} leftOffset={20} image={currBadge}/> : <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>}
         </View>
     }
   }
@@ -103,8 +106,8 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
   return (
     <View style={styles.container}>
       <ScrollView contentContainerStyle={styles.scrollContent}>
-        <Button title="Reset Dungeon" onPress={() => changeDungeon(0)}/>
         <TopImage topOffset={20} leftOffset={0} />
+        <Button title="Reset Dungeon" onPress={() => changeDungeon(0)}/>
         <Text style={styles.title}>Dungeon Level {dungeonLevel}</Text>
 
         <Text style={styles.levelInfo}>
@@ -127,7 +130,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 }
 
 const styles = StyleSheet.create({
-  container: { flex: 1, padding: 20, backgroundColor: 'rgb(13, 17, 23)', alignItems: 'center', height: screenHeight * 3, width: screenWidth},
+  container: { flex: 1, backgroundColor: 'rgb(13, 17, 23)', alignItems: 'center', height: screenHeight * 3, width: screenWidth},
   title: { fontSize: 28, color: '#fff', marginBottom: 20 },
   image: { width: 150, height: 150, marginBottom: 20 },
   levelInfo: { fontSize: 16, color: '#aaa' },
@@ -141,6 +144,9 @@ const styles = StyleSheet.create({
     borderRadius: screenHeight * 0.05,        
   },
   scrollContent: {
+    width: screenWidth,
+    paddingTop: screenHeight * 0.4,
     alignItems: 'center',
+    alignSelf: 'stretch'
   },
 });

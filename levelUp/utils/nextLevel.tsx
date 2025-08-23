@@ -1,16 +1,16 @@
 import React from "react";
 import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { Canvas, Image as SkiaImage, useImage, Fit, FilterMode, MipmapMode } from "@shopify/react-native-skia";
+import { Canvas, Image as SkiaImage, useImage, Fit, FilterMode, MipmapMode, SkImage } from "@shopify/react-native-skia";
 
 type LevelProps = {
   topOffset: number;
   leftOffset: number;
+  image: SkImage | null;
 };
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-export default function NextLevel({ topOffset, leftOffset }: LevelProps) {
-  const image = useImage(require("../assets/images/NextLevel.png"));
+function NextLevelBase({ topOffset, leftOffset, image }: LevelProps){
 
   return (
     <View
@@ -36,6 +36,9 @@ export default function NextLevel({ topOffset, leftOffset }: LevelProps) {
     </View>
   );
 }
+
+const NextLevel = React.memo(NextLevelBase);
+export default NextLevel;
 
 const styles = StyleSheet.create({
   level: {

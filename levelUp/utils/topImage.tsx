@@ -14,15 +14,15 @@ export default function TopImage({ topOffset, leftOffset }: LevelProps) {
 
   return (
     <View
-      style={{width: screenWidth, height: screenHeight * 0.3}}
+      style={{position: 'absolute', top: screenHeight*0.05, width: screenWidth, height: screenHeight * 0.3}}
     >
-        <Canvas style={{flex: 1, margin: 0, padding: 0}}>
+        <Canvas style={{width: screenWidth, height: screenHeight*0.3}}>
           <SkiaImage
             image={image}
-            x={0}
+            x={-30}
             y={0}
-            width={1536 * 0.25}
-            height={1024 * 0.25}
+            width={1536 * 0.3}
+            height={1024 * 0.3}
             sampling={{ filter: FilterMode.Nearest, mipmap: MipmapMode.Nearest }}
           />
         </Canvas>

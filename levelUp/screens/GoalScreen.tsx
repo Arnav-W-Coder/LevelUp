@@ -148,11 +148,9 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         animationType="fade"
         onRequestClose={resetGoalsModal}
       >
-        <View style={{position: 'absolute', top: 10, right: 10, zIndex: 1, padding: 10,}}>
-        </View>
         {/* Fullscreen container */}
         <View style={{height: screenHeight - (screenHeight*0.11)}}>
-          <BlurView intensity={70} tint={'dark'} style={StyleSheet.absoluteFill} />
+          <BlurView intensity={80} tint={'dark'} style={StyleSheet.absoluteFill} />
   
           {/* Background pressable (closes modal) */}
           <Pressable
@@ -163,7 +161,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
           <Portal.Host>
           {/* Foreground content (ignores background press) */}
           <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
-            <View style={{top: screenHeight * 0.2}}>
+            <View style={{top: screenHeight * 0.2, left: screenWidth*0.05}}>
             <FlatList
               data={getGoalsByCategory(selectedCategory)}
               keyExtractor={(item) => item.id}

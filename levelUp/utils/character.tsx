@@ -18,7 +18,7 @@ export default function CharacterImage({ topOffset, leftOffset }: LevelProps) {
   // Decide which asset to load
   const spriteSource = useMemo(() => {
     if (dungeonLevel <= 25) {
-      return require("../assets/images/testGif.png");
+      return require("../assets/images/StageOneCharacter.png");
     } else if (dungeonLevel <= 50) {
       return require("../assets/images/StageTwoCharacter.png");
     } else {
@@ -30,12 +30,12 @@ export default function CharacterImage({ topOffset, leftOffset }: LevelProps) {
   const spriteSheet = useImage(spriteSource);
 
   // Animate frame every 200ms (5 fps)
-  useEffect(() => {
-    const interval = setInterval(() => {
-      setCurrentFrame((prev) => (prev + 1) % frameCount);
-    }, 100);
-    return () => clearInterval(interval);
-  }, []);
+  // useEffect(() => {
+  //   const interval = setInterval(() => {
+  //     setCurrentFrame((prev) => (prev + 1) % frameCount);
+  //   }, 100);
+  //   return () => clearInterval(interval);
+  // }, []);
 
   if (!spriteSheet) return null;
 
@@ -43,19 +43,19 @@ export default function CharacterImage({ topOffset, leftOffset }: LevelProps) {
   const frameHeight = spriteSheet.height();
 
   return (
-    <Canvas style={{flex: 1}}>
+    <Canvas style={{flex: 1, borderRadius:12}}>
         <SkiaImage
           image={spriteSheet}
-          x={0}
-          y={0}
-          width={frameWidth * 2} // scale here
-          height={frameHeight * 2}
-          rect={{
-            x: currentFrame * frameWidth,
-            y: 0,
-            width: frameWidth,
-            height: frameHeight,
-          }}
+          x={-50}
+          y={-200}
+          width={frameWidth * 0.5} // scale here
+          height={frameHeight * 0.5}
+          // rect={{
+          //   x: currentFrame * frameWidth,
+          //   y: 0,
+          //   width: frameWidth,
+          //   height: frameHeight,
+          // }}
         />
     </Canvas>
   );

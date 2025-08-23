@@ -22,9 +22,9 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       {/* <Image source={require('../assets/images/testCharacter.png')} style={styles.characterImage} /> */}
       
       
-      <View style={styles.streak}>
-        <Text style={{width: '100%', height: '100%', color: 'rgb(255, 255, 255)'}}>Streak {streak}</Text>
-      </View>
+      {streak !== 0 && <View style={styles.streak}>
+        <Text style={styles.streakText}>Streak {streak} 🔥</Text>
+      </View>}
 
       {/* Left XP Bars */}
       <View style={[styles.xpBar, styles.xpLeft1]}>
@@ -55,7 +55,6 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
         <View style={{ position: 'absolute', top: screenHeight * 0.05, left: screenWidth * (0.5 - (0.35/2)), width: screenWidth * 0.35, height: screenHeight * 0.4, backgroundColor: 'white', borderRadius: 12}}>
             <CharacterImage topOffset={0} leftOffset={0}/>
         </View>
-            <View style={{ position: 'absolute', top: screenHeight * 0.04, left: screenWidth * (0.5 - (0.38/2)), width: screenWidth * 0.38, height: screenHeight * 0.45, borderRadius: 12, borderWidth: 10, borderColor: 'rgb(28, 28, 28)'}}/>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Character"}/>
     </View>
 
@@ -74,7 +73,7 @@ const styles = StyleSheet.create({
   },
   screen: {
     flex: 1,
-    backgroundColor: 'rgb(28, 28, 28)',
+    backgroundColor: 'rgb(13, 17, 23)',
   },
   xpBar: {
     position: 'absolute',
@@ -124,14 +123,19 @@ const styles = StyleSheet.create({
 
   streak: {
     position: 'absolute',
-    top: screenHeight * 0.15, 
-    left: screenWidth * 0.75,
-    width: screenWidth * 0.2,
-    height: screenWidth * 0.1,
-    backgroundColor: 'black',
+    top: screenHeight * 0.8, 
+    left: screenWidth * 0.5 - (screenWidth*0.25/2),
+    width: screenWidth * 0.3,
+    height: screenWidth * 0.15,
+    backgroundColor: 'rgba(25, 33, 59, 1)',
     alignItems: 'center',
     justifyContent: 'center',
     borderRadius: 12
+  },
+  streakText: {
+    fontSize: 20,
+    fontWeight: '300',
+    color: '#F5F5F5'
   }
 });
 
