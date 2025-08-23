@@ -26,11 +26,11 @@ Instead of just checking off tasks, you’ll earn XP, level up, and track progre
 
 🔄 How It Works
 flowchart TD
-    A[Plan Goals 📝] --> B[Complete Tasks ✅]
-    B --> C[Earn XP ⭐]
-    C --> D[Level Up ⬆️]
-    D --> E[Visualize Growth 📊]
-    E --> F[Stay Motivated 🚀]
+    [Plan Goals 📝] --> [Complete Tasks ✅]
+     --> [Earn XP ⭐]
+     --> [Level Up ⬆️]
+     --> [Visualize Growth 📊]
+     --> [Stay Motivated 🚀]
 
 🛠️ Tech Stack
 
@@ -45,8 +45,7 @@ Storage: AsyncStorage (for persisting goals & XP)
 🚀 Getting Started
 Prerequisites
 
-Node.js
- >= 18
+Node.js >= 18
 
 Expo CLI
 
