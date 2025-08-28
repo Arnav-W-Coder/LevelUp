@@ -11,7 +11,10 @@
     "ios": {
       "bundleIdentifier": "com.arnav.levelup",
       "buildNumber": "1",
-      "supportsTablet": true
+      "supportsTablet": true,
+      "infoPlist": {
+        "ITSAppUsesNonExemptEncryption": false
+      }
     },
     "android": {
       "package": "com.arnav.levelup",
@@ -41,6 +44,12 @@
     ],
     "experiments": {
       "typedRoutes": true
+    },
+    "extra": {
+      "router": {},
+      "eas": {
+        "projectId": "8856df9f-fcea-4dac-a2e2-b61c0100ee03"
+      }
     }
   }
 }
