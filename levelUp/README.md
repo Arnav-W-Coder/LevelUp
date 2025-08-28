@@ -1,50 +1,80 @@
-# Welcome to your Expo app 👋
+# 🌟 **LevelUp** – Turn Your Self-Growth Into a Game 🎮
 
-This is an [Expo](https://expo.dev) project created with [`create-expo-app`](https://www.npmjs.com/package/create-expo-app).
+# 📖 Overview
 
-## Get started
+LevelUp is a gamified self-improvement app that makes personal growth fun, visual, and rewarding.
+Instead of just checking off tasks, you’ll earn XP, level up, and track progress in the four core areas of life:
 
-1. Install dependencies
+🧠 Mind (Mental Growth)
 
-   ```bash
-   npm install
-   ```
+💪 Body (Physical Health)
 
-2. Start the app
+🌱 Spirit (Spiritual Balance)
 
-   ```bash
-   npx expo start
-   ```
+🤝 Accountability (Consistency & Responsibility)
 
-In the output, you'll find options to open the app in a
+✨ Features
 
-- [development build](https://docs.expo.dev/develop/development-builds/introduction/)
-- [Android emulator](https://docs.expo.dev/workflow/android-studio-emulator/)
-- [iOS simulator](https://docs.expo.dev/workflow/ios-simulator/)
-- [Expo Go](https://expo.dev/go), a limited sandbox for trying out app development with Expo
+🎯 Daily & Tomorrow Goals – Plan and track goals for today and tomorrow
 
-You can start developing by editing the files inside the **app** directory. This project uses [file-based routing](https://docs.expo.dev/router/introduction).
+✅ Goal Completion System – Check off goals to earn XP
 
-## Get a fresh project
+📈 XP & Level Progression – Visualize your growth across categories
 
-When you're ready, run:
+🎮 Gamified Experience – Level-up mechanics keep motivation high
 
-```bash
-npm run reset-project
-```
+📱 Cross-Platform – Built with React Native & Expo
 
-This command will move the starter code to the **app-example** directory and create a blank **app** directory where you can start developing.
+# 🔄 How It Works
+flowchart TD
+    [Plan Goals 📝] --> [Complete Tasks ✅]
+     --> [Earn XP ⭐]
+     --> [Level Up ⬆️]
+     --> [Visualize Growth 📊]
+     --> [Stay Motivated 🚀]
 
-## Learn more
+# 🛠️ Tech Stack
 
-To learn more about developing your project with Expo, look at the following resources:
+Language: TypeScript
 
-- [Expo documentation](https://docs.expo.dev/): Learn fundamentals, or go into advanced topics with our [guides](https://docs.expo.dev/guides).
-- [Learn Expo tutorial](https://docs.expo.dev/tutorial/introduction/): Follow a step-by-step tutorial where you'll create a project that runs on Android, iOS, and the web.
+Framework: React & React Native
 
-## Join the community
+Runtime: Expo
 
-Join our community of developers creating universal apps.
+Storage: AsyncStorage (for persisting goals & XP)
 
-- [Expo on GitHub](https://github.com/expo/expo): View our open source platform and contribute.
-- [Discord community](https://chat.expo.dev): Chat with Expo users and ask questions.
+🚀 Getting Started
+Prerequisites
+
+Node.js >= 18
+
+Expo CLI
+
+# Installation
+### Clone the repository
+git clone https://github.com/Arnav-W-Coder/LevelUp.git
+
+### Navigate into the project folder
+cd LevelUp
+
+### Install dependencies
+npm install
+
+Run the App
+### Start the Expo development server
+npx expo start
+
+
+Use the Expo Go app on iOS/Android to preview instantly.
+
+# 📌 Roadmap
+
+ Add streaks & rewards for consistent habits
+
+ Pixel-style dungeon progression visuals
+
+
+# 🤝 Contributing
+
+Contributions, ideas, and feedback are welcome!
+Open an issue or submit a pull request to help improve LevelUp.
