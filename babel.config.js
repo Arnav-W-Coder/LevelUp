@@ -13,7 +13,7 @@ module.exports = function (api) {
         alias: { '@': './' },
         extensions: ['.tsx', '.ts', '.js', '.jsx', '.json'],
       }],
-      'expo-router/babel',
+
       // Reanimated must remain LAST
       'react-native-reanimated/plugin',
     ],
