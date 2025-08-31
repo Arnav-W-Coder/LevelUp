@@ -98,7 +98,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
             <NextLevel topOffset={-12} leftOffset={-12} image={nextBadge}/>
           </TouchableOpacity>);
       }else if(level.id < dungeonLevel){
-        items.push( <View key={level.id} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
+        items.push( <View key={level.id} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: 'rgba(255, 255, 255, 1)'}]}>
           <CompletedLevel topOffset={-12} leftOffset={-12} image={doneBadge} /> 
           </View>);
       }else{
