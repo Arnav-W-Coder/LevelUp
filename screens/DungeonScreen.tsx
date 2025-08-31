@@ -95,15 +95,15 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
 
       if(level.id === dungeonLevel + 1){ 
         items.push( <TouchableOpacity key={level.id} onPress={advanceDungeon} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgb(8, 159, 46)': level.id===dungeonLevel? 'rgb(231, 240, 165)' :'rgb(40, 114, 234)'}]}>
-            <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>
+            <NextLevel topOffset={-12} leftOffset={-12} image={nextBadge}/>
           </TouchableOpacity>);
       }else if(level.id < dungeonLevel){
         items.push( <View key={level.id} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
-          <CompletedLevel topOffset={-10} leftOffset={-10} image={doneBadge} /> 
+          <CompletedLevel topOffset={-12} leftOffset={-12} image={doneBadge} /> 
           </View>);
       }else{
         items.push( <View key={level.id} style={[styles.level, {top: topOffset, left: leftOffset, backgroundColor: level.completed? 'rgba(255, 255, 255, 1)': level.id===dungeonLevel? 'rgba(255, 255, 255, 1)' :'rgb(40, 114, 234)'}]}>
-        {level.id === dungeonLevel ? <CurrentLevel topOffset={20} leftOffset={20} image={currBadge}/> : <NextLevel topOffset={-10} leftOffset={-10} image={nextBadge}/>}
+        {level.id === dungeonLevel ? <CurrentLevel topOffset={20} leftOffset={20} image={currBadge}/> : <NextLevel topOffset={-12} leftOffset={-12} image={nextBadge}/>}
           </View>);
       }
     }
