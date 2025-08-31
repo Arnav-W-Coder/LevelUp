@@ -11,7 +11,7 @@
     "ios": {
       "bundleIdentifier": "com.arnav.levelup",
       "buildNumber": "9",
-      "supportsTablet": true,
+      "supportsTablet": false,
       "infoPlist": {
         "ITSAppUsesNonExemptEncryption": false
       }
