@@ -1,19 +1,14 @@
 // screens/HomeScreen.tsx
-import React, { useRef, useMemo, useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useXP } from '../context/XPContext';
-import { useFocusEffect } from 'expo-router';
-import { getToday, getYesterday } from '../utils/Date';
-import Menu from '../utils/menu';
-import { BottomSheetModal, useBottomSheetModal } from '@gorhom/bottom-sheet';
 import { BlurView } from 'expo-blur';
-import CustomBottomSheetModal from '../utils/bottomScreenModal';
+import React, { useEffect, useState } from 'react';
+import { Animated, Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Portal } from 'react-native-paper';
+import { useXP } from '../context/XPContext';
 import GoalDropdown from '../utils/goalsAccordian';
-import {Portal} from 'react-native-paper'
-import TopImage from '../utils/homeTopImage'
-import { Canvas, Image as SkiaImage, useImage, Fit, FilterMode, MipmapMode } from "@shopify/react-native-skia";
-import SaveButton from '../utils/saveButton'
+import TopImage from '../utils/homeTopImage';
+import Menu from '../utils/menu';
+import SaveButton from '../utils/saveButton';
 
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -274,7 +269,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
 
   const renderModal = () => (
     <View>
-      <Modal visible={modalVisible} transparent animationType="fade" onRequestClose={() => resetModal}>
+      <Modal visible={modalVisible} transparent animationType="fade" presentationStyle="overFullScreen" onRequestClose={resetModal}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalBox}>
               <Text style={styles.modalTitle}>Add a Goal</Text>
@@ -373,8 +368,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
               {
                 width: boxWidth,
                 height: boxHeight,
-                marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing : 0,
-                marginBottom: boxSpacing,
+                marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing/2 : 0,
+                marginBottom: boxSpacing/2,
               },
             ]}>
       {title==="Mind" ? <Image source={require('../assets/images/MindButton2.png')} style={styles.categoryImage} />
@@ -382,7 +377,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         : title==="Spirit" ? <Image source={require('../assets/images/SpiritButton.png')} style={styles.categoryImage} />
         : <Image source={require('../assets/images/AccountabilityButton.png')} style={styles.categoryImage} />
       } 
-      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.02}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
+      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.015}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
     </Pressable>
   );
 
@@ -408,8 +403,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         {renderCategoryBox('Spirit')}
         {renderCategoryBox('Accountability')}
         {renderModal()}
-        {goalsModal()}
       </View>
+      {goalsModal()}
       <Pressable onPress={() => changeTodayMode(!todayMode)} style={({pressed}) => [styles.todayButton, pressed && styles.buttonPressed]}>
         {/* <Image source={require('../assets/images/TodayButton.png')} style={styles.todayImage}/> */}
         {!todayMode? <Text style={{position: 'absolute', color: 'white'}}>Today</Text>: <Text style={{position: 'absolute', color: 'white'}}>Tomorrow</Text>}
@@ -456,12 +451,12 @@ const styles = StyleSheet.create({
     flexDirection: 'row',
     flexWrap: 'wrap',
     justifyContent: 'center',
-    paddingHorizontal: screenWidth * 0.1, // Matches sideMargin
-    paddingBottom: screenHeight * 0.2,
+    paddingHorizontal: screenWidth * 0.01, // Matches sideMargin
+    paddingBottom: screenHeight * 0.1,
     paddingTop: screenHeight * 0.15
   },
   box: {
-    backgroundColor: '#222',
+    //backgroundColor: '#222',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -494,8 +489,8 @@ const styles = StyleSheet.create({
   xpBarFill: { height: '100%', backgroundColor: '#0f0', borderRadius: 10 },
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015 },
   input: { backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02, fontSize: screenHeight*0.02 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center' },
-  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.05, borderRadius: 10, marginBottom: screenHeight*0.2, marginHorizontal: screenWidth*0.05, marginTop: screenHeight*0.15 },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: screenWidth * 0.05, paddingVertical: screenHeight * 0.05},
+  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.02, borderRadius: 10, maxWidth: screenWidth * 0.9, maxHeight: screenHeight * 0.8},
   modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, fontWeight: 'bold' },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },
@@ -504,8 +499,8 @@ const styles = StyleSheet.create({
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
   buttonPressed: {transform: [{ scale: 0.9 }]},
   categoryImage: {
-    width: 170,
-    height: 100,
+    width: 170 * (0.7),
+    height: 100 * (0.7),
     //resizeMode: 'cover'
   },
   todayImage: {

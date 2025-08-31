@@ -1,6 +1,6 @@
+import { Canvas, FilterMode, MipmapMode, Image as SkiaImage, SkImage } from "@shopify/react-native-skia";
 import React from "react";
-import { View, Text, StyleSheet, Dimensions } from "react-native";
-import { Canvas, Image as SkiaImage, useImage, Fit, FilterMode, MipmapMode, SkImage } from "@shopify/react-native-skia";
+import { Dimensions, StyleSheet, View } from "react-native";
 
 type LevelProps = {
   topOffset: number;

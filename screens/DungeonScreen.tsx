@@ -1,14 +1,13 @@
-import React, { useState, useEffect, useMemo, useCallback } from 'react';
-import { View, Text, StyleSheet, Button, Image, ScrollView, Dimensions, TouchableOpacity } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import { useImage } from "@shopify/react-native-skia";
+import React, { useEffect, useMemo, useState } from 'react';
+import { Dimensions, ScrollView, StyleSheet, Text, TouchableOpacity, View } from 'react-native';
 import { useXP } from '../context/XPContext';
-import Menu from '../utils/menu'
-import { Canvas, Image as SkiaImage, useImage, Paint, Fit, FilterMode } from "@shopify/react-native-skia";
-import CurrentLevel from '../utils/currentLevel';
-import TopImage from '../utils/topImage';
-import NextLevel from '../utils/nextLevel';
 import CompletedLevel from '../utils/completedLevel';
-import {Portal} from 'react-native-paper'
+import CurrentLevel from '../utils/currentLevel';
+import Menu from '../utils/menu';
+import NextLevel from '../utils/nextLevel';
+import TopImage from '../utils/topImage';
 
 
 type Props = {
@@ -143,8 +142,8 @@ const styles = StyleSheet.create({
   level: {
     position: 'absolute',
     left: screenWidth * 0.48,
-    width: screenHeight * 0.1,              
-    height: screenHeight * 0.1,             
+    width: screenHeight * 0.085,              
+    height: screenHeight * 0.085,             
     borderRadius: screenHeight * 0.05,        
   },
   scrollContent: {

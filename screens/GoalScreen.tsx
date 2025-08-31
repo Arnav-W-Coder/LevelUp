@@ -1,14 +1,13 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, FlatList, StyleSheet, Button, TouchableOpacity, TextInput, Alert, Animated, Modal, Pressable, Dimensions, ScrollView, Image } from 'react-native';
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { useXP } from '../context/XPContext';
-import { useFocusEffect } from 'expo-router';
-import { getYesterday, getToday } from '../utils/Date';
-import Menu from '../utils/menu'
 import { BlurView } from 'expo-blur';
-import { Portal } from 'react-native-paper'
+import React, { useEffect, useState } from 'react';
+import { Animated, Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, Text, View } from 'react-native';
+import { Portal } from 'react-native-paper';
+import { useXP } from '../context/XPContext';
+import { getToday, getYesterday } from '../utils/Date';
 import GoalDropdown from '../utils/goalsAccordian';
-import TopImage from '../utils/goalTopImage'
+import TopImage from '../utils/goalTopImage';
+import Menu from '../utils/menu';
 
 type Props = {
   goToCharacter: () => void;
@@ -190,8 +189,8 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
               {
                 width: boxWidth,
                 height: boxHeight,
-                marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing : 0,
-                marginBottom: boxSpacing,
+                marginRight: categories.indexOf(title) % 2 === 0 ? boxSpacing/2 : 0,
+                marginBottom: boxSpacing/2,
               }, pressed && styles.buttonPressed
             ]}>
       {title==="Mind" ? <Image source={require('../assets/images/MindButton2.png')} style={styles.categoryImage} />
@@ -199,7 +198,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
               : title==="Spirit" ? <Image source={require('../assets/images/SpiritButton.png')} style={styles.categoryImage} />
               : <Image source={require('../assets/images/AccountabilityButton.png')} style={styles.categoryImage} />
             } 
-      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.02}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
+      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.015}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
     </Pressable>
   );
 
@@ -268,7 +267,7 @@ const styles = StyleSheet.create({
     paddingTop: screenHeight * 0.05
   },
   box: {
-    backgroundColor: '#222',
+    //backgroundColor: '#222',
     borderRadius: 12,
     justifyContent: 'center',
     alignItems: 'center',
@@ -278,7 +277,7 @@ const styles = StyleSheet.create({
     fontSize: 13,
     fontWeight: '400',
   },
-  categoryTitle: { position: 'absolute', fontSize: screenHeight * 0.03, fontWeight: '500', color: '#000000ff', marginBottom: screenHeight * 0.01 },
+  categoryTitle: { position: 'absolute', fontSize: screenHeight * 0.03, fontWeight: '500', color: 'black' },
   goalText: {
     color: '#fff',
     fontSize: 16,
@@ -300,8 +299,8 @@ const styles = StyleSheet.create({
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
   buttonPressed: {transform: [{ scale: 0.9 }],},
   categoryImage: {
-    width: 170,
-    height: 100,
+    width: 170 * 0.7,
+    height: 100 * 0.7,
     //resizeMode: 'cover'
   },
 });
