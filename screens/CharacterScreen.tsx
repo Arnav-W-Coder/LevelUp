@@ -1,9 +1,8 @@
-import React, { useState, useEffect } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Pressable, Button, Image, Dimensions } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import CharacterImage from '@/utils/character';
+import React from 'react';
+import { Dimensions, StyleSheet, Text, View } from 'react-native';
 import { useXP } from '../context/XPContext';
 import Menu from '../utils/menu';
-import CharacterImage from '@/utils/character';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -36,14 +35,14 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       <View style={[styles.xpBar, styles.xpLeft2]}>
         <View style={[styles.xpBarFill, { width: `${(xp[1] / (10 + 2 * Math.pow(level[1] - 1, 2))) * 100}%` }]}/>
       </View>
-      <Text style={[styles.label, styles.labelSpirit]}>Spirit</Text>
+      <Text style={[styles.label, styles.labelSpirit]}>Body</Text>
       <Text style={[styles.label, styles.labelSpiritLevel]}>{level[1]}</Text>
 
       {/* Right XP Bars */}
       <View style={[styles.xpBar, styles.xpRight1]}>
         <View style={[styles.xpBarFill, { width: `${(xp[2] / (10 + 2 * Math.pow(level[2] - 1, 2))) * 100}%` }]}/>
       </View>
-      <Text style={[styles.label, styles.labelBody]}>Body</Text>
+      <Text style={[styles.label, styles.labelBody]}>Spirit</Text>
       <Text style={[styles.label, styles.labelBodyLevel]}>{level[2]}</Text>
 
       <View style={[styles.xpBar, styles.xpRight2]}> 
@@ -72,7 +71,7 @@ const styles = StyleSheet.create({
   xpBarFill: {
     height: '100%',
     backgroundColor: '#0f0',
-    borderRadius: 10,
+    borderRadius: 4,
   },
   screen: {
     flex: 1,
