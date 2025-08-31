@@ -189,11 +189,15 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   };
 
   const activateModal = (title: string) => {
-    setModalVisible(true);
     if(title === 'Mind'){setDefaultTemplates(defaultGoals[0])}
     if(title === 'Body'){setDefaultTemplates(defaultGoals[1])}
     if(title === 'Spirit'){setDefaultTemplates(defaultGoals[2])}
     if(title === 'Accountability'){setDefaultTemplates(defaultGoals[3])}
+    // 1) close the first modal
+    setGoalsVisible(false);
+
+    // 2) open the second modal on next frame so they don't overlap
+    requestAnimationFrame(() => setModalVisible(true));
   }
 
   const activateGoals = (title: string) => {
@@ -213,6 +217,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
 
   const resetModal = () => {
     setModalVisible(false);
+    requestAnimationFrame(() => setGoalsVisible(true));
     setCustomTitle('');
     setCustomAM('');
     setCustomPM("");
@@ -402,8 +407,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         {renderCategoryBox('Body')}
         {renderCategoryBox('Spirit')}
         {renderCategoryBox('Accountability')}
-        {renderModal()}
       </View>
+      {renderModal()}
       {goalsModal()}
       <Pressable onPress={() => changeTodayMode(!todayMode)} style={({pressed}) => [styles.todayButton, pressed && styles.buttonPressed]}>
         {/* <Image source={require('../assets/images/TodayButton.png')} style={styles.todayImage}/> */}
@@ -499,8 +504,8 @@ const styles = StyleSheet.create({
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
   buttonPressed: {transform: [{ scale: 0.9 }]},
   categoryImage: {
-    width: 170 * (0.7),
-    height: 100 * (0.7),
+    width: 170 * (0.8),
+    height: 100 * (0.8),
     //resizeMode: 'cover'
   },
   todayImage: {

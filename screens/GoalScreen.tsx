@@ -299,8 +299,8 @@ const styles = StyleSheet.create({
   modalButtons: { flexDirection: 'row', justifyContent: 'space-between', marginTop: screenHeight * 0.02 },
   buttonPressed: {transform: [{ scale: 0.9 }],},
   categoryImage: {
-    width: 170 * 0.7,
-    height: 100 * 0.7,
+    width: 170 * 0.8,
+    height: 100 * 0.8,
     //resizeMode: 'cover'
   },
 });
