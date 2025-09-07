@@ -228,6 +228,16 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     setSelectedTemplate('');
   }
 
+  const renderEmptyScreen = () => {
+    <View>
+      <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/HomeEmptyScreen.png')}/> 
+          <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
+            {position: 'absolute', left: screenWidth * 0.55, top: screenHeight * 0.05, width: 100, height: 100}}>
+        <Image source={require('../assets/images/AddButton.png')} style={{width: 200, height: 200}}/>
+      </TouchableOpacity>
+    </View>
+  };
+
   const goalsModal = () => ( 
     <Modal
       visible={goalsVisible}
@@ -236,7 +246,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       onRequestClose={resetGoalsModal}
     >
       {/* Fullscreen container */}
-      <View style={{height: screenHeight - (screenHeight*0.11)}}>
+      <View style={{height: screenHeight}}>
         <BlurView intensity={80} tint={'dark'} style={StyleSheet.absoluteFill} />
 
         {/* Background pressable (closes modal) */}
@@ -244,18 +254,15 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
           style={StyleSheet.absoluteFill}
           onPress={resetGoalsModal}
         />
+        { getGoalByCategory(selectedCategory).length === 0 ? 
+          <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/HomeEmptyScreen.png')}/> 
+          :
+        <View></View>}
+            
         <Portal.Host>
           {/* Foreground content (ignores background press) */}
           {/* <Text style={{top: screenHeight * 0.001, left: screenWidth * 0.1, color: 'white', fontSize: screenWidth * 0.15}}>{selectedCategory}</Text> */}
-          {getGoalByCategory(selectedCategory).length === 0 ? 
-          <View>
-          <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/HomeEmptyScreen.png')}/> 
-          <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
-              {position: 'absolute', left: screenWidth * 0.55, top: screenHeight * 0.05, width: 100, height: 100}}>
-                <Image source={require('../assets/images/AddButton.png')} style={{width: 200, height: 200}}/>
-            </TouchableOpacity>
-            </View>
-          : <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
+           <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
             <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
               {position: 'absolute', left: screenWidth * 0.4, top: screenHeight * 0.01, width: 100, height: 100}}>
                 <Image source={require('../assets/images/AddButton.png')} style={{width: 200, height: 200}}/>
@@ -277,7 +284,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
               contentContainerStyle={{overflow: 'visible'}} 
             />
             </View>
-          </View>}
+          </View>
         </Portal.Host>
       </View>
     </Modal>

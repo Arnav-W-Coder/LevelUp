@@ -148,7 +148,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         onRequestClose={resetGoalsModal}
       >
         {/* Fullscreen container */}
-        <View style={{height: screenHeight - (screenHeight*0.11)}}>
+        <View style={{height: screenHeight}}>
           <BlurView intensity={80} tint={'dark'} style={StyleSheet.absoluteFill} />
   
           {/* Background pressable (closes modal) */}
@@ -156,12 +156,16 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
             style={StyleSheet.absoluteFill}
             onPress={resetGoalsModal}
           />
+
+          { getGoalsByCategory(selectedCategory).length === 0 ? 
+                    <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/GoalsReturnScreen.png')}/> 
+                    :
+                  <View></View>}
   
           <Portal.Host>
           {/* Foreground content (ignores background press) */}
-          { getGoalsByCategory(selectedCategory).length === 0 ? 
-          <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (120), overflow: 'visible', height: 120, width: 240}} source={require('../assets/images/GoalsReturnScreen.png')}/> 
-          : <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
+           
+           <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
             <View style={{top: screenHeight * 0.2, left: screenWidth*0.05}}>
             <FlatList
               data={getGoalsByCategory(selectedCategory)}
@@ -179,7 +183,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
               contentContainerStyle={{overflow: 'visible'}} 
             />
             </View>
-          </View>}
+          </View>
         </Portal.Host>
         </View>
       </Modal>
@@ -224,8 +228,8 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         {renderCategoryBox('Body')}
         {renderCategoryBox('Spirit')}
         {renderCategoryBox('Accountability')}
-        {goalsModal()}
       </View>
+      {goalsModal()}
       {tomorrowSaved ? <Image style={{position: 'absolute', top: screenHeight*0.8, left: screenWidth*0.5 - (100), width: 200, height: 100}} source={require('../assets/images/SavedTomorrow.png')}/>
       : <View></View>
       }
