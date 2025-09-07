@@ -1,15 +1,14 @@
-import React, {useRef, useState} from "react";
-import { Portal } from 'react-native-paper';
+import React, { useRef, useState } from "react";
 import {
-  View,
+  Dimensions,
+  Image,
+  StyleSheet,
   Text,
   TouchableOpacity,
   TouchableWithoutFeedback,
-  StyleSheet,
-  Dimensions,
-  LayoutAnimation,
-  Image,
+  View
 } from "react-native";
+import { Portal } from 'react-native-paper';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -74,7 +73,7 @@ return (
         <Portal>
           <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}}>
             {isGoal ? <View><View style={[styles.checkButton, {left: screenWidth*0.72, top: screenHeight*0.765, 
-              width: 80, height: 75, backgroundColor:'#EDEDED'}]}></View><Image source={require('../assets/images/CheckButton.png')} 
+              width: 80, height: 75, backgroundColor:'#edededff'}]}></View><Image source={require('../assets/images/CheckButton.png')} 
               style={styles.checkButton}/></View> : <Image source={require('../assets/images/DeleteButton.png')} style={styles.deleteButton}/>}
           </TouchableOpacity>
         </Portal>

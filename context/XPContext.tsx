@@ -1,6 +1,6 @@
+import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { createContext, useContext, useEffect, useState } from 'react';
 import { Animated } from 'react-native';
-import AsyncStorage from '@react-native-async-storage/async-storage';
 import { getToday, getYesterday } from '../utils/Date';
 
 type XPContextType = {
@@ -11,6 +11,8 @@ type XPContextType = {
   streak: number;
   action: boolean;
   todayMode: boolean;
+  tomorrowSaved: boolean;
+  changeTomorrowSaved: (val: boolean) => void;
   changeTodayMode: (val: boolean) => void;
   changeAction: (val: boolean) => void;
   changeStreak: (amount: number) => void;
@@ -42,6 +44,8 @@ const XPContext = createContext<XPContextType>({
   streak: 0,
   action: false,
   todayMode: false,
+  tomorrowSaved: false,
+  changeTomorrowSaved: () => {},
   changeTodayMode: () => {},
   changeAction: () => {},
   changeStreak: () => {},
@@ -69,6 +73,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [streak, setStreak] = useState(0);
   const [action, setAction] = useState(false);
   const [todayMode, setTodayMode] = useState(false);
+  const [tomorrowSaved, setTomorrowSaved] = useState(false);
   
   useEffect(() => {
     const now = new Date();
@@ -79,6 +84,8 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     const timeout = setTimeout(async () => {
       const today = getToday();
       setCurrentDate(today);
+      setTomorrowSaved(false);
+      await AsyncStorage.setItem('levelup_tomorrowSaved', JSON.stringify(false));
     }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
 
     return () => clearTimeout(timeout);
@@ -95,6 +102,11 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         const storedAction = await AsyncStorage.getItem(ACTION_KEY);
         const lastActionDate = await AsyncStorage.getItem('levelup_lastActiveDate');
         const storedTodayMode = await AsyncStorage.getItem('levelup_todaymode');
+        const storedTomorrowSaved = await AsyncStorage.getItem('levelup_tomorrowSaved');
+        
+        if(storedTomorrowSaved){
+          setTomorrowSaved(Boolean(storedTomorrowSaved));
+        }
 
         if (storedXp) {
           const parsedXp = JSON.parse(storedXp);
@@ -234,8 +246,13 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     await AsyncStorage.setItem('levelup_lastActiveDate', JSON.stringify(getToday()));
   }
 
+  const changeTomorrowSaved = async (val: boolean) => {
+    setTomorrowSaved(val);
+    await AsyncStorage.setItem('levelup_tomorrowSaved', JSON.stringify(val));
+  }
+
   return (
-    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, streak, action, todayMode, changeTodayMode, changeAction, changeStreak, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
+    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, streak, action, todayMode, tomorrowSaved, changeTomorrowSaved, changeTodayMode, changeAction, changeStreak, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
       {children}
     </XPContext.Provider>
   );

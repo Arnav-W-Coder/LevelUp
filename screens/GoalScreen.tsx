@@ -39,7 +39,7 @@ type Goal = {
 };
 
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
-  const { todayMode, savedGoals, addXp, changeGoals, changeStreak, changeYesterdayGoals} = useXP();
+  const { todayMode, savedGoals, addXp, changeGoals, tomorrowSaved, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
   const [goalsVisible, setGoalsVisible] = useState(false);
@@ -159,7 +159,9 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   
           <Portal.Host>
           {/* Foreground content (ignores background press) */}
-          <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
+          { getGoalsByCategory(selectedCategory).length === 0 ? 
+          <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (120), overflow: 'visible', height: 120, width: 240}} source={require('../assets/images/GoalsReturnScreen.png')}/> 
+          : <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
             <View style={{top: screenHeight * 0.2, left: screenWidth*0.05}}>
             <FlatList
               data={getGoalsByCategory(selectedCategory)}
@@ -177,7 +179,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
               contentContainerStyle={{overflow: 'visible'}} 
             />
             </View>
-          </View>
+          </View>}
         </Portal.Host>
         </View>
       </Modal>
@@ -224,6 +226,9 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         {renderCategoryBox('Accountability')}
         {goalsModal()}
       </View>
+      {tomorrowSaved ? <Image style={{position: 'absolute', top: screenHeight*0.8, left: screenWidth*0.5 - (100), width: 200, height: 100}} source={require('../assets/images/SavedTomorrow.png')}/>
+      : <View></View>
+      }
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Goal"}/>
     </View>
   );
