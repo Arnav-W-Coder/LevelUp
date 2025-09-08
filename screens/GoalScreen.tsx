@@ -156,16 +156,18 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
             style={StyleSheet.absoluteFill}
             onPress={resetGoalsModal}
           />
-
-          { getGoalsByCategory(selectedCategory).length === 0 ? 
-                    <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/GoalsReturnScreen.png')}/> 
-                    :
-                  <View></View>}
   
           <Portal.Host>
           {/* Foreground content (ignores background press) */}
            
            <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
+            { getGoalsByCategory(selectedCategory).length === 0 ?
+                        <View style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, left: screenWidth*0.08, height: screenHeight*0.5, width: screenWidth*0.5, overflow: 'visible' }}> 
+                          <Image style={{height: 140, width: 280}} source={require('../assets/images/GoalsReturnScreen.png')}
+                          /> 
+                        </View>
+                      :
+                    <View></View>}
             <View style={{top: screenHeight * 0.2, left: screenWidth*0.05}}>
             <FlatList
               data={getGoalsByCategory(selectedCategory)}

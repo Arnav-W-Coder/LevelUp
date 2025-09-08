@@ -254,10 +254,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
           style={StyleSheet.absoluteFill}
           onPress={resetGoalsModal}
         />
-        { getGoalByCategory(selectedCategory).length === 0 ? 
-          <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/HomeEmptyScreen.png')}/> 
-          :
-        <View></View>}
             
         <Portal.Host>
           {/* Foreground content (ignores background press) */}
@@ -267,6 +263,13 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
               {position: 'absolute', left: screenWidth * 0.4, top: screenHeight * 0.01, width: 100, height: 100}}>
                 <Image source={require('../assets/images/AddButton.png')} style={{width: 200, height: 200}}/>
             </TouchableOpacity>
+            { getGoalByCategory(selectedCategory).length === 0 ?
+            <View style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, left: screenWidth*0.08, height: screenHeight*0.5, width: screenWidth*0.5, overflow: 'visible' }}> 
+              <Image style={{height: 140, width: 280}} source={require('../assets/images/HomeEmptyScreen.png')}
+              /> 
+            </View>
+          :
+        <View></View>}
             <View style={{top: screenHeight * 0.2, left: screenWidth*0.05}}>
             <FlatList
               data={getGoalByCategory(selectedCategory)}
