@@ -1,13 +1,12 @@
-import React from "react";
-import {View, Text, StyleSheet} from "react-native";
-import { Pressable, Dimensions } from "react-native";
 import {
   Canvas,
-  Image as SkiaImage,
-  useImage,
   FilterMode,
   MipmapMode,
+  Image as SkiaImage,
+  useImage,
 } from "@shopify/react-native-skia";
+import React from "react";
+import { Dimensions, Pressable, StyleSheet } from "react-native";
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get("window");
 
@@ -16,7 +15,7 @@ export default function SaveButton({ saveGoals }: { saveGoals: () => void }) {
   const h = 100;
 
   // Load once at top level
-  const btnImg = useImage(require("../assets/images/SaveButton1.png"));
+  const btnImg = useImage(require("../assets/images/SaveButton2.png"));
 
   if (!btnImg) return null; // still loading
 
@@ -26,15 +25,13 @@ export default function SaveButton({ saveGoals }: { saveGoals: () => void }) {
       style={({ pressed }) => [
         {
           position: "absolute",
-          top: screenHeight * 0.4,
-          left: screenWidth * 0.5 - w/2,
+          top: screenHeight * 0.8,
+          left: screenWidth * 0.6
         },
         pressed && styles.buttonPressed,
       ]}
     >
-      <View style={{position: 'absolute', top: 20, left: 50, width: w/2, height: h/2 + 5, backgroundColor: "rgba(45, 155, 240, 1)", alignItems: 'center'}}>
-        <Text style={{color: 'rgba(31, 31, 31, 1)', top: 12, fontSize: 25, fontWeight: '500'}}>Save</Text>
-      </View>
+      
       {/* Give Canvas explicit size */}
       <Canvas style={{ width: w, height: h }}>
         <SkiaImage

@@ -1,8 +1,9 @@
 // screens/HomeScreen.tsx
+import FadeMessage from '@/utils/fadeMessage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
 import React, { useEffect, useState } from 'react';
-import { Animated, Dimensions, FlatList, Image, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, View } from 'react-native';
+import { Animated, Dimensions, FlatList, Image, Keyboard, Modal, Pressable, StyleSheet, Text, TextInput, TouchableOpacity, TouchableWithoutFeedback, View } from 'react-native';
 import { Portal } from 'react-native-paper';
 import { useXP } from '../context/XPContext';
 import GoalDropdown from '../utils/goalsAccordian';
@@ -43,7 +44,7 @@ const GOALS_KEY = 'levelup_goals';
 
 export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHome}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const { todayMode, changeTodayMode, changeTomorrowSaved, changeStreak, addXp, changeGoals } = useXP();
+  const { todayMode, changeTodayMode, changeTomorrowSaved, changeStreak, changeGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
@@ -54,6 +55,8 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const [selectedCategory, setSelectedCategory] = useState("");
   const [ defaultTemplates, setDefaultTemplates] = useState<string[]>([]);
   const [activeGoal, setActiveGoal] = useState<string | null>(null);
+  const [showSaved, setShowSaved] = useState(false);
+
 
   const defaultMGoals = ['Read a Nonfication Book', 'Learn a New Skill', 'Improve in School/College', 'Improve in Job', 'Other'];
   const defaultBGoals = ['Exercise', 'Diet', 'Sports', 'Drink Water', 'Other'];
@@ -107,25 +110,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       return () => clearTimeout(timeout);
   }, []);
 
-  const toggleGoalCompleted = (id: string, place: string) => {
-    setGoals((prevGoals) =>
-      prevGoals.map((goal) => {
-        if (goal.id === id) {
-          const toggled = !goal.isCompleted
-          const updatedGoal = { ...goal, isCompleted: toggled };
-          if (toggled){
-            if(place === "Mind"){addXp(50, 0)}
-            if(place === "Body"){addXp(50, 1)}
-            if(place === "Spirit"){addXp(50, 2)}
-            if(place === "Accountability"){addXp(50, 3)}
-          } 
-          return updatedGoal;
-        }
-        return goal;
-      })
-    );
-  };
-
   const generateId = () => {
     return `${Date.now()}-${Math.floor(Math.random() * 1000000)}`;
   };
@@ -155,6 +139,10 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   }
 
   const saveGoals = () => {
+    // your save logic here...
+    setShowSaved(true);
+    // auto-hide after animation ends
+    setTimeout(() => setShowSaved(false), 1800);
     changeGoals(goals);
     if(!todayMode){
       changeTomorrowSaved(true);
@@ -197,10 +185,10 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     if(title === 'Spirit'){setDefaultTemplates(defaultGoals[2])}
     if(title === 'Accountability'){setDefaultTemplates(defaultGoals[3])}
     // 1) close the first modal
-    setGoalsVisible(false);
+    //setGoalsVisible(false);
 
-    // 2) open the second modal on next frame so they don't overlap
-    requestAnimationFrame(() => setModalVisible(true));
+    // 2) open the second modal
+    setModalVisible(true);
   }
 
   const activateGoals = (title: string) => {
@@ -227,16 +215,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     setTime("");
     setSelectedTemplate('');
   }
-
-  const renderEmptyScreen = () => {
-    <View>
-      <Image style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, right: screenWidth*0.5 - (140), overflow: 'visible', height: 140, width: 280}} source={require('../assets/images/HomeEmptyScreen.png')}/> 
-          <TouchableOpacity onPress={() => activateModal(selectedCategory)} style={
-            {position: 'absolute', left: screenWidth * 0.55, top: screenHeight * 0.05, width: 100, height: 100}}>
-        <Image source={require('../assets/images/AddButton.png')} style={{width: 200, height: 200}}/>
-      </TouchableOpacity>
-    </View>
-  };
 
   const goalsModal = () => ( 
     <Modal
@@ -296,6 +274,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
   const renderModal = () => (
     <View>
       <Modal visible={modalVisible} transparent animationType="fade" presentationStyle="overFullScreen" onRequestClose={resetModal}>
+        <TouchableWithoutFeedback onPress={Keyboard.dismiss} accessible={false}>
           <View style={styles.modalOverlay}>
             <View style={styles.modalBox}>
               <Text style={styles.modalTitle}>Add a Goal</Text>
@@ -332,16 +311,16 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
               {/* Custom fields */}
               <TextInput
                 placeholder="Description (optional)"
-                style={styles.input}
+                style={[styles.input, {borderWidth: 1, borderColor: 'white'}]}
                 value={customTitle}
                 onChangeText={setCustomTitle}
                 placeholderTextColor="#aaa"
               />
+              <Text style={styles.modalTitle}>Time (optional)</Text>
                 <View style={styles.templateRow}>
-                  <Text style={styles.modalTitle}>Time</Text>
                   <TextInput
                     placeholder="00"
-                    style={styles.input}
+                    style={[styles.input, {borderWidth: 1, borderColor: 'white'}]}
                     value={customAM}
                     onChangeText={setCustomAM}
                     placeholderTextColor="#aaa"
@@ -349,7 +328,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                   <Text style={styles.modalTitle}>:</Text>
                   <TextInput
                     placeholder="00"
-                    style={styles.input}
+                    style={[styles.input, {borderWidth: 1, borderColor: 'white'}]}
                     value={customPM}
                     onChangeText={setCustomPM}
                     placeholderTextColor="#aaa"
@@ -384,6 +363,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                 </Pressable>
               </View>
             </View>
+            </TouchableWithoutFeedback>
         </Modal>
     </View>
   );
@@ -403,19 +383,17 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         : title==="Spirit" ? <Image source={require('../assets/images/SpiritButton.png')} style={styles.categoryImage} />
         : <Image source={require('../assets/images/AccountabilityButton.png')} style={styles.categoryImage} />
       } 
-      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.015}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
+      {title==="Accountability" ? <Text style={[styles.categoryTitle]}>{"Reflect"}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
     </Pressable>
   );
-
-  const completedCount = goals.filter((g) => g.isCompleted).length;
-  const totalGoals = goals.length;
 
   return (
     <View style={styles.container}>
       <TopImage/>    
-      {todayMode?<Text style={styles.header}>Plan Today's Goals</Text> : <Text style={styles.header}>Plan Tomorrow's Goals</Text>}
+      {todayMode?<Text style={styles.header}>1. Plan Today's Goals</Text> : <Text style={styles.header}>1. Plan Tomorrow's Goals</Text>}
       {/* <Button title="Save Goals" onPress={() => saveGoals()} /> */}
       <SaveButton saveGoals={() => saveGoals()}/>
+      <FadeMessage visible={showSaved} message="Goals Saved" />
       {/* <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
@@ -433,21 +411,12 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       {goalsModal()}
       <Pressable onPress={() => changeTodayMode(!todayMode)} style={({pressed}) => [styles.todayButton, pressed && styles.buttonPressed]}>
         {/* <Image source={require('../assets/images/TodayButton.png')} style={styles.todayImage}/> */}
-        {!todayMode? <Text style={{position: 'absolute', color: 'white'}}>Today</Text>: <Text style={{position: 'absolute', color: 'white'}}>Tomorrow</Text>}
+        {!todayMode? <Text style={{position: 'absolute', color: 'white'}}>Tomorrow</Text>: <Text style={{position: 'absolute', color: 'white'}}>Today</Text>}
       </Pressable>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Home"}/>
     </View>
   );
 }
-
-// 'flex-start': Left
-// justifyContent: 'center': Center
-// justifyContent: 'flex-end': Right
-// alignItems: 'flex-start': Top
-// alignItems: 'center': Center
-// alignItems: 'flex-end': Bottom
-//  marginTop: height * 0.1, // 10% from top
-//  marginLeft: width * 0.05,
 
 const styles = StyleSheet.create({
   topSpace: {
@@ -498,7 +467,7 @@ const styles = StyleSheet.create({
     height: screenWidth*0.125,
     borderRadius: 12,
     left: (screenWidth * 0.5) - (screenWidth*0.25)/2,
-    top: screenHeight * 0.8,
+    top: screenHeight * 0.45,
     backgroundColor: '#222',
     justifyContent: 'center',
     alignItems: 'center',
@@ -513,11 +482,11 @@ const styles = StyleSheet.create({
   progress: { color: '#aaa', marginTop: screenHeight * 0.01, fontSize: screenWidth * 0.04 },
   xpBarBackground: { marginTop: screenHeight * 0.02, height: screenHeight * 0.02, width: '100%', backgroundColor: '#555', borderRadius: 10 },
   xpBarFill: { height: '100%', backgroundColor: '#0f0', borderRadius: 10 },
-  inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015 },
+  inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015},
   input: { backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02, fontSize: screenHeight*0.02 },
-  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)', justifyContent: 'center', alignItems: 'center', paddingHorizontal: screenWidth * 0.05, paddingVertical: screenHeight * 0.05},
-  modalBox: { backgroundColor: '#333', padding: screenWidth * 0.02, borderRadius: 10, maxWidth: screenWidth * 0.9, maxHeight: screenHeight * 0.8},
-  modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, fontWeight: 'bold' },
+  modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'},
+  modalBox: { flex: 1, backgroundColor: '#333', padding: screenWidth * 0.05, marginBottom: screenHeight * 0.35, borderRadius: 12},
+  modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, marginRight: screenWidth * 0.02, fontWeight: 'bold' },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },
   selected: { backgroundColor: '#28a745' },

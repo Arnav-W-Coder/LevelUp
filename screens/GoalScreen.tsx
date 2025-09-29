@@ -1,3 +1,4 @@
+import FadeMessage from '@/utils/fadeMessage';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
 import React, { useEffect, useState } from 'react';
@@ -21,7 +22,6 @@ const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 const boxSpacing = screenWidth * 0.1;
 const sideMargin = screenWidth * 0.1;
 const usableWidth = screenWidth - (sideMargin * 2);
-const usableHeight = screenHeight - (screenHeight * 0.5);
 const boxWidth = (usableWidth - boxSpacing) / 2; // Two boxes per row + spacing
 const boxHeight = boxWidth/2
 
@@ -41,11 +41,11 @@ type Goal = {
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
   const { todayMode, savedGoals, addXp, changeGoals, tomorrowSaved, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
-  const [loadGoal, setLoadGoals] = useState<Goal[]>([]);
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
   const [activeGoal, setActiveGoal] = useState<string | null>(null);
   const [lastToggled, setLastToggled] = useState("");
+  const [showChecked, setShowChecked] = useState(false);
   
 
   useEffect(() => {
@@ -91,6 +91,11 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   
 
   const removeGoal = (id: string) => {
+    // your save logic here...
+    setShowChecked(true);
+    // auto-hide after animation ends
+    setTimeout(() => setShowChecked(false), 1800);
+    
     setGoals((prevGoals) => {
       const updatedGoals = prevGoals.filter(goal => goal.id !== id);
       if(todayMode){
@@ -102,26 +107,6 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
       return updatedGoals;
     });
   }
-
-  const fadeAndRemoveGoal = (id: string) => {
-    const goal = goals.find((g) => g.id === id);
-    if (!goal) return;
-
-    Animated.parallel([
-      Animated.timing(goal.fadeAnim, {
-        toValue: 0,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-      Animated.timing(goal.scaleAnim, {
-        toValue: 0.8,
-        duration: 800,
-        useNativeDriver: true,
-      }),
-    ]).start(() => {
-      removeGoal(id);
-    });
-  };
 
   const getGoalsByCategory = (category: string) => {
     return goals.filter((goal) => goal.category === category);
@@ -147,7 +132,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
         animationType="fade"
         onRequestClose={resetGoalsModal}
       >
-        {/* Fullscreen container */}
+
         <View style={{height: screenHeight}}>
           <BlurView intensity={80} tint={'dark'} style={StyleSheet.absoluteFill} />
   
@@ -159,7 +144,13 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
   
           <Portal.Host>
           {/* Foreground content (ignores background press) */}
-           
+            <Portal>
+              <FadeMessage
+                visible={showChecked}
+                message="Goal Completed & XP Earned"
+              />
+            </Portal>
+        {/* Fullscreen container */}
            <View style={{position: 'absolute', alignItems: 'center', right: screenWidth*0.25, width: screenWidth*0.55, overflow: 'visible'}}>
             { getGoalsByCategory(selectedCategory).length === 0 ?
                         <View style={{position: 'absolute', alignItems: 'center', top: screenHeight*0.4, left: screenWidth*0.08, height: screenHeight*0.5, width: screenWidth*0.5, overflow: 'visible' }}> 
@@ -206,17 +197,14 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
               : title==="Spirit" ? <Image source={require('../assets/images/SpiritButton.png')} style={styles.categoryImage} />
               : <Image source={require('../assets/images/AccountabilityButton.png')} style={styles.categoryImage} />
             } 
-      {title==="Accountability" ? <Text style={[styles.categoryTitle, {fontSize: screenHeight * 0.015}]}>{title}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
+      {title==="Accountability" ? <Text style={[styles.categoryTitle]}>{"Reflect"}</Text> : <Text style={styles.categoryTitle}>{title}</Text>}
     </Pressable>
   );
-
-  const completedCount = goals.filter((g) => g.isCompleted).length;
-  const totalGoals = goals.length;
 
   return (
     <View style={styles.container}>
       <TopImage/>
-      <Text style={styles.header}>Today's Goals</Text>
+      <Text style={styles.header}>2. Check Today's Goals</Text>
       {/* <Button
       title="Reset Goals (Dev Only)"
       onPress={async () => {
@@ -239,15 +227,6 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     </View>
   );
 }
-
-// 'flex-start': Left
-// justifyContent: 'center': Center
-// justifyContent: 'flex-end': Right
-// alignItems: 'flex-start': Top
-// alignItems: 'center': Center
-// alignItems: 'flex-end': Bottom
-//  marginTop: height * 0.1, // 10% from top
-//  marginLeft: width * 0.05,
 
 const styles = StyleSheet.create({
   topSpace: {

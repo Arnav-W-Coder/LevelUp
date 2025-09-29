@@ -27,7 +27,7 @@ const DUNGEON_KEY = 'levelup_dungeonLevels';
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
 export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }:Props) {
-  const { xp, level, dungeonLevel, changeDungeon } = useXP();
+  const { level, dungeonLevel, changeDungeon } = useXP();
   const [dungeonLevels, setDungeonLevels] = useState<dungeon[]>(Array.from({ length: 50 }, (_, i) => ({
     id: i,
     completed: false
@@ -115,10 +115,10 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
       <ScrollView contentContainerStyle={styles.scrollContent}>
         <TopImage topOffset={20} leftOffset={0} />
         {/* <Button title="Reset Dungeon" onPress={() => changeDungeon(0)}/> */}
-        <Text style={styles.title}>Dungeon Level {dungeonLevel}</Text>
+        <Text style={styles.title}>Dungeon Level {dungeonLevel + 1}</Text>
 
         <Text style={styles.levelInfo}>
-          Required Level: {(dungeonLevel + 1) * 2}
+          Required Levels: {(dungeonLevel + 1) * 2}
         </Text>
 
         <View style={{ position: 'relative', width: screenWidth, height: screenHeight * 0.1 + 
@@ -142,8 +142,8 @@ const styles = StyleSheet.create({
   level: {
     position: 'absolute',
     left: screenWidth * 0.48,
-    width: screenHeight * 0.085,              
-    height: screenHeight * 0.085,             
+    width: 85,              
+    height: 85,             
     borderRadius: screenHeight * 0.05,        
   },
   scrollContent: {

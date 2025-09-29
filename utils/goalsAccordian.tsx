@@ -33,6 +33,7 @@ export default function GoalDropdown({ goal, activeGoal, setActiveGoal, removeGo
   const [cardX, setCardX] = useState(0);
   const [cardHeight, setCardHeight] = useState(0);
   const [cardWidth, setCardWidth] = useState(0);
+  
   const isActive = activeGoal === goal.id;
 
   const toggle = () => {

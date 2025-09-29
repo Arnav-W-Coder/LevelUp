@@ -14,12 +14,11 @@ type Props = {
 };
 
 export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }: Props) {
-  const { xp, level, streak, addXp, changeLevel, changeXp } = useXP();
+  const { xp, level, streak} = useXP();
 
   return (
     <View style={styles.screen}>
       {/* <Image source={require('../assets/images/testCharacter.png')} style={styles.characterImage} /> */}
-      
       
       {streak !== 0 && <View style={styles.streak}>
         <Text style={styles.streakText}>Streak {streak} 🔥</Text>
@@ -48,7 +47,7 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
       <View style={[styles.xpBar, styles.xpRight2]}> 
         <View style={[styles.xpBarFill, { width: `${(xp[3] / (10 + 2 * Math.pow(level[3] - 1, 2))) * 100}%` }]}/>
       </View>
-      <Text style={[styles.label, styles.labelAccountability, {fontSize: screenWidth*0.04}]}>Accountability</Text>
+      <Text style={[styles.label, styles.labelAccountability]}>Reflect</Text>
       <Text style={[styles.label, styles.labelAccountabilityLevel]}>{level[3]}</Text>
       {/* <Button title="Reset" onPress={() => {changeXp([0, 0, 0, 0]), changeLevel([0, 0, 0, 0])}} /> */}
         <View style={{ position: 'absolute', top: screenHeight * 0.05, left: screenWidth * (0.5 - (0.35/2)), width: screenWidth * 0.35, 
@@ -57,6 +56,8 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
           shadowColor: "#000",}}>
             <CharacterImage topOffset={0} leftOffset={0}/>
         </View>
+      <Text style={styles.header}>Character Summary</Text>
+
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Character"}/>
     </View>
 
@@ -68,6 +69,14 @@ const styles = StyleSheet.create({
     height: '20%', // Leave this space open for visuals
   },
   image: { width: 100, height: 100, marginBottom: 20 },
+  header: {
+    position: 'absolute',
+    color: '#fff',
+    fontSize: 24,
+    fontWeight: 'bold',
+    top: screenHeight * 0.5,
+    left: screenWidth * 0.25
+  },
   xpBarFill: {
     height: '100%',
     backgroundColor: '#0f0',
@@ -109,18 +118,18 @@ const styles = StyleSheet.create({
     textShadowRadius: 4,
   },
   // Positioning labels and bars
-  xpLeft1: { top: screenHeight * 0.55, left: screenWidth * 0.05 },
+  xpLeft1: { top: screenHeight * 0.6, left: screenWidth * 0.05 },
   xpLeft2: { top: screenHeight * 0.71, left: screenWidth * 0.05 },
-  xpRight1: { top: screenHeight * 0.55, left: screenWidth * 0.55 },
+  xpRight1: { top: screenHeight * 0.6, left: screenWidth * 0.55 },
   xpRight2: { top: screenHeight * 0.71, left: screenWidth * 0.55 },
 
-  labelMind: { top: screenHeight * 0.52, left: screenWidth * 0.05 },
-  labelMindLevel: { top: screenHeight * 0.52, left: screenWidth * 0.35 },
+  labelMind: { top: screenHeight * 0.57, left: screenWidth * 0.05 },
+  labelMindLevel: { top: screenHeight * 0.57, left: screenWidth * 0.35 },
   labelBody: { top: screenHeight * 0.68, left: screenWidth * 0.05 },
   labelBodyLevel: { top: screenHeight * 0.68, left: screenWidth * 0.35 },
-  labelSpirit: { top: screenHeight * 0.52, left: screenWidth * 0.55 },
-  labelSpiritLevel: { top: screenHeight * 0.52, left: screenWidth * 0.85 },
-  labelAccountability: { top: screenHeight * 0.685, left: screenWidth * 0.55 },
+  labelSpirit: { top: screenHeight * 0.57, left: screenWidth * 0.55 },
+  labelSpiritLevel: { top: screenHeight * 0.57, left: screenWidth * 0.85 },
+  labelAccountability: { top: screenHeight * 0.68, left: screenWidth * 0.55 },
   labelAccountabilityLevel: { top: screenHeight * 0.68, left: screenWidth * 0.85 },
 
   streak: {
