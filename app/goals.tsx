@@ -9,6 +9,6 @@ export default function SecondPage() {
     goToDungeon={() => router.replace("/dungeon")}   
     goToCharacter={() => router.replace("/character")}
     goToGoal={() => router.replace('/goals')} 
-  />;
+    goToCalendar={() => router.replace('/calendar')} />;
   
 }

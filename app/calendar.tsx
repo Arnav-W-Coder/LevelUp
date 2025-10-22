@@ -1,12 +1,11 @@
-// app/character.tsx
 import { useRouter } from 'expo-router';
-import CharacterScreen from '../screens/CharacterScreen';
+import GoalCalendar from '../screens/Calendar';
 
 export default function SecondPage() {
   const router = useRouter();
 
   return( 
-    <CharacterScreen goToHome={() => router.replace('/')} 
+    <GoalCalendar goToHome={() => router.replace('/')} 
       goToCharacter={() => router.replace('/character')} 
       goToGoal={() => router.replace('/goals')} 
       goToDungeon={() => router.replace('/dungeon')} 

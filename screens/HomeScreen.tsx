@@ -38,13 +38,14 @@ type Props = {
   goToDungeon: () => void;
   goToGoal: () => void;
   goToHome: () => void;
+  goToCalendar: () => void;
 };
 
 const GOALS_KEY = 'levelup_goals';
 
-export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHome}: Props) {
+export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHome, goToCalendar}: Props) {
   const [goals, setGoals] = useState<Goal[]>([]);
-  const { todayMode, changeTodayMode, changeTomorrowSaved, changeStreak, changeGoals } = useXP();
+  const { todayMode, changeTodayMode, changeTomorrowSaved, changeStreak, changeGoals, changeTomorrowGoals } = useXP();
   const [modalVisible, setModalVisible] = useState(false);
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [customTitle, setCustomTitle] = useState('');
@@ -146,6 +147,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     changeGoals(goals);
     if(!todayMode){
       changeTomorrowSaved(true);
+      changeTomorrowGoals(goals);
     }
   }
 
@@ -185,10 +187,10 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
     if(title === 'Spirit'){setDefaultTemplates(defaultGoals[2])}
     if(title === 'Accountability'){setDefaultTemplates(defaultGoals[3])}
     // 1) close the first modal
-    //setGoalsVisible(false);
+    setGoalsVisible(false);
 
-    // 2) open the second modal
-    setModalVisible(true);
+    // 2) open the second modal on next frame so they don't overlap
+    requestAnimationFrame(() => setModalVisible(true));
   }
 
   const activateGoals = (title: string) => {
@@ -287,7 +289,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
               }
               }>
                 <Pressable onPress={() => resetModal()} style={({pressed}) => [{backgroundColor: 'rgba(73, 152, 237, 1)', 
-                  width: screenWidth * 0.08, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5}, 
+                  width: screenWidth * 0.08, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5, marginTop: screenHeight * 0.015}, 
                   pressed && styles.buttonPressed]}>
                   <Text style={{fontSize: screenWidth * 0.06, color: 'white', fontWeight: 'bold'}}>x</Text>
                 </Pressable>
@@ -336,9 +338,9 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                   <View style={styles.templateRow}>
                     <Pressable
                       key={"AM"}
-                      style={[
+                      style={({pressed}) => [
                         styles.templateButton,
-                        time === "AM" && styles.selected,
+                        time === "AM" && styles.selected, pressed && styles.buttonPressed
                       ]}
                       onPress={() => setTime("AM")}
                     >
@@ -346,9 +348,9 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
                     </Pressable>
                     <Pressable
                       key={"PM"}
-                      style={[
+                      style={({pressed}) => [
                         styles.templateButton,
-                        time === "PM" && styles.selected,
+                        time === "PM" && styles.selected, pressed && styles.buttonPressed
                       ]}
                       onPress={() => setTime("PM")}
                     >
@@ -413,7 +415,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
         {/* <Image source={require('../assets/images/TodayButton.png')} style={styles.todayImage}/> */}
         {!todayMode? <Text style={{position: 'absolute', color: 'white'}}>Tomorrow</Text>: <Text style={{position: 'absolute', color: 'white'}}>Today</Text>}
       </Pressable>
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Home"}/>
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} goToCalendar={goToCalendar} screen={"Home"}/>
     </View>
   );
 }
@@ -485,7 +487,7 @@ const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015},
   input: { backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02, fontSize: screenHeight*0.02 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'},
-  modalBox: { flex: 1, backgroundColor: '#333', padding: screenWidth * 0.05, marginBottom: screenHeight * 0.35, borderRadius: 12},
+  modalBox: { flex: 1, backgroundColor: '#333', padding: screenWidth * 0.05, paddingTop: screenHeight * 0.02, marginBottom: screenHeight * 0.35, borderRadius: 12},
   modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, marginRight: screenWidth * 0.02, fontWeight: 'bold' },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },

@@ -14,7 +14,8 @@ type Props = {
   goToCharacter: () => void;
   goToDungeon: () => void;
   goToHome: () => void;
-  goToGoal: () => void; 
+  goToGoal: () => void;
+  goToCalendar: () => void; 
 };
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -38,7 +39,7 @@ type Goal = {
   time: string;
 };
 
-export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal}: Props) {
+export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal, goToCalendar}: Props) {
   const { todayMode, savedGoals, addXp, changeGoals, tomorrowSaved, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalsVisible, setGoalsVisible] = useState(false);
@@ -96,6 +97,8 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     // auto-hide after animation ends
     setTimeout(() => setShowChecked(false), 1800);
     
+    
+
     setGoals((prevGoals) => {
       const updatedGoals = prevGoals.filter(goal => goal.id !== id);
       if(todayMode){
@@ -223,7 +226,7 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
       {tomorrowSaved ? <Image style={{position: 'absolute', top: screenHeight*0.8, left: screenWidth*0.5 - (100), width: 200, height: 100}} source={require('../assets/images/SavedTomorrow.png')}/>
       : <View></View>
       }
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Goal"}/>
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} goToCalendar={goToCalendar} screen={"Goal"}/>
     </View>
   );
 }

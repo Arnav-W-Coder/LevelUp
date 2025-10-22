@@ -15,6 +15,7 @@ type Props = {
   goToCharacter: () => void;
   goToGoal: () => void;
   goToDungeon: () => void;
+  goToCalendar: () => void;
 };
 
 type dungeon = {
@@ -26,7 +27,7 @@ const DUNGEON_KEY = 'levelup_dungeonLevels';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
-export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }:Props) {
+export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToDungeon, goToCalendar }:Props) {
   const { level, dungeonLevel, changeDungeon } = useXP();
   const [dungeonLevels, setDungeonLevels] = useState<dungeon[]>(Array.from({ length: 50 }, (_, i) => ({
     id: i,
@@ -127,7 +128,7 @@ export default function DungeonScreen({ goToHome, goToCharacter, goToGoal, goToD
           {renderLevels}
         </View>
       </ScrollView>
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Dungeon"}/>
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} goToCalendar={goToCalendar} screen={"Dungeon"}/>
     </View>
   );
 }

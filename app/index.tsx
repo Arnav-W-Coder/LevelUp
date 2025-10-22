@@ -1,7 +1,6 @@
 // app/index.tsx
-import { View, Text } from 'react-native';
-import HomeScreen from "../screens/HomeScreen";
 import { useRouter } from 'expo-router';
+import HomeScreen from "../screens/HomeScreen";
 
 export default function app() {
   const router = useRouter();
@@ -11,6 +10,7 @@ export default function app() {
         goToCharacter={() => router.replace('/character')} 
         goToDungeon={() => router.replace("/dungeon")} 
         goToGoal={() => router.replace("/goals")}
-        goToHome={() => router.replace('/')} />
+        goToHome={() => router.replace('/')} 
+        goToCalendar={() => router.replace('/calendar')} />
   );
 }

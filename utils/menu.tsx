@@ -1,5 +1,5 @@
-import React, { useState, useEffect, useRef } from 'react';
-import { View, Text, StyleSheet, TouchableOpacity, Pressable, Button, Image, Dimensions, Animated } from 'react-native';
+import React, { useState } from 'react';
+import { Dimensions, Image, Pressable, StyleSheet, View } from 'react-native';
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
 
@@ -8,11 +8,12 @@ type Props = {
     goToGoal: () => void;
     goToDungeon: () => void;
     goToCharacter: () => void;
+    goToCalendar: () => void;
     screen: String
 };
 
-export default function menu({ goToHome, goToGoal, goToDungeon, goToCharacter, screen }: Props) {
-    const[isSelected, setSelected] = useState(["Home", "Character", "Goal", "Dungeon"]);
+export default function menu({ goToHome, goToGoal, goToDungeon, goToCharacter, goToCalendar, screen }: Props) {
+    const[isSelected, setSelected] = useState(["Home", "Character", "Goal", "Dungeon", "Calendar"]);
     return (
         <View style={styles.menu}>
             <Pressable onPress={goToHome} style={({pressed}) => [styles.menuButton, pressed && styles.buttonPressed, screen === isSelected[0] && styles.selected ]}>
@@ -26,6 +27,9 @@ export default function menu({ goToHome, goToGoal, goToDungeon, goToCharacter, s
             </Pressable>
             <Pressable onPress={goToDungeon} style={({pressed}) => [styles.menuButton, pressed && styles.buttonPressed, screen === isSelected[3] && styles.selected ]}>
                 <Image source={require('../assets/images/levelUp dungeon icon.png')} style={styles.image} resizeMode='cover'/>
+            </Pressable>
+            <Pressable onPress={goToCalendar} style={({pressed}) => [styles.menuButton, pressed && styles.buttonPressed, screen === isSelected[4] && styles.selected ]}>
+                <Image source={require('../assets/images/levelUp calendar icon.png')} style={styles.calendar} resizeMode='cover'/>
             </Pressable>
         </View>
     );
@@ -51,6 +55,11 @@ const styles = StyleSheet.create({
     image: {
         width: '100%',
         height: '100%',
+    },
+    calendar:{
+        width: '200%',
+        height: '100%',
+        alignSelf: 'center'
     },
     menuButton: {
         width: screenWidth * 0.12,

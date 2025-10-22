@@ -11,9 +11,10 @@ type Props = {
   goToCharacter: () => void;
   goToDungeon: () => void;
   goToGoal: () => void;
+  goToCalendar: () => void;
 };
 
-export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goToDungeon }: Props) {
+export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goToDungeon, goToCalendar }: Props) {
   const { xp, level, streak} = useXP();
 
   return (
@@ -58,7 +59,7 @@ export default function CharacterScreen({ goToHome, goToCharacter, goToGoal, goT
         </View>
       <Text style={styles.header}>Character Summary</Text>
 
-      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} screen={"Character"}/>
+      <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} goToCalendar={goToCalendar} screen={"Character"}/>
     </View>
 
   );

@@ -12,6 +12,8 @@ type XPContextType = {
   action: boolean;
   todayMode: boolean;
   tomorrowSaved: boolean;
+  tomorrowGoals: Goal[];
+  changeTomorrowGoals: (newGoals: Goal[]) => void;
   changeTomorrowSaved: (val: boolean) => void;
   changeTodayMode: (val: boolean) => void;
   changeAction: (val: boolean) => void;
@@ -45,6 +47,8 @@ const XPContext = createContext<XPContextType>({
   action: false,
   todayMode: false,
   tomorrowSaved: false,
+  tomorrowGoals: [],
+  changeTomorrowGoals: () => {},
   changeTomorrowSaved: () => {},
   changeTodayMode: () => {},
   changeAction: () => {},
@@ -74,6 +78,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   const [action, setAction] = useState(false);
   const [todayMode, setTodayMode] = useState(false);
   const [tomorrowSaved, setTomorrowSaved] = useState(false);
+  const [tomorrowGoals, setTomorrowGoals] = useState<Goal[]>([]);
   
   useEffect(() => {
     const now = new Date();
@@ -103,9 +108,22 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         const lastActionDate = await AsyncStorage.getItem('levelup_lastActiveDate');
         const storedTodayMode = await AsyncStorage.getItem('levelup_todaymode');
         const storedTomorrowSaved = await AsyncStorage.getItem('levelup_tomorrowSaved');
+        const storedTomorrowGoals = await AsyncStorage.getItem('levelup_tomorrowGoals');
         
         if(storedTomorrowSaved){
           setTomorrowSaved(Boolean(storedTomorrowSaved));
+        }
+        
+        if (storedTomorrowGoals) {
+          const parsedGoals = JSON.parse(storedTomorrowGoals);
+          const updatedGoals = parsedGoals.map((goal: Goal) => ({
+            ...goal,
+            fadeAnim: new Animated.Value(1),
+            scaleAnim: new Animated.Value(1),
+          }));
+          if (Array.isArray(parsedGoals)) setTomorrowGoals(updatedGoals);
+        }else{
+          setTomorrowGoals([]);
         }
 
         if (storedXp) {
@@ -251,8 +269,13 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
     await AsyncStorage.setItem('levelup_tomorrowSaved', JSON.stringify(val));
   }
 
+  const changeTomorrowGoals = async (newGoals: Goal[]) => {
+    setTomorrowGoals(newGoals);
+    await AsyncStorage.setItem('levelup_tomorrowGoals', JSON.stringify(newGoals));
+  }
+
   return (
-    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, streak, action, todayMode, tomorrowSaved, changeTomorrowSaved, changeTodayMode, changeAction, changeStreak, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
+    <XPContext.Provider value={{ xp, level, savedGoals, dungeonLevel, streak, action, todayMode, tomorrowSaved, tomorrowGoals, changeTomorrowGoals, changeTomorrowSaved, changeTodayMode, changeAction, changeStreak, addXp, changeLevel, changeXp, changeGoals, changeYesterdayGoals, changeDungeon }}>
       {children}
     </XPContext.Provider>
   );

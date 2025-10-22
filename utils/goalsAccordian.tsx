@@ -62,15 +62,15 @@ return (
         <TouchableWithoutFeedback onPress={() => setActiveGoal(null)}>
           <View style={styles.backdrop} />
         </TouchableWithoutFeedback>
-        <View
+        {goal.time !== "" && goal.description !== "" ? <View
           style={[
             styles.overlay,
             { top: cardY + cardHeight + 8, left: screenWidth * 0.04 },
           ]}
         >
-          {goal.time !== "" && <Text style={styles.overlayTime}>⏰ {goal.time}</Text>}
-          {goal.description !== "" && <Text style={styles.overlayDesc}>Description: {goal.description}</Text>}
-        </View> 
+          {goal.time !== "" ? <Text style={styles.overlayTime}>⏰ {goal.time}</Text> : <View></View>}
+          {goal.description !== "" ? <Text style={styles.overlayDesc}>Description: {goal.description}</Text> : <View></View>}
+        </View> : <View></View>} 
         <Portal>
           <TouchableOpacity onPress={() => {setActiveGoal(null), removeGoal(goal.id)}}>
             {isGoal ? <View><View style={[styles.checkButton, {left: screenWidth*0.72, top: screenHeight*0.765, 

@@ -1,6 +1,5 @@
-import { View, Text } from 'react-native';
 import { useRouter } from 'expo-router';
-import DungeonScreen from '../screens/DungeonScreen'; 
+import DungeonScreen from '../screens/DungeonScreen';
 
 export default function SecondPage() {
   const router = useRouter();
@@ -11,7 +10,7 @@ export default function SecondPage() {
         goToCharacter={() => router.replace('/character')}
         goToGoal={() => router.replace('/goals')}
         goToDungeon={() => router.replace('/dungeon')}
-    />
+        goToCalendar={() => router.replace('/calendar')} />
   );
   
 }
