@@ -8,7 +8,10 @@
     "android": "expo run:android",
     "ios": "expo run:ios",
     "web": "expo start --web",
-    "lint": "expo lint"
+    "lint": "expo lint",
+    "dev:backend": "\".\\.venv\\Scripts\\python.exe\" backend\\backend.py",
+    "dev:android": "npx expo run:android",
+    "dev": "concurrently -n BACKEND,EXPO -c blue,green \"npm run dev:backend\" \"npm run dev:android\""
   },
   "dependencies": {
     "@expo/vector-icons": "^14.1.0",
@@ -52,6 +55,7 @@
     "@types/react": "~19.0.10",
     "@types/react-native-calendars": "^1.1264.7",
     "babel-plugin-module-resolver": "^5.0.2",
+    "concurrently": "^9.2.1",
     "eslint": "^9.25.0",
     "eslint-config-expo": "~9.2.0",
     "expo-module-scripts": "^4.1.10",

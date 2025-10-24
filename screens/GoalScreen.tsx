@@ -57,10 +57,14 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
     const loadGoals = async () => {
       const YESTERDAY = getYesterday();
       let stored;
-      if(todayMode){
-        stored = await AsyncStorage.getItem(getToday());
-      }else{
-        stored = await AsyncStorage.getItem(YESTERDAY);
+      const yesterday_stored = await AsyncStorage.getItem(YESTERDAY);
+      const today_stored = await AsyncStorage.getItem(getToday());
+      if(yesterday_stored && !today_stored){
+        stored = yesterday_stored;
+      }else if(yesterday_stored && today_stored){
+        stored = today_stored;
+      }else if(!yesterday_stored && today_stored){
+        stored = today_stored;
       }
       if (stored) {
         const parsed: Goal[] = JSON.parse(stored);

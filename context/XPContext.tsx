@@ -90,7 +90,9 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       const today = getToday();
       setCurrentDate(today);
       setTomorrowSaved(false);
+      setTomorrowGoals([]);
       await AsyncStorage.setItem('levelup_tomorrowSaved', JSON.stringify(false));
+      await AsyncStorage.setItem('levelup_tomorrowGoals', JSON.stringify([]));
     }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
 
     return () => clearTimeout(timeout);
@@ -110,8 +112,10 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
         const storedTomorrowSaved = await AsyncStorage.getItem('levelup_tomorrowSaved');
         const storedTomorrowGoals = await AsyncStorage.getItem('levelup_tomorrowGoals');
         
-        if(storedTomorrowSaved){
-          setTomorrowSaved(Boolean(storedTomorrowSaved));
+        if (storedTomorrowSaved !== null) {
+            setTomorrowSaved(JSON.parse(storedTomorrowSaved)); // true/false correctly
+        } else {
+            setTomorrowSaved(false);
         }
         
         if (storedTomorrowGoals) {
@@ -152,8 +156,10 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           setDungeonLevel(Number(storedDungeon));
         }
 
-        if(storedAction){
-          setAction(Boolean(storedAction));
+        if (storedAction !== null) {
+            setAction(JSON.parse(storedAction)); // true/false correctly
+        } else {
+            setAction(false);
         }
 
         if(storedStreak){
@@ -179,8 +185,10 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
           }
         }
 
-        if(storedTodayMode){
-          setTodayMode(Boolean(storedTodayMode));
+        if (storedTodayMode !== null) {
+            setTodayMode(JSON.parse(storedTodayMode)); // true/false correctly
+        } else {
+            setTodayMode(false);
         }
 
       } catch (err) {

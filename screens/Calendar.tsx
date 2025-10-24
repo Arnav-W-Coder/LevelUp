@@ -232,6 +232,7 @@ export default function GoalCalendar({
 
       <FlatList
         data={goalsForSelected}
+        style={{ flex: 1 }}
         keyExtractor={(item, idx) => `${selectedDate}-${idx}-${item}`}
         ItemSeparatorComponent={() => <View style={{ height: 8 }} />}
         ListEmptyComponent={
@@ -239,7 +240,7 @@ export default function GoalCalendar({
             No goals planned for this day.
           </Text>
         }
-        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: 16 }}
+        contentContainerStyle={{ paddingHorizontal: 16, paddingBottom: screenHeight * 0.08 + 10}}
         renderItem={({ item }) => (
           <View style={styles.goalCard}>
             <Text style={styles.goalTitle}>{item}</Text>
