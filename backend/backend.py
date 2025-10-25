@@ -9,8 +9,10 @@ import json, os
 import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
-
-
+import os, nltk
+NLTK_PATH = os.environ.get("NLTK_DATA", "/opt/render/nltk_data")
+if NLTK_PATH not in nltk.data.path:
+    nltk.data.path.append(NLTK_PATH)
 
 app = Flask(__name__)
 # TODO: In production, restrict to your app's origins
