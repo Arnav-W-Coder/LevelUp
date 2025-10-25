@@ -1,7 +1,7 @@
 // summarizeWithFlask.ts
 
 export async function summarizeWithFlask(reflection: string) {
-  const base = 'https://levelup-2.onrender.com'
+  const base = 'https://levelup-3.onrender.com'
   const res = await fetch(`${base}/summarize`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
