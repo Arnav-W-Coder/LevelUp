@@ -162,75 +162,75 @@ export default function JournalCard({ summarize, onJournalSaved, showLastN = 3 }
   const lastN = todayEntries.slice(0, showLastN);
 
   return (
-    <View style={{ backgroundColor: '#111827', padding: 14, borderRadius: 16, borderWidth: 1, borderColor: '#1F2937' }}>
-      <Text style={{ color: 'white', fontWeight: '800', fontSize: 18, marginBottom: 8 }}>Daily Reflection</Text>
-      <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8 }}>
-        How did today’s goals make you feel? One or two sentences is perfect.
-      </Text>
+          <View style={{ backgroundColor: '#111827', padding: 14, borderRadius: 16, borderWidth: 1, borderColor: '#1F2937' }}>
+            <Text style={{ color: 'white', fontWeight: '800', fontSize: 18, marginBottom: 8 }}>Daily Reflection</Text>
+            <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8 }}>
+              How did today’s goals make you feel? One or two sentences is perfect.
+            </Text>
 
-      <View
-        style={{
-          backgroundColor: 'white',
-          borderRadius: 12,
-          paddingHorizontal: 12,
-          paddingVertical: 8,
-          marginBottom: 8,
-        }}
-      >
-        <TextInput
-          value={text}
-          onChangeText={setText}
-          placeholder="e.g., I didn’t want to start, but I feel proud I finished."
-          placeholderTextColor="#6B7280"
-          multiline
-          style={{ minHeight: 70, color: '#111827' }}
-        />
-      </View>
-
-      {error ? <Text style={{ color: '#FCA5A5', marginBottom: 8 }}>{error}</Text> : null}
-
-      <Pressable
-        onPress={onAnalyzeAndSave}
-        disabled={busy}
-        style={{
-          backgroundColor: busy ? '#374151' : '#2563EB',
-          borderRadius: 12,
-          paddingVertical: 10,
-          alignItems: 'center',
-          justifyContent: 'center',
-        }}
-      >
-        {busy ? (
-          <ActivityIndicator />
-        ) : (
-          <Text style={{ color: 'white', fontWeight: '700' }}>Analyze & Save</Text>
-        )}
-      </Pressable>
-
-      {/* Recent summaries */}
-      {lastN.length > 0 && (
-        <View style={{ marginTop: 12, gap: 8 }}>
-          <Text style={{ color: '#D1D5DB', fontWeight: '700' }}>Today’s Insights</Text>
-          {lastN.map((e) => (
             <View
-              key={e.id}
               style={{
-                backgroundColor: '#0B1220',
-                borderColor: '#1F2937',
-                borderWidth: 1,
+                backgroundColor: 'white',
                 borderRadius: 12,
-                padding: 10,
+                paddingHorizontal: 12,
+                paddingVertical: 8,
+                marginBottom: 8,
               }}
             >
-              <Text style={{ color: '#93C5FD', fontSize: 12, marginBottom: 4 }}>{e.emotion}</Text>
-              <Text style={{ color: 'white' }}>✨ {e.summary}</Text>
-              <Text style={{ color: '#9CA3AF', fontSize: 11, marginTop: 4 }}>
-                {new Date(e.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
-              </Text>
+              <TextInput
+                value={text}
+                onChangeText={setText}
+                placeholder="e.g., I didn’t want to start, but I feel proud I finished."
+                placeholderTextColor="#6B7280"
+                multiline
+                style={{ minHeight: 70, color: '#111827' }}
+              />
             </View>
-          ))}
-        </View>
-      )}
-    </View>
+
+            {error ? <Text style={{ color: '#FCA5A5', marginBottom: 8 }}>{error}</Text> : null}
+
+            <Pressable
+              onPress={onAnalyzeAndSave}
+              disabled={busy}
+              style={{
+                backgroundColor: busy ? '#374151' : '#2563EB',
+                borderRadius: 12,
+                paddingVertical: 10,
+                alignItems: 'center',
+                justifyContent: 'center',
+              }}
+            >
+              {busy ? (
+                <ActivityIndicator />
+              ) : (
+                <Text style={{ color: 'white', fontWeight: '700' }}>Analyze & Save</Text>
+              )}
+            </Pressable>
+
+            {/* Recent summaries */}
+            {lastN.length > 0 && (
+              <View style={{ marginTop: 12, gap: 8 }}>
+                <Text style={{ color: '#D1D5DB', fontWeight: '700' }}>Today’s Insights</Text>
+                {lastN.map((e) => (
+                  <View
+                    key={e.id}
+                    style={{
+                      backgroundColor: '#0B1220',
+                      borderColor: '#1F2937',
+                      borderWidth: 1,
+                      borderRadius: 12,
+                      padding: 10,
+                    }}
+                  >
+                    <Text style={{ color: '#93C5FD', fontSize: 12, marginBottom: 4 }}>{e.emotion}</Text>
+                    <Text style={{ color: 'white' }}>✨ {e.summary}</Text>
+                    <Text style={{ color: '#9CA3AF', fontSize: 11, marginTop: 4 }}>
+                      {new Date(e.createdAt).toLocaleTimeString([], { hour: 'numeric', minute: '2-digit' })}
+                    </Text>
+                  </View>
+                ))}
+              </View>
+            )}
+          </View>
   );
 }

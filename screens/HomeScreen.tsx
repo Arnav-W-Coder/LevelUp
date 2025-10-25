@@ -290,7 +290,7 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
               }
               }>
                 <Pressable onPress={() => resetModal()} style={({pressed}) => [{backgroundColor: 'rgba(73, 152, 237, 1)', 
-                  width: screenWidth * 0.08, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5, marginTop: screenHeight * 0.015}, 
+                  width: screenWidth * 0.08, height: screenWidth * 0.08, alignItems: 'center', justifyContent: 'flex-start', borderRadius: 5, marginTop: screenHeight * 0.025}, 
                   pressed && styles.buttonPressed]}>
                   <Text style={{fontSize: screenWidth * 0.06, color: 'white', fontWeight: 'bold'}}>x</Text>
                 </Pressable>
@@ -489,7 +489,7 @@ const styles = StyleSheet.create({
   inputContainer: { flexDirection: 'row', alignItems: 'center', marginBottom: screenHeight * 0.015},
   input: { backgroundColor: '#333', color: '#fff', padding: screenHeight * 0.015, borderRadius: 8, marginRight: screenWidth * 0.02, fontSize: screenHeight*0.02 },
   modalOverlay: { flex: 1, backgroundColor: 'rgba(0,0,0,0.5)'},
-  modalBox: { flex: 1, backgroundColor: '#333', padding: screenWidth * 0.05, paddingTop: screenHeight * 0.02, marginBottom: screenHeight * 0.35, borderRadius: 12},
+  modalBox: { flex: 1, backgroundColor: '#333', padding: screenWidth * 0.05, paddingTop: screenHeight * 0.05, marginBottom: screenHeight * 0.35, borderRadius: 12},
   modalTitle: { fontSize: screenWidth * 0.05, color: '#fff', marginBottom: screenHeight * 0.01, marginTop: screenHeight * 0.02, marginRight: screenWidth * 0.02, fontWeight: 'bold' },
   templateRow: { flexDirection: 'row', flexWrap: 'wrap', marginBottom: screenHeight * 0.015 },
   templateButton: { backgroundColor: '#444', padding: screenHeight * 0.015, margin: screenWidth * 0.01, borderRadius: 6 },

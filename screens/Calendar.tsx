@@ -2,7 +2,7 @@ import JournalCard from '@/utils/journalCard';
 import { summarizeWithFlask } from '@/utils/summarize';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import React, { useEffect, useMemo, useState } from 'react';
-import { Dimensions, Modal, Pressable, SafeAreaView, SectionList, StyleSheet, Text, View } from 'react-native';
+import { Dimensions, Keyboard, KeyboardAvoidingView, Modal, Platform, Pressable, SafeAreaView, ScrollView, SectionList, StyleSheet, Text, TouchableWithoutFeedback, View } from 'react-native';
 import { Calendar } from 'react-native-calendars';
 import { useXP } from '../context/XPContext';
 import Menu from '../utils/menu';
@@ -361,11 +361,11 @@ export default function GoalCalendar({
       {/* Floating write button */}
       { selectedDate === localYMD() ? <Pressable
         onPress={() => setJournalModalOpen(true)}
-        style={{
+        style={({pressed}) => [{
           position: 'absolute', right: 16, bottom: 100,
           backgroundColor: '#2563EB', paddingHorizontal: 16, paddingVertical: 12,
           borderRadius: 999, borderWidth: 1, borderColor: '#1F2937'
-        }}
+        }, pressed && styles.buttonPressed]}
       >
         <Text style={{ color: 'white', fontWeight: '700' }}>Write reflection</Text>
       </Pressable> : <View></View>}
@@ -387,6 +387,20 @@ export default function GoalCalendar({
             backgroundColor: 'black', paddingBottom: 24, paddingTop: 12,
             borderTopLeftRadius: 16, borderTopRightRadius: 16
           }}>
+            <KeyboardAvoidingView
+              style={{height: screenHeight*0.5}}
+              behavior={Platform.select({ ios: 'padding', android: 'padding' })}
+              keyboardVerticalOffset={Platform.select({
+                ios: 60,   // adjust if you have a header / modal handle
+                android:0,
+              })}
+            >
+              <TouchableWithoutFeedback onPress={Keyboard.dismiss}>
+                <ScrollView
+                  contentContainerStyle={{ flex: 1, padding: 16, paddingBottom: 32 }}
+                  keyboardShouldPersistTaps="handled"
+                  showsVerticalScrollIndicator={false}
+                >
             <JournalCard
               summarize={summarizeWithFlask}
               onJournalSaved={async () => {
@@ -411,11 +425,15 @@ export default function GoalCalendar({
                 setJournalModalOpen(false);
               }}
             />
+            </ScrollView>
+          </TouchableWithoutFeedback>
+        </KeyboardAvoidingView>
             <Pressable onPress={() => setJournalModalOpen(false)} style={{ alignSelf: 'center', marginTop: 8 }}>
               <Text style={{ color: '#9CA3AF' }}>Close</Text>
             </Pressable>
           </View>
         </View>
+            
       </Modal>
     </SafeAreaView>
   );
