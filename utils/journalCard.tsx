@@ -162,7 +162,7 @@ export default function JournalCard({ summarize, onJournalSaved, showLastN = 3 }
   const lastN = todayEntries.slice(0, showLastN);
 
   return (
-    <View style={{ position: 'absolute', top: 10, backgroundColor: '#111827', padding: 14, borderRadius: 16, borderWidth: 1, borderColor: '#1F2937' }}>
+    <View style={{ backgroundColor: '#111827', padding: 14, borderRadius: 16, borderWidth: 1, borderColor: '#1F2937' }}>
       <Text style={{ color: 'white', fontWeight: '800', fontSize: 18, marginBottom: 8 }}>Daily Reflection</Text>
       <Text style={{ color: '#9CA3AF', fontSize: 13, marginBottom: 8 }}>
         How did today’s goals make you feel? One or two sentences is perfect.

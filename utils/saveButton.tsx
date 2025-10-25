@@ -15,7 +15,7 @@ export default function SaveButton({ saveGoals }: { saveGoals: () => void }) {
   const h = 100;
 
   // Load once at top level
-  const btnImg = useImage(require("../assets/images/SaveButton2.png"));
+  const btnImg = useImage(require("../assets/images/SaveButton3.png"));
 
   if (!btnImg) return null; // still loading
 

@@ -244,6 +244,7 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   const changeGoals = async (newGoals: Goal[]) => {
+    setSavedGoals(newGoals);
     await AsyncStorage.setItem(currentDate, JSON.stringify(newGoals));
   }
 

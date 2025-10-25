@@ -1,6 +1,5 @@
 // screens/HomeScreen.tsx
 import FadeMessage from '@/utils/fadeMessage';
-import JournalCard from '@/utils/journalCard';
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import { BlurView } from 'expo-blur';
 import React, { useEffect, useState } from 'react';
@@ -12,7 +11,6 @@ import HelpIcon from '../utils/helpIcon';
 import TopImage from '../utils/homeTopImage';
 import Menu from '../utils/menu';
 import SaveButton from '../utils/saveButton';
-import { summarizeWithFlask } from "../utils/summarize";
 
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');
@@ -420,7 +418,6 @@ export default function HomeScreen({goToCharacter, goToDungeon, goToGoal, goToHo
       </Pressable>
       <Menu goToHome={goToHome} goToGoal={goToGoal} goToDungeon={goToDungeon} goToCharacter={goToCharacter} goToCalendar={goToCalendar} screen={"Home"}/>
       <HelpIcon/>
-      <JournalCard summarize={summarizeWithFlask}/>  
     </View>
   );
 }
