@@ -12,7 +12,7 @@ import HelpIcon from '../utils/helpIcon';
 import TopImage from '../utils/homeTopImage';
 import Menu from '../utils/menu';
 import SaveButton from '../utils/saveButton';
-import { summarizeWithFlask } from "../utils/summarizeWithFlask";
+import { summarizeWithFlask } from "../utils/summarize";
 
 
 const { width: screenWidth, height: screenHeight } = Dimensions.get('window');

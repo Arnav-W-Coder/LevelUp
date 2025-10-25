@@ -5,6 +5,10 @@ import time
 import re
 import random
 from datetime import datetime
+import json, os
+import numpy as np
+from sklearn.feature_extraction.text import TfidfVectorizer
+from sklearn.preprocessing import normalize
 
 app = Flask(__name__)
 # TODO: In production, restrict to your app's origins
@@ -43,96 +47,68 @@ def time_greeting():
     if 12 <= h < 18: return "Afternoon"
     return "Evening"
 
-TEMPLATES = {
-    # Each mood has multiple styles; we’ll pick one at random
-    "positive": {
-        "coach": [
-            "🔥 {greeting}, {name}! Momentum is building. That {topic} win keeps stacking.",
-            "Love that energy, {name}. Keep leaning into {topic}—you’re compounding gains.",
-            "You showed up and it shows. Bank that confidence and take the next tiny step.",
-            "That’s a clean rep on {topic}. Lock it in and let it pull you forward."
-        ],
-        "friend": [
-            "That felt good, huh? Proud of you for sticking with {topic}.",
-            "Yesss—little wins like this on {topic} add up fast.",
-            "You did the thing. That glow you feel? You earned it.",
-            "I can hear the spark in this. Keep that vibe going, {name}."
-        ],
-        "zen": [
-            "Notice the lightness after {topic}. Keep choosing the small kind action.",
-            "Momentum is quiet but real. Return to this feeling when it gets noisy.",
-            "A gentle yes to {topic} today. The path gets clearer with each step.",
-            "Consistency is a soft drumbeat—yours is steady."
-        ]
-    },
-    "neutral": {
-        "coach": [
-            "Logged it—steady reps matter. One tiny nudge on {topic} next.",
-            "Neutral today is fine. What’s a 2-minute move you can make on {topic}?",
-            "Not every day is fireworks. Keep the base strong; progress follows.",
-            "You kept the promise to show up. That’s the muscle we’re training."
-        ],
-        "friend": [
-            "Okay, noted. Even writing this down helps future you.",
-            "Chill day. Maybe one small thing for {topic} before you wrap?",
-            "You’re still in the game—no drama needed.",
-            "Sometimes ‘fine’ is a win. Tomorrow we add 1%."
-        ],
-        "zen": [
-            "You observed without judgment. That’s practice.",
-            "Let today be simple. One breath, one tiny step.",
-            "The middle is where stamina grows.",
-            "Quiet progress is still progress."
-        ]
-    },
-    "negative": {
-        "coach": [
-            "Tough reps count double. One ultra-small next step on {topic}, right now.",
-            "Resistance showed up; you showed up anyway. That’s grit.",
-            "Shrink the target: 2 minutes on {topic}. Start there.",
-            "We don’t need heroics—just one honest push. You’ve got this."
-        ],
-        "friend": [
-            "Oof, felt heavy. Proud of you for being real about it.",
-            "Hey, that was rough. Let’s find a tiny win on {topic} and call it.",
-            "You’re not alone in this. Small is still forward.",
-            "Be kind to yourself tonight. A little reset goes a long way."
-        ],
-        "zen": [
-            "Name the weight, breathe once, take the smallest step.",
-            "Suffering visited; let it pass through. Choose one gentle action.",
-            "Sit with it briefly, then loosen your grip. One tiny move on {topic}.",
-            "Storms pass. Anchor in a single simple act."
-        ]
-    }
-}
+DATA_PATH = os.path.join(os.path.dirname(__file__), "responses.json")
 
+def clean_text(s: str) -> str:
+    s = s.lower()
+    s = re.sub(r"[^a-z0-9\-\' ]+", " ", s)
+    s = re.sub(r"\s+", " ", s).strip()
+    return s
+
+class ResponseBank:
+    def __init__(self, path: str):
+        with open(path, "r", encoding="utf-8") as f:
+            self.items = json.load(f)  # list of dicts
+        # Keep original texts; build corpus for TF-IDF
+        self.texts = [clean_text(it["text"] + " " + " ".join(it.get("tags", []))) for it in self.items]
+        self.vectorizer = TfidfVectorizer(ngram_range=(1,2), min_df=1, max_features=50000)
+        self.matrix = self.vectorizer.fit_transform(self.texts)  # (N x D)
+        self.matrix = normalize(self.matrix)
+
+    def query(self, reflection: str, mood: str, style: str|None, keywords: list[str], k: int = 8):
+        # Filter by mood (and optional style) first to keep results on-tone
+        idx = [i for i, it in enumerate(self.items) if it.get("mood") == mood or (mood == "neutral" and it.get("mood") in ("neutral","positive","negative"))]
+        if style:
+            idx = [i for i in idx if self.items[i].get("style") == style] or idx  # if no style matches, fall back to mood only
+
+        if not idx:
+            idx = list(range(len(self.items)))
+
+        # Build query string: reflection + keywords boost
+        q = clean_text(reflection + " " + " ".join(keywords or []))
+        q_vec = self.vectorizer.transform([q])
+        q_vec = normalize(q_vec)
+
+        # Compute cosine similarity only against filtered indices
+        subM = self.matrix[idx]
+        sims = (subM @ q_vec.T).toarray().ravel()
+
+        # Small bonus if tag overlap
+        if keywords:
+            overlaps = np.array([len(set(keywords) & set(self.items[i].get("tags", []))) for i in idx], dtype=float)
+            sims += 0.05 * overlaps  # tiny tag boost
+
+        # Take top-k indices
+        top_order = np.argsort(-sims)[: max(k, 1)]
+        ranked = [idx[i] for i in top_order]
+
+        return [self.items[i] for i in ranked]
+
+# sentiment banding
+def sentiment_to_mood(p: float) -> str:
+    if p > 0.35: return "positive"
+    if p < -0.35: return "negative"
+    return "neutral"
+
+# simple topic chooser
 def choose_topic(keywords, reflection):
-    # Prefer detected keywords; otherwise pick a salient word from the reflection
-    if keywords:
-        return keywords[0]
-    # fallback: simple content word from reflection
+    if keywords: return keywords[0]
     rb = TextBlob(reflection)
-    nouns = [w.lower() for (w, pos) in rb.tags if pos.startswith("NN")]
+    nouns = [w.lower() for (w,pos) in rb.tags if pos.startswith("NN")]
     return nouns[0] if nouns else "this"
 
-def friendly_emotion_label(p):
-    if p > 0.35: return "Motivated"
-    if p < -0.35: return "Stressed"
-    return "Neutral"
-
-def generate_summary(name, p, keywords, reflection, style="coach"):
-    mood = band(p)                # positive / neutral / negative
-    style = style if style in TEMPLATES[mood] else "coach"
-    topic = choose_topic(keywords, reflection)
-    template = random.choice(TEMPLATES[mood][style])
-    # Basic personalization
-    return template.format(
-        name=(name or "friend"),
-        greeting=time_greeting(),
-        topic=topic
-    )
-
+# --- load dataset at startup
+RESP = ResponseBank(DATA_PATH)
 
 def top_keywords(text: str, n: int = 5):
     blob = TextBlob(text)
@@ -162,30 +138,39 @@ def summarize():
 
     data = request.get_json(silent=True) or {}
     reflection = (data.get("reflection") or "").strip()
-    user_name = (data.get("name") or "").strip()[:24]  # optional
-    style = (data.get("style") or "coach").strip()      # "coach" | "friend" | "zen"
+    user_name  = (data.get("name") or "friend").strip()[:24]
+    style      = (data.get("style") or "").strip()  # optional: "coach"|"friend"|"zen"
 
     if not reflection:
-        return jsonify({"error": "Empty reflection"}), 400
+        return jsonify({"error":"Empty reflection"}), 400
     if len(reflection) > 1000:
-        return jsonify({"error": "Reflection too long (max 1000)"}), 413
+        return jsonify({"error":"Reflection too long (max 1000)"}), 413
 
     blob = TextBlob(reflection)
-    pol = float(blob.sentiment.polarity)
+    pol  = float(blob.sentiment.polarity)
     subj = float(blob.sentiment.subjectivity)
 
-    # keywords = noun phrases (fallbacks already added earlier)
-    keywords = top_keywords(reflection, n=5)
+    # keywords from your earlier top_keywords implementation (or reuse TextBlob noun_phrases with fallbacks)
+    kws = top_keywords(reflection, n=5)
 
-    summary = generate_summary(user_name, pol, keywords, reflection, style=style)
-    emotion = friendly_emotion_label(pol)
+    mood = sentiment_to_mood(pol)
+    candidates = RESP.query(reflection, mood=mood, style=style or None, keywords=kws, k=8)
 
+    # pick one of the top results with a bit of randomness (top-3 weighted sample)
+    pick_pool = candidates[:3] if len(candidates) >= 3 else candidates
+    chosen = random.choice(pick_pool) if pick_pool else {"text":"Keeping it simple—one tiny step is enough.", "tags":[]}
+
+    topic = choose_topic(kws, reflection)
+    greeting = time_greeting()  # you already have this in your code
+    text = chosen["text"].format(name=user_name, topic=topic, greeting=greeting)
+
+    emotion = "Motivated" if mood == "positive" else "Stressed" if mood == "negative" else "Neutral"
     return jsonify({
-        "summary": summary,
+        "summary": text,
         "emotion": emotion,
         "polarity": pol,
         "subjectivity": subj,
-        "keywords": keywords
+        "keywords": kws
     }), 200
 
 if __name__ == "__main__":
