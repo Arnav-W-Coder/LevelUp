@@ -115,18 +115,17 @@ def choose_topic(keywords, reflection):
 RESP = ResponseBank(DATA_PATH)
 
 def top_keywords(text: str, n: int = 5):
-    blob = TextBlob(text)
-    phrases = [p.lower() for p in blob.noun_phrases if 2 <= len(p) <= 40]
-    if phrases:
-        return phrases[:n]
-    nouns = [w.lower() for (w, pos) in blob.tags if pos.startswith("NN")]
-    nouns = [re.sub(r"[^a-z0-9\- ]", "", w) for w in nouns if len(w) >= 2]
-    out = []
+    try:
+        tags = TextBlob(text).tags  # needs 'punkt' + 'averaged_perceptron_tagger'
+        nouns = [w.lower() for (w, pos) in tags if pos.startswith("NN")]
+    except Exception:
+        nouns = [w for w in re.sub(r"[^a-z0-9\- ]+", " ", text.lower()).split() if len(w) >= 2]
+
+    seen, out = set(), []
     for w in nouns:
-        if w not in out:
-            out.append(w)
-        if len(out) >= n:
-            break
+        if w not in seen:
+            seen.add(w); out.append(w)
+        if len(out) >= n: break
     return out
 
 # ---- Routes ----
