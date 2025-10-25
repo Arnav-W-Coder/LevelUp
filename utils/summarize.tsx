@@ -1,9 +1,7 @@
 // summarizeWithFlask.ts
-import { Platform } from "react-native";
 
 export async function summarizeWithFlask(reflection: string) {
-  const base =
-    Platform.OS === "android" ? "http://10.0.2.2:8000" : "http://127.0.0.1:8000";
+  const base = 'https://levelup-1-yvv6.onrender.com'
   const res = await fetch(`${base}/summarize`, {
     method: "POST",
     headers: { "Content-Type": "application/json" },
