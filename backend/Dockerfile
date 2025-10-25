@@ -20,4 +20,4 @@ COPY . /app
 
 ENV PORT=8000
 EXPOSE 8000
-CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "app:app", "--timeout", "120"]
+CMD ["gunicorn", "-w", "2", "-b", "0.0.0.0:8000", "backend:app", "--timeout", "120"]
