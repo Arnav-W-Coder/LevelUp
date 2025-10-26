@@ -156,7 +156,7 @@ BAD_TOPIC_TOKENS = {
   # generic verbs/utility
   "want","make","made","doing","did","do","does","going","went","start","started","finish","finished","get","got","feel","feels","feeling","felt",
   # super generic/time/interrogatives that make bad topics
-  "today","tomorrow","yesterday","day","things","stuff","time","about","what","when","where","why","how",
+  "today","tomorrow","yesterday","day","things","stuff","time","about","what","when","where","why","how","think"
 }
 STOPWORDS = {
   "a","an","the","and","or","but","if","then","so","because","as","of","to","in","on","for","with","at","by","from",
