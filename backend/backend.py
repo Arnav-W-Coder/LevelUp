@@ -107,30 +107,33 @@ class ResponseBank:
 # put near your helpers
 POS_TOKENS = {"good","great","ok","okay","glad","happy","excited","confident","proud","relieved"}
 NEGATORS   = {"not","no","never","cannot","cant","can't","dont","don't","didnt","didn't","won't","wont","isn't","isnt","aren't","arent","wasn't","wasnt","weren't","werent"}
+NEG_WORDS_HARD = {"shit","terrible","awful","horrible","worthless","useless","hopeless","bad","sucks","suck","garbage","failure","failed","failing"}
 
 def adjusted_sentiment(text: str):
-    t_norm = normalize_contractions(text).lower()
-    blob   = TextBlob(t_norm)
-    pol    = float(blob.sentiment.polarity)
-    subj   = float(blob.sentiment.subjectivity)
+    t = normalize_contractions(text).lower()
+    blob = TextBlob(t)
+    pol = float(blob.sentiment.polarity)
+    subj = float(blob.sentiment.subjectivity)
 
-    # If there’s a negator anywhere, and TextBlob thinks it’s positive,
-    # flip/drag it down (handles “not good”, “don’t feel good”, etc.)
-    if any(neg in t_norm for neg in NEGATORS):
-        # explicit “not <positive>” ⇒ strongly negative
-        if re.search(r"\bnot\s+(%s)\b" % "|".join(map(re.escape, POS_TOKENS)), t_norm):
-            pol = min(pol, -0.5)
-        # generic negation present with positive score ⇒ dampen/flip
-        if pol > 0:
-            pol = -0.8 * abs(pol)
+    # Hard negativity override if strong negative words seen
+    if any(w in t for w in NEG_WORDS_HARD):
+        pol = min(pol, -0.6)
 
-    # Clamp tiny values to neutral to avoid jitter
+    # “not <positive>” pattern → negative
+    if re.search(r"\bnot\s+(%s)\b" % "|".join(map(re.escape, POS_WORDS)), t):
+        pol = min(pol, -0.5)
+
+    # generic negation present while positive → dampen/flip
+    if any(n in t for n in NEGATORS) and pol > 0:
+        pol = -0.8 * abs(pol)
+
+    # clamp tiny values
     if -0.05 < pol < 0.05:
         pol = 0.0
     return pol, subj
 
 def sentiment_to_mood(p: float) -> str:
-    # tighten thresholds a bit to avoid false positives
+    # tighter thresholds than stock
     if p > 0.2:  return "positive"
     if p < -0.2: return "negative"
     return "neutral"
@@ -155,6 +158,9 @@ STOPWORDS = {
   "this","that","these","those","very","also","just","too","than",
 }
 STOPWORDS = STOPWORDS.union(NEGATIONS)  # <- merge sets safely
+# Extend your blocks
+BAD_TOPIC_TOKENS.update({"about","what","when","where","why","how","like","anything"})
+BAD_TOPIC_TOKENS.update(NEG_WORDS_HARD)  # never use profanity as topic
 
 def normalize_quotes(s: str) -> str:
     return (s.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"'))
