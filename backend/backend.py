@@ -171,23 +171,21 @@ def cleaned_tokens(s: str) -> list[str]:
     return toks
 
 def top_keywords(text: str, n: int = 5) -> list[str]:
-    """
-    Regex-only, frequency-based keywords.
-    No POS, no noun_phrases. Strong filtering.
-    """
+    """Regex-only, frequency-based keywords. Strong filtering (no POS)."""
     toks = cleaned_tokens(text)
     if not toks:
         return []
     freq = Counter(toks)
-    # top-N by frequency
-    return [w for w, _ in freq.most_common(n)]
+    kws = [w for w, _ in freq.most_common(n)]
+    # final guard: strip any negations that somehow slipped through
+    return [w for w in kws if w not in NEGATIONS]
 
 def choose_topic(keywords: list[str], reflection: str) -> str:
     for w in keywords:
-        if w not in BAD_TOPIC_TOKENS and w not in STOPWORDS:
+        if w.isalpha() and len(w) > 2 and w not in BAD_TOPIC_TOKENS and w not in STOPWORDS and w not in NEGATIONS:
             return w
     for w in cleaned_tokens(reflection):
-        if w not in BAD_TOPIC_TOKENS:
+        if w not in BAD_TOPIC_TOKENS and w not in NEGATIONS:
             return w
     return "this"
 
@@ -237,8 +235,13 @@ def summarize():
     chosen = random.choice(pick_pool) if pick_pool else {"text":"Keeping it simple—one tiny step is enough.", "tags":[]}
 
     topic = choose_topic(kws, reflection)
-    greeting = time_greeting()  # you already have this in your code
-    text = fmt(chosen["text"], name=user_name, topic=choose_topic(kws, reflection), greeting=time_greeting())
+    
+    # last-ditch topic guard
+    if (not topic.isalpha()) or (len(topic) < 3) or (topic in NEGATIONS) or (topic in STOPWORDS) or (topic in BAD_TOPIC_TOKENS):
+        topic = "this"
+
+    greeting = time_greeting()
+    text = fmt(chosen["text"], name=user_name, topic=topic, greeting=greeting)
     text = re.sub(r"\s+", " ", text).strip()
 
     emotion = "Motivated" if mood == "positive" else "Stressed" if mood == "negative" else "Neutral"
