@@ -59,6 +59,13 @@ def clean_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
+def normalize_quotes(s: str) -> str:
+    return (s.replace("’", "'")
+             .replace("‘", "'")
+             .replace("“", '"')
+             .replace("”", '"'))
+
+
 class ResponseBank:
     def __init__(self, path: str):
         with open(path, "r", encoding="utf-8") as f:
@@ -105,11 +112,18 @@ def sentiment_to_mood(p: float) -> str:
     return "neutral"
 
 # simple topic chooser
+BAD_TOPIC_TOKENS = {"didn","don","doesn","won","wouldn","shouldn","cant","couldn","im","ive","youre","isnt","arent","wasnt","werent"}
+
 def choose_topic(keywords, reflection):
-    if keywords: return keywords[0]
-    rb = TextBlob(reflection)
-    nouns = [w.lower() for (w,pos) in rb.tags if pos.startswith("NN")]
-    return nouns[0] if nouns else "this"
+    # prefer non-stopword nouns from your POS-based top_keywords
+    for w in keywords:
+        if len(w) > 2 and w.isalpha() and w not in BAD_TOPIC_TOKENS:
+            return w
+    # fallback: scan reflection for a decent noun-like word
+    for w in re.findall(r"[a-zA-Z]{3,}", reflection.lower()):
+        if w not in BAD_TOPIC_TOKENS:
+            return w
+    return "this"
 
 # --- load dataset at startup
 RESP = ResponseBank(DATA_PATH)
@@ -141,6 +155,7 @@ def summarize():
 
     data = request.get_json(silent=True) or {}
     reflection = (data.get("reflection") or "").strip()
+    reflection = normalize_quotes((data.get("reflection") or "").strip())
     user_name  = (data.get("name") or "friend").strip()[:24]
     style      = (data.get("style") or "").strip()  # optional: "coach"|"friend"|"zen"
 
