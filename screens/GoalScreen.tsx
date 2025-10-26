@@ -40,7 +40,7 @@ type Goal = {
 };
 
 export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGoal, goToCalendar}: Props) {
-  const { todayMode, savedGoals, addXp, changeGoals, tomorrowSaved, changeYesterdayGoals} = useXP();
+  const { todayMode, savedGoals, addXp, changeGoals, changeStreak, streak, tomorrowSaved, action, changeYesterdayGoals} = useXP();
   const [goals, setGoals] = useState<Goal[]>([]);
   const [goalsVisible, setGoalsVisible] = useState(false);
   const [selectedCategory, setSelectedCategory] = useState("");
@@ -113,6 +113,8 @@ export default function GoalScreen({goToCharacter, goToDungeon, goToHome, goToGo
       setLastToggled(selectedCategory);
       return updatedGoals;
     });
+    changeStreak(1);
+    console.log("The current streak is " + streak + ", and the there has been an action today:" + action);
   }
 
   const getGoalsByCategory = (category: string) => {

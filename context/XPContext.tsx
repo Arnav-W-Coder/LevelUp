@@ -93,6 +93,16 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
       setTomorrowGoals([]);
       await AsyncStorage.setItem('levelup_tomorrowSaved', JSON.stringify(false));
       await AsyncStorage.setItem('levelup_tomorrowGoals', JSON.stringify([]));
+
+      const last = await AsyncStorage.getItem('levelup_lastActiveDate');
+      if (last !== getYesterday()) {
+        setStreak(0);
+        await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
+      }
+      // New day starts with no action
+      setAction(false);
+      await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
+
     }, millisTillMidnight + 1000); // add buffer to make sure we're past midnight
 
     return () => clearTimeout(timeout);
@@ -162,28 +172,16 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
             setAction(false);
         }
 
-        if(storedStreak){
-          setStreak(Number(storedStreak));
-          if(lastActionDate){
-            const lastAction = Number(lastActionDate)
-            if(lastAction !== Number(getYesterday()) || lastAction !== Number(getToday())){
-              if(!action){ 
-                setStreak(0);
-                await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
-              }
-              setAction(false);
-              await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
-            }
+        const actionToday = lastActionDate === getToday();
+        setAction(actionToday);
+        await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(actionToday));
 
-          }else{
-            if(!action){ 
-              setStreak(0);
-              await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
-            }
-            setAction(false);
-            await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(false));
-          }
+        let st = Number(storedStreak);
+        if (lastActionDate !== getToday() && lastActionDate !== getYesterday()) {
+          st = 0;
+          await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(0));
         }
+        setStreak(st);
 
         if (storedTodayMode !== null) {
             setTodayMode(JSON.parse(storedTodayMode)); // true/false correctly
@@ -191,10 +189,10 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
             setTodayMode(false);
         }
 
-      } catch (err) {
-        console.error('Failed to load XP or level from storage:', err);
-      }
-    };
+        } catch (err) {
+          console.error('Failed to load XP or level from storage:', err);
+        }
+      };
 
     loadProgress();
   }, []);
@@ -258,19 +256,27 @@ export const XPProvider: React.FC<{ children: React.ReactNode }> = ({ children }
   }
 
   const changeStreak = async (amount: number) => {
+    const lastActionDate = await AsyncStorage.getItem('levelup_lastActiveDate');
     console.log(action)
-    if(!action){ 
+    if(lastActionDate === getToday()){
+      if(!action){ 
+        setAction(true);
+        await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(true));
+      }
+      return;
+    }else if(lastActionDate === getYesterday()){
       const newStreak = streak + amount;
       setStreak(newStreak);
       await AsyncStorage.setItem(STREAK_KEY, JSON.stringify(newStreak));
-      changeAction(true);
+      setAction(true);
+      await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(true));
     }
+    await AsyncStorage.setItem('levelup_lastActiveDate', getToday());
   }
 
   const changeAction = async (val: boolean) => {
     setAction(val); 
     await AsyncStorage.setItem(ACTION_KEY, JSON.stringify(val));
-    await AsyncStorage.setItem('levelup_lastActiveDate', JSON.stringify(getToday()));
   }
 
   const changeTomorrowSaved = async (val: boolean) => {
