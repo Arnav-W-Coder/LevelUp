@@ -317,7 +317,7 @@ def summarize():
         topic = "this"
 
     greeting = time_greeting()
-    text = fmt(chosen["text"], name=user_name, topic=topic, greeting=greeting)
+    text = chosen["text"]
     text = re.sub(r"\s+", " ", text).strip()
 
     emotion = "Motivated" if mood == "positive" else "Stressed" if mood == "negative" else "Neutral"

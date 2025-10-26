@@ -1,56 +1,248 @@
 [
-  { "mood": "positive", "style": "coach",  "tags": ["workout","gym","body"], "text": "Strong rep on {topic}, {name}. Bank that win and let it pull you forward." },
-  { "mood": "positive", "style": "friend", "tags": ["study","focus","mind"], "text": "Love that focus session on {topic}. You showed up and it shows." },
-  { "mood": "neutral",  "style": "zen",    "tags": ["journaling","reflect"], "text": "You observed today without judgment. One light touch on {topic} is enough." },
-  { "mood": "negative", "style": "coach",  "tags": ["procrastination","start"], "text": "Shrink the target: 2 minutes on {topic}. Start now, {name}." },
-  { "mood": "positive", "style": "coach", "tags": ["workout","gym","body"], "text": "🔥 {greeting}, {name}! Momentum is building. That {topic} win keeps stacking." },
-  { "mood": "positive", "style": "coach", "tags": ["study","focus","mind"], "text": "Love that focus session on {topic}. You’re sharpening the blade each rep." },
-  { "mood": "positive", "style": "coach", "tags": ["routine","habit","discipline"], "text": "Habit locked. Every {topic} rep makes consistency your default." },
-  { "mood": "positive", "style": "coach", "tags": ["goal","progress"], "text": "That {topic} milestone is proof your systems work—keep iterating." },
-  { "mood": "positive", "style": "coach", "tags": ["sleep","recovery"], "text": "Rest is training, too. Great job honoring your recovery with {topic}." },
-  { "mood": "positive", "style": "friend", "tags": ["gratitude","mood"], "text": "That’s awesome, {name}! You sound genuinely proud about {topic}." },
-  { "mood": "positive", "style": "friend", "tags": ["mind","focus"], "text": "Your tone says it all—peaceful and clear. Keep that focus energy on {topic}." },
-  { "mood": "positive", "style": "friend", "tags": ["habit","routine"], "text": "Small habits are paying off, {name}. {topic} is becoming second nature." },
-  { "mood": "positive", "style": "friend", "tags": ["achievement","success"], "text": "Proud moment right there. Take a breath and enjoy the {topic} success." },
-  { "mood": "positive", "style": "friend", "tags": ["body","workout"], "text": "You crushed it! Feels great to see {topic} gains showing up." },
-  { "mood": "positive", "style": "zen", "tags": ["meditation","breathing"], "text": "The calm from {topic} is real—stay in that steady rhythm." },
-  { "mood": "positive", "style": "zen", "tags": ["reflection","awareness"], "text": "Awareness blooms naturally after {topic}. Stay grounded in it." },
-  { "mood": "positive", "style": "zen", "tags": ["mindfulness"], "text": "You moved through {topic} with ease. Let that softness linger." },
-  { "mood": "positive", "style": "zen", "tags": ["gratitude"], "text": "Gratitude fills the room after {topic}. Quiet success is still success." },
-  { "mood": "neutral", "style": "coach", "tags": ["routine","progress"], "text": "Neutral days count. Keep the base strong—{topic} consistency wins long-term." },
-  { "mood": "neutral", "style": "coach", "tags": ["discipline"], "text": "No fireworks, just reps. That’s discipline. One more clean {topic} tomorrow." },
-  { "mood": "neutral", "style": "coach", "tags": ["study","habit"], "text": "Even steady effort on {topic} builds your floor higher each time." },
-  { "mood": "neutral", "style": "coach", "tags": ["focus"], "text": "You showed up. That’s the point. One more focused block on {topic} later." },
-  { "mood": "neutral", "style": "coach", "tags": ["body","routine"], "text": "Not every session pops—but you still logged {topic}. That’s winning quietly." },
-  { "mood": "neutral", "style": "friend", "tags": ["study","mood"], "text": "Alright, pretty chill day. You kept {topic} moving and didn’t overthink it." },
-  { "mood": "neutral", "style": "friend", "tags": ["mind","routine"], "text": "Balanced day, huh? Sometimes just showing up for {topic} is enough." },
-  { "mood": "neutral", "style": "friend", "tags": ["progress"], "text": "No drama today—just steady {topic}. That’s how growth sneaks up." },
-  { "mood": "neutral", "style": "friend", "tags": ["reflection"], "text": "Even on calm days, reflection like this keeps your compass true." },
-  { "mood": "neutral", "style": "zen", "tags": ["breath","awareness"], "text": "Today felt even. Let the quiet rhythm of {topic} guide your next step." },
-  { "mood": "neutral", "style": "zen", "tags": ["routine"], "text": "Steady work on {topic} builds invisible strength. Stay present in it." },
-  { "mood": "neutral", "style": "zen", "tags": ["balance"], "text": "No highs, no lows—just balance. {topic} continues in its own time." },
-  { "mood": "neutral", "style": "zen", "tags": ["reflection"], "text": "You observed without pushing. That’s mastery through stillness." },
-  { "mood": "negative", "style": "coach", "tags": ["motivation","resistance"], "text": "Resistance showed up—you showed up anyway. One small {topic} step is enough." },
-  { "mood": "negative", "style": "coach", "tags": ["fatigue","focus"], "text": "Tired happens. Tighten scope—5 minutes on {topic} and call it a win." },
-  { "mood": "negative", "style": "coach", "tags": ["stress","anxiety"], "text": "Breathe, reset, and take one concrete {topic} action. Small motion breaks fog." },
-  { "mood": "negative", "style": "coach", "tags": ["failure","resilience"], "text": "Setback ≠ stop. Adjust and reframe {topic} as feedback, not defeat." },
-  { "mood": "negative", "style": "friend", "tags": ["stress","mood"], "text": "Rough patch? Happens to everyone. Step back from {topic} and breathe." },
-  { "mood": "negative", "style": "friend", "tags": ["burnout","fatigue"], "text": "Hey, sounds like you’re drained. A short rest before {topic} might help." },
-  { "mood": "negative", "style": "friend", "tags": ["doubt","motivation"], "text": "It’s okay to wobble. You’ve handled worse {topic} days than this." },
-  { "mood": "negative", "style": "friend", "tags": ["disappointment","progress"], "text": "Disappointed? Totally fair. Still, {topic} doesn’t define you." },
-  { "mood": "negative", "style": "zen", "tags": ["patience","healing"], "text": "Storms fade. Sit with {topic} gently—no need to fix everything now." },
-  { "mood": "negative", "style": "zen", "tags": ["calm","awareness"], "text": "Acknowledge the feeling, then loosen your grip. {topic} can wait a breath." },
-  { "mood": "negative", "style": "zen", "tags": ["struggle","pain"], "text": "Pain showed up to teach. Notice it, thank it, then take one calm {topic} step." },
-  { "mood": "negative", "style": "zen", "tags": ["anxiety","tension"], "text": "Breathe into the discomfort. {topic} will unfold in time." },
-  { "mood": "positive", "style": "coach", "tags": ["learning","growth"], "text": "Growth curve rising—{topic} progress looks sharp, {name}!" },
-  { "mood": "positive", "style": "friend", "tags": ["team","community"], "text": "Loved hearing your joy about {topic}. Feels like connection and flow." },
-  { "mood": "positive", "style": "zen", "tags": ["presence","awareness"], "text": "Joy flowed naturally during {topic}. That’s presence at work." },
-  { "mood": "neutral", "style": "coach", "tags": ["reflection","mind"], "text": "Solid check-in. Keep {topic} data flowing—it builds awareness." },
-  { "mood": "negative", "style": "coach", "tags": ["stress","mind"], "text": "Stress flagged. Log it, breathe, then narrow {topic} to one simple action." },
-  { "mood": "negative", "style": "friend", "tags": ["mood","emotions"], "text": "Tough day vibes. Tomorrow’s {topic} can be lighter—don’t overthink it." },
-  { "mood": "neutral", "style": "zen", "tags": ["breathing","focus"], "text": "You breathed through it. Even calm {topic} practice builds resilience." },
-  { "mood": "positive", "style": "coach", "tags": ["discipline","mindset"], "text": "Mindset locked. That consistent {topic} energy is how winners operate." },
-  { "mood": "positive", "style": "friend", "tags": ["joy","energy"], "text": "You sound energized! Keep letting {topic} fuel that spark." },
-  { "mood": "positive", "style": "zen", "tags": ["peace","gratitude"], "text": "Peace in motion—your {topic} practice radiates gratitude." },
-  { "mood": "negative", "style": "zen", "tags": ["stillness","acceptance"], "text": "Let today soften around you. The {topic} storm will pass in quiet clarity." }
+  {
+    "mood": "positive",
+    "style": "friend",
+    "text": "That’s awesome! You’re really hitting your stride lately.",
+    "tags": ["momentum", "achievement"]
+  },
+  {
+    "mood": "positive",
+    "style": "friend",
+    "text": "Love that energy! It’s great to see you proud of yourself.",
+    "tags": ["confidence", "selfesteem"]
+  },
+  {
+    "mood": "positive",
+    "style": "friend",
+    "text": "You did it — take a moment to celebrate before chasing the next thing.",
+    "tags": ["celebration", "progress"]
+  },
+  {
+    "mood": "positive",
+    "style": "friend",
+    "text": "Small wins stack up fast. You’re proving consistency beats intensity.",
+    "tags": ["growth", "discipline"]
+  },
+  {
+    "mood": "positive",
+    "style": "friend",
+    "text": "You earned that good feeling. Keep showing up for yourself.",
+    "tags": ["motivation", "selfcare"]
+  },
+  {
+    "mood": "positive",
+    "style": "coach",
+    "text": "Strong follow-through today. That’s what separates dreamers from doers.",
+    "tags": ["focus", "execution"]
+  },
+  {
+    "mood": "positive",
+    "style": "coach",
+    "text": "Momentum is your friend — keep it rolling tomorrow.",
+    "tags": ["routine", "momentum"]
+  },
+  {
+    "mood": "positive",
+    "style": "coach",
+    "text": "You pushed through and finished strong. That’s discipline in action.",
+    "tags": ["discipline", "consistency"]
+  },
+  {
+    "mood": "positive",
+    "style": "coach",
+    "text": "Results follow effort — you’re building something that lasts.",
+    "tags": ["longterm", "effort"]
+  },
+  {
+    "mood": "positive",
+    "style": "coach",
+    "text": "Proud moment right there. That’s what growth feels like.",
+    "tags": ["growth", "reflection"]
+  },
+  {
+    "mood": "positive",
+    "style": "zen",
+    "text": "Breathe it in. Satisfaction doesn’t need noise — only presence.",
+    "tags": ["mindfulness", "peace"]
+  },
+  {
+    "mood": "positive",
+    "style": "zen",
+    "text": "Joy isn’t found in finishing — it’s in noticing that you have.",
+    "tags": ["awareness", "calm"]
+  },
+  {
+    "mood": "positive",
+    "style": "zen",
+    "text": "Progress feels lighter when you stop to appreciate it.",
+    "tags": ["gratitude", "balance"]
+  },
+  {
+    "mood": "positive",
+    "style": "zen",
+    "text": "You acted with intention, and that’s the root of peace.",
+    "tags": ["intention", "mindfulness"]
+  },
+  {
+    "mood": "positive",
+    "style": "zen",
+    "text": "Each completed effort is a moment of harmony. Hold onto it.",
+    "tags": ["balance", "completion"]
+  },
+  {
+    "mood": "neutral",
+    "style": "friend",
+    "text": "Not every day needs fireworks — sometimes just showing up is enough.",
+    "tags": ["presence", "consistency"]
+  },
+  {
+    "mood": "neutral",
+    "style": "friend",
+    "text": "You kept the streak alive. That’s quiet progress.",
+    "tags": ["habit", "routine"]
+  },
+  {
+    "mood": "neutral",
+    "style": "friend",
+    "text": "Steady pace today — nothing fancy, just effort that counts.",
+    "tags": ["effort", "balance"]
+  },
+  {
+    "mood": "neutral",
+    "style": "friend",
+    "text": "Sometimes maintaining is winning. You did that today.",
+    "tags": ["maintenance", "patience"]
+  },
+  {
+    "mood": "neutral",
+    "style": "friend",
+    "text": "You stayed consistent even when the spark wasn’t there — that’s power.",
+    "tags": ["consistency", "grit"]
+  },
+  {
+    "mood": "neutral",
+    "style": "coach",
+    "text": "Effort without reward still sharpens the blade. Keep at it.",
+    "tags": ["discipline", "effort"]
+  },
+  {
+    "mood": "neutral",
+    "style": "coach",
+    "text": "Today built foundation, even if you don’t see it yet.",
+    "tags": ["foundation", "progress"]
+  },
+  {
+    "mood": "neutral",
+    "style": "coach",
+    "text": "Routine builds resilience — this is how mastery looks in progress.",
+    "tags": ["routine", "resilience"]
+  },
+  {
+    "mood": "neutral",
+    "style": "coach",
+    "text": "Your consistency is paying off quietly. Keep stacking days.",
+    "tags": ["routine", "discipline"]
+  },
+  {
+    "mood": "neutral",
+    "style": "zen",
+    "text": "Observe today without labeling it good or bad. It simply was.",
+    "tags": ["awareness", "mindfulness"]
+  },
+  {
+    "mood": "neutral",
+    "style": "zen",
+    "text": "Calm effort is still progress. Still water runs deep.",
+    "tags": ["calm", "balance"]
+  },
+  {
+    "mood": "neutral",
+    "style": "zen",
+    "text": "Evenness is a kind of strength — the middle path matters.",
+    "tags": ["moderation", "peace"]
+  },
+  {
+    "mood": "neutral",
+    "style": "zen",
+    "text": "Be here, and let the day settle where it may.",
+    "tags": ["presence", "reflection"]
+  },
+  {
+    "mood": "negative",
+    "style": "friend",
+    "text": "Tough one, huh? Happens to everyone. What matters is that you tried.",
+    "tags": ["support", "resilience"]
+  },
+  {
+    "mood": "negative",
+    "style": "friend",
+    "text": "Be kind to yourself. Bad moments don’t define you.",
+    "tags": ["selfcompassion", "healing"]
+  },
+  {
+    "mood": "negative",
+    "style": "friend",
+    "text": "You showed up even when it was hard — that’s quiet courage.",
+    "tags": ["courage", "grit"]
+  },
+  {
+    "mood": "negative",
+    "style": "friend",
+    "text": "Rough days happen. You’ll bounce back stronger than you think.",
+    "tags": ["resilience", "patience"]
+  },
+  {
+    "mood": "negative",
+    "style": "coach",
+    "text": "Don’t overthink the stumble. Rest, reset, and get back to the basics.",
+    "tags": ["reset", "reflection"]
+  },
+  {
+    "mood": "negative",
+    "style": "coach",
+    "text": "Failure isn’t final — it’s feedback. Tomorrow’s a clean slate.",
+    "tags": ["learning", "growth"]
+  },
+  {
+    "mood": "negative",
+    "style": "coach",
+    "text": "Tough reps build stronger muscles — emotional ones too.",
+    "tags": ["resilience", "grit"]
+  },
+  {
+    "mood": "negative",
+    "style": "coach",
+    "text": "Even setbacks count when you learn something from them.",
+    "tags": ["growth", "mindset"]
+  },
+  {
+    "mood": "negative",
+    "style": "zen",
+    "text": "Storms pass. Let the clouds be, and wait for the calm to return.",
+    "tags": ["acceptance", "calm"]
+  },
+  {
+    "mood": "negative",
+    "style": "zen",
+    "text": "Suffering isn’t failure — it’s part of becoming.",
+    "tags": ["growth", "resilience"]
+  },
+  {
+    "mood": "negative",
+    "style": "zen",
+    "text": "Pause and breathe. Even in struggle, awareness is strength.",
+    "tags": ["awareness", "healing"]
+  },
+  {
+    "mood": "negative",
+    "style": "zen",
+    "text": "Don’t fight the low — just notice it. It will rise again naturally.",
+    "tags": ["mindfulness", "balance"]
+  },
+  {
+    "mood": "negative",
+    "style": "zen",
+    "text": "Every wave dips before it climbs. You’re still part of the tide.",
+    "tags": ["acceptance", "flow"]
+  }
 ]
