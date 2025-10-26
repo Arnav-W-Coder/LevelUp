@@ -10,6 +10,7 @@ import numpy as np
 from sklearn.feature_extraction.text import TfidfVectorizer
 from sklearn.preprocessing import normalize
 import os, nltk
+from collections import Counter
 NLTK_PATH = os.environ.get("NLTK_DATA", "/opt/render/nltk_data")
 if NLTK_PATH not in nltk.data.path:
     nltk.data.path.append(NLTK_PATH)
@@ -65,6 +66,12 @@ def normalize_quotes(s: str) -> str:
              .replace("“", '"')
              .replace("”", '"'))
 
+def fmt(template: str, **kwargs) -> str:
+    try:
+        return template.format(**kwargs)
+    except Exception:
+        return re.sub(r"[{}]", "", template)
+
 
 class ResponseBank:
     def __init__(self, path: str):
@@ -86,10 +93,9 @@ class ResponseBank:
             idx = list(range(len(self.items)))
 
         # Only add **filtered** keywords back into the query to avoid “didn” etc.
-        safe_kws = [w for w in (keywords or []) if len(w) > 2 and w.isalpha()
-                    and w not in STOPWORDS and w not in BAD_TOPIC_TOKENS]
-
+        safe_kws = [w for w in (keywords or []) if w not in STOPWORDS and w not in BAD_TOPIC_TOKENS and w.isalpha() and len(w) > 2]
         q = clean_text(reflection + (" " + " ".join(safe_kws) if safe_kws else ""))
+
         q_vec = self.vectorizer.transform([q])
         q_vec = normalize(q_vec)
 
@@ -129,68 +135,54 @@ STOPWORDS = {
 }
 
 def normalize_quotes(s: str) -> str:
-    for k,v in CONTRACTIONS.items():
-        s = s.replace(k, v)
-    return s
+    return (s.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"'))
 
 def normalize_contractions(s: str) -> str:
-    # Turn didn’t → didn’t (ASCII), then remove stray fragments like "didn t"
     s = normalize_quotes(s)
-    s = re.sub(r"\b(n|)\'t\b", " not", s)         # didn't → did not
-    s = re.sub(r"\b(can|could|should|would)n\'t\b", r"\1 not", s)  # can’t → can not
+    # expand common ones
+    s = re.sub(r"\b(can|could|should|would)n\'t\b", r"\1 not", s, flags=re.I)
+    s = re.sub(r"\b(\w+)n\'t\b", r"\1 not", s, flags=re.I)  # didn't -> did not
     s = re.sub(r"\bI\'m\b", "I am", s, flags=re.I)
     s = re.sub(r"\bI\'ve\b", "I have", s, flags=re.I)
     s = re.sub(r"\bI\'ll\b", "I will", s, flags=re.I)
     s = re.sub(r"\bI\'d\b", "I would", s, flags=re.I)
-    s = re.sub(r"\b(\w+)\'re\b", r"\1 are", s)
-    s = re.sub(r"\b(\w+)\'ve\b", r"\1 have", s)
-    s = re.sub(r"\b(\w+)\'ll\b", r"\1 will", s)
-    s = re.sub(r"\b(\w+)\'d\b", r"\1 would", s)
+    s = re.sub(r"\b(\w+)\'re\b", r"\1 are", s, flags=re.I)
+    s = re.sub(r"\b(\w+)\'ve\b", r"\1 have", s, flags=re.I)
+    s = re.sub(r"\b(\w+)\'ll\b", r"\1 will", s, flags=re.I)
+    s = re.sub(r"\b(\w+)\'d\b", r"\1 would", s, flags=re.I)
     return s
 
-def clean_tokens(s: str) -> list[str]:
-    # Lower, keep letters/hyphens/spaces, split
-    s = s.lower()
+def cleaned_tokens(s: str) -> list[str]:
+    s = normalize_contractions(s).lower()
     s = re.sub(r"[^a-z0-9\- ]+", " ", s)
-    toks = [t for t in s.split() if len(t) > 2 and t not in STOPWORDS and t not in BAD_TOPIC_TOKENS]
+    toks = []
+    for w in s.split():
+        if len(w) < 3:          # drop tiny bits (to, nt, t)
+            continue
+        if w in STOPWORDS or w in BAD_TOPIC_TOKENS:
+            continue
+        if w.isdigit():
+            continue
+        toks.append(w)
     return toks
 
-def top_keywords(text: str, n: int = 5):
-    text = normalize_contractions(text)
-    # Try POS tags first (keeps only nouns); fall back to regex tokens
-    try:
-        tags = TextBlob(text).tags  # needs punkt + averaged_perceptron_tagger
-        nouns = []
-        for w,pos in tags:
-            w = w.lower()
-            if pos.startswith("NN") and len(w) > 2 and w.isalpha() and w not in STOPWORDS and w not in BAD_TOPIC_TOKENS:
-                nouns.append(w)
-        # de-dupe preserving order
-        seen, out = set(), []
-        for w in nouns:
-            if w not in seen:
-                seen.add(w); out.append(w)
-            if len(out) >= n: break
-        if out:
-            return out
-    except Exception:
-        pass
-
-    # Fallback: regex tokens with filters
-    toks = clean_tokens(text)
-    seen, out = set(), []
-    for w in toks:
-        if w not in seen:
-            seen.add(w); out.append(w)
-        if len(out) >= n: break
-    return out
+def top_keywords(text: str, n: int = 5) -> list[str]:
+    """
+    Regex-only, frequency-based keywords.
+    No POS, no noun_phrases. Strong filtering.
+    """
+    toks = cleaned_tokens(text)
+    if not toks:
+        return []
+    freq = Counter(toks)
+    # top-N by frequency
+    return [w for w, _ in freq.most_common(n)]
 
 def choose_topic(keywords: list[str], reflection: str) -> str:
     for w in keywords:
-        if len(w) > 2 and w.isalpha() and w not in BAD_TOPIC_TOKENS:
+        if w not in BAD_TOPIC_TOKENS and w not in STOPWORDS:
             return w
-    # fallback: scan cleaned tokens
-    for w in clean_tokens(reflection):
+    for w in cleaned_tokens(reflection):
         if w not in BAD_TOPIC_TOKENS:
             return w
     return "this"
@@ -198,24 +190,17 @@ def choose_topic(keywords: list[str], reflection: str) -> str:
 # --- load dataset at startup
 RESP = ResponseBank(DATA_PATH)
 
-def top_keywords(text: str, n: int = 5):
-    try:
-        tags = TextBlob(text).tags  # needs 'punkt' + 'averaged_perceptron_tagger'
-        nouns = [w.lower() for (w, pos) in tags if pos.startswith("NN")]
-    except Exception:
-        nouns = [w for w in re.sub(r"[^a-z0-9\- ]+", " ", text.lower()).split() if len(w) >= 2]
-
-    seen, out = set(), []
-    for w in nouns:
-        if w not in seen:
-            seen.add(w); out.append(w)
-        if len(out) >= n: break
-    return out
-
 # ---- Routes ----
 @app.get("/health")
 def health():
     return jsonify({"ok": True}), 200
+
+APP_VERSION = "kwfix-2025-10-25-01"
+
+@app.get("/version")
+def version():
+    return {"version": APP_VERSION}
+
 
 @app.post("/summarize")
 def summarize():
@@ -234,9 +219,8 @@ def summarize():
     if len(reflection) > 1000:
         return jsonify({"error":"Reflection too long (max 1000)"}), 413
 
-    blob = TextBlob(reflection)
-    pol  = float(blob.sentiment.polarity)
-    subj = float(blob.sentiment.subjectivity)
+    pol  = float(TextBlob(reflection).sentiment.polarity)
+    subj = float(TextBlob(reflection).sentiment.subjectivity)
 
     # keywords from your earlier top_keywords implementation (or reuse TextBlob noun_phrases with fallbacks)
     kws = top_keywords(reflection, n=5)
@@ -250,7 +234,8 @@ def summarize():
 
     topic = choose_topic(kws, reflection)
     greeting = time_greeting()  # you already have this in your code
-    text = chosen["text"].format(name=user_name, topic=topic, greeting=greeting)
+    text = fmt(chosen["text"], name=user_name, topic=choose_topic(kws, reflection), greeting=time_greeting())
+    text = re.sub(r"\s+", " ", text).strip()
 
     emotion = "Motivated" if mood == "positive" else "Stressed" if mood == "negative" else "Neutral"
     return jsonify({
