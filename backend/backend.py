@@ -60,12 +60,6 @@ def clean_text(s: str) -> str:
     s = re.sub(r"\s+", " ", s).strip()
     return s
 
-def normalize_quotes(s: str) -> str:
-    return (s.replace("’", "'")
-             .replace("‘", "'")
-             .replace("“", '"')
-             .replace("”", '"'))
-
 def fmt(template: str, **kwargs) -> str:
     try:
         return template.format(**kwargs)
@@ -110,35 +104,57 @@ class ResponseBank:
         ranked = [idx[i] for i in top_order]
         return [self.items[i] for i in ranked]
 
-# sentiment banding
+# put near your helpers
+POS_TOKENS = {"good","great","ok","okay","glad","happy","excited","confident","proud","relieved"}
+NEGATORS   = {"not","no","never","cannot","cant","can't","dont","don't","didnt","didn't","won't","wont","isn't","isnt","aren't","arent","wasn't","wasnt","weren't","werent"}
+
+def adjusted_sentiment(text: str):
+    t_norm = normalize_contractions(text).lower()
+    blob   = TextBlob(t_norm)
+    pol    = float(blob.sentiment.polarity)
+    subj   = float(blob.sentiment.subjectivity)
+
+    # If there’s a negator anywhere, and TextBlob thinks it’s positive,
+    # flip/drag it down (handles “not good”, “don’t feel good”, etc.)
+    if any(neg in t_norm for neg in NEGATORS):
+        # explicit “not <positive>” ⇒ strongly negative
+        if re.search(r"\bnot\s+(%s)\b" % "|".join(map(re.escape, POS_TOKENS)), t_norm):
+            pol = min(pol, -0.5)
+        # generic negation present with positive score ⇒ dampen/flip
+        if pol > 0:
+            pol = -0.8 * abs(pol)
+
+    # Clamp tiny values to neutral to avoid jitter
+    if -0.05 < pol < 0.05:
+        pol = 0.0
+    return pol, subj
+
 def sentiment_to_mood(p: float) -> str:
-    if p > 0.35: return "positive"
-    if p < -0.35: return "negative"
+    # tighten thresholds a bit to avoid false positives
+    if p > 0.2:  return "positive"
+    if p < -0.2: return "negative"
     return "neutral"
 
 # -------- Text normalization & filtering --------
 CONTRACTIONS = {
     "’": "'", "‘": "'", "“": '"', "”": '"',
 }
-
-NEGATIONS = {"not","no","never","none","without"}
-
-# words to always drop as topics/keywords (contraction bits, auxiliaries, generic verbs)
+NEGATIONS = {"not","no","never","without"}
 BAD_TOPIC_TOKENS = {
-    "didn","don","doesn","won","wouldn","shouldn","cant","couldn","im","ive","youre","isnt","arent","wasnt","werent",
-    "nt","t","ll","re","ve","s","m","d",
-    "want","make","made","doing","did","do","does","going","went","start","started","finish","finished","get","got",
-    "today","tomorrow","yesterday","day","things","stuff"
+  # contraction shards
+  "didn","don","doesn","won","wouldn","shouldn","cant","couldn","isnt","arent","wasnt","werent","nt","t","ll","re","ve","m","d",
+  # generic verbs/utility
+  "want","make","made","doing","did","do","does","going","went","start","started","finish","finished","get","got","feel","feels","feeling","felt",
+  # super generic/time/interrogatives that make bad topics
+  "today","tomorrow","yesterday","day","things","stuff","time","about","what","when","where","why","how",
 }
-# minimal stopword set (keep it small; you can expand later)
 STOPWORDS = {
-    "a","an","the","and","or","but","if","then","so","because","as","of","to","in","on","for","with","at","by","from",
-    "is","am","are","was","were","be","been","being",
-    "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their"
+  "a","an","the","and","or","but","if","then","so","because","as","of","to","in","on","for","with","at","by","from",
+  "is","am","are","was","were","be","been","being",
+  "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their","it","its",
+  "this","that","these","those","very","also","just","too","than",
 }
-
-# merge negations safely
-STOPWORDS = STOPWORDS.union(NEGATIONS)
+STOPWORDS = STOPWORDS.union(NEGATIONS)  # <- merge sets safely
 
 def normalize_quotes(s: str) -> str:
     return (s.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"'))
@@ -223,8 +239,7 @@ def summarize():
     if len(reflection) > 1000:
         return jsonify({"error":"Reflection too long (max 1000)"}), 413
 
-    pol  = float(TextBlob(reflection).sentiment.polarity)
-    subj = float(TextBlob(reflection).sentiment.subjectivity)
+    pol, subj = adjusted_sentiment(reflection)
 
     # keywords from your earlier top_keywords implementation (or reuse TextBlob noun_phrases with fallbacks)
     kws = top_keywords(reflection, n=5)
