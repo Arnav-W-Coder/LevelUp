@@ -116,25 +116,51 @@ POS_WORDS = {"good","great","ok","okay","glad","happy","excited","confident","pr
 NEGATORS   = {"not","no","never","cannot","cant","can't","dont","don't","didnt","didn't","won't","wont","isn't","isnt","aren't","arent","wasn't","wasnt","weren't","werent"}
 NEG_WORDS_HARD = {"shit","terrible","awful","horrible","worthless","useless","hopeless","bad","sucks","suck","garbage","failure","failed","failing"}
 
-def adjusted_sentiment(text: str):
-    t = normalize_contractions(text).lower()
-    blob = TextBlob(t)
-    pol = float(blob.sentiment.polarity)
-    subj = float(blob.sentiment.subjectivity)
+def clause_polarity(clause: str) -> float:
+    t = normalize_contractions(clause).lower()
+    pol = float(TextBlob(t).sentiment.polarity)
 
-    # Hard negativity override if strong negative words seen
+    # hard negatives override inside the clause
     if any(w in t for w in NEG_WORDS_HARD):
         pol = min(pol, -0.6)
 
-    # “not <positive>” pattern → negative
+    # “not <positive>” inside the clause → negative
     if re.search(r"\bnot\s+(%s)\b" % "|".join(map(re.escape, POS_WORDS)), t):
         pol = min(pol, -0.5)
 
-    # generic negation present while positive → dampen/flip
+    # generic negator + positive score → dampen/flip this clause only
     if any(n in t for n in NEGATORS) and pol > 0:
-        pol = -0.8 * abs(pol)
+        pol = -0.6 * abs(pol)  # softer than before
 
-    # clamp tiny values
+    # small positive bump for clear completion language without a negator
+    if any(b in t for b in POS_BOOSTERS) and not any(n in t for n in NEGATORS):
+        pol = min(1.0, pol + 0.2)
+
+    return pol
+
+def adjusted_sentiment(text: str):
+    # split into clauses; if there's a “but/however”, weight right side more
+    parts = [p.strip() for p in BUT_SPLITTER.split(text) if p.strip()]
+    if len(parts) == 1:
+        pol = clause_polarity(parts[0])
+        subj = float(TextBlob(normalize_contractions(text)).sentiment.subjectivity)
+        if -0.05 < pol < 0.05:
+            pol = 0.0
+        return pol, subj
+
+    # weight later clause(s) higher (e.g., 0.7 last, 0.3 rest combined)
+    weights = []
+    if len(parts) == 2:
+        weights = [0.3, 0.7]
+    else:
+        # distribute increasing weights toward the end
+        base = np.linspace(0.2, 0.8, num=len(parts))
+        weights = (base / base.sum()).tolist()
+
+    pols = [clause_polarity(p) for p in parts]
+    pol = float(sum(w * p for w, p in zip(weights, pols)))
+
+    subj = float(TextBlob(normalize_contractions(text)).sentiment.subjectivity)
     if -0.05 < pol < 0.05:
         pol = 0.0
     return pol, subj
@@ -149,6 +175,7 @@ def sentiment_to_mood(p: float) -> str:
 CONTRACTIONS = {
     "’": "'", "‘": "'", "“": '"', "”": '"',
 }
+BUT_SPLITTER = re.compile(r"\b(?:but|however|though|yet)\b", flags=re.I)
 NEGATIONS = {"not","no","never","without"}
 BAD_TOPIC_TOKENS = {
   # contraction shards
