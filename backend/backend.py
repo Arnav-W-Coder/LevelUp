@@ -134,9 +134,11 @@ BAD_TOPIC_TOKENS = {
 STOPWORDS = {
     "a","an","the","and","or","but","if","then","so","because","as","of","to","in","on","for","with","at","by","from",
     "is","am","are","was","were","be","been","being",
-    "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their",
-    NEGATIONS
+    "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their"
 }
+
+# merge negations safely
+STOPWORDS = STOPWORDS.union(NEGATIONS)
 
 def normalize_quotes(s: str) -> str:
     return (s.replace("’", "'").replace("‘", "'").replace("“", '"').replace("”", '"'))
@@ -235,7 +237,7 @@ def summarize():
     chosen = random.choice(pick_pool) if pick_pool else {"text":"Keeping it simple—one tiny step is enough.", "tags":[]}
 
     topic = choose_topic(kws, reflection)
-    
+
     # last-ditch topic guard
     if (not topic.isalpha()) or (len(topic) < 3) or (topic in NEGATIONS) or (topic in STOPWORDS) or (topic in BAD_TOPIC_TOKENS):
         topic = "this"
