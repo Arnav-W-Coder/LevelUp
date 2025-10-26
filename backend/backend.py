@@ -115,7 +115,7 @@ class ResponseBank:
 POS_WORDS = {"good","great","ok","okay","glad","happy","excited","confident","proud","relieved"}
 NEGATORS   = {"not","no","never","cannot","cant","can't","dont","don't","didnt","didn't","won't","wont","isn't","isnt","aren't","arent","wasn't","wasnt","weren't","werent"}
 NEG_WORDS_HARD = {"shit","terrible","awful","horrible","worthless","useless","hopeless","bad","sucks","suck","garbage","failure","failed","failing"}
-
+POS_BOOSTERS = {"proud","finished","completed","accomplished","achieved","progress","streak","workout","gym","done"}
 def clause_polarity(clause: str) -> float:
     t = normalize_contractions(clause).lower()
     pol = float(TextBlob(t).sentiment.polarity)
