@@ -2,7 +2,7 @@
   "expo": {
     "name": "LevelUp",
     "slug": "levelUp",
-    "version": "1.7.0",
+    "version": "1.8.0",
     "orientation": "portrait",
     "icon": "./assets/splash.png",
     "scheme": "levelup",
