@@ -77,32 +77,31 @@ class ResponseBank:
         self.matrix = normalize(self.matrix)
 
     def query(self, reflection: str, mood: str, style: str|None, keywords: list[str], k: int = 8):
-        # Filter by mood (and optional style) first to keep results on-tone
-        idx = [i for i, it in enumerate(self.items) if it.get("mood") == mood or (mood == "neutral" and it.get("mood") in ("neutral","positive","negative"))]
+        idx = [i for i, it in enumerate(self.items)
+            if it.get("mood") == mood or (mood == "neutral" and it.get("mood") in ("neutral","positive","negative"))]
         if style:
-            idx = [i for i in idx if self.items[i].get("style") == style] or idx  # if no style matches, fall back to mood only
+            idx = [i for i in idx if self.items[i].get("style") == style] or idx
 
         if not idx:
             idx = list(range(len(self.items)))
 
-        # Build query string: reflection + keywords boost
-        q = clean_text(reflection + " " + " ".join(keywords or []))
+        # Only add **filtered** keywords back into the query to avoid “didn” etc.
+        safe_kws = [w for w in (keywords or []) if len(w) > 2 and w.isalpha()
+                    and w not in STOPWORDS and w not in BAD_TOPIC_TOKENS]
+
+        q = clean_text(reflection + (" " + " ".join(safe_kws) if safe_kws else ""))
         q_vec = self.vectorizer.transform([q])
         q_vec = normalize(q_vec)
 
-        # Compute cosine similarity only against filtered indices
         subM = self.matrix[idx]
         sims = (subM @ q_vec.T).toarray().ravel()
 
-        # Small bonus if tag overlap
-        if keywords:
-            overlaps = np.array([len(set(keywords) & set(self.items[i].get("tags", []))) for i in idx], dtype=float)
-            sims += 0.05 * overlaps  # tiny tag boost
+        if safe_kws:
+            overlaps = np.array([len(set(safe_kws) & set(self.items[i].get("tags", []))) for i in idx], dtype=float)
+            sims += 0.05 * overlaps
 
-        # Take top-k indices
         top_order = np.argsort(-sims)[: max(k, 1)]
         ranked = [idx[i] for i in top_order]
-
         return [self.items[i] for i in ranked]
 
 # sentiment banding
@@ -111,16 +110,87 @@ def sentiment_to_mood(p: float) -> str:
     if p < -0.35: return "negative"
     return "neutral"
 
-# simple topic chooser
-BAD_TOPIC_TOKENS = {"didn","don","doesn","won","wouldn","shouldn","cant","couldn","im","ive","youre","isnt","arent","wasnt","werent"}
+# -------- Text normalization & filtering --------
+CONTRACTIONS = {
+    "’": "'", "‘": "'", "“": '"', "”": '"',
+}
+# words to always drop as topics/keywords (contraction bits, auxiliaries, generic verbs)
+BAD_TOPIC_TOKENS = {
+    "didn","don","doesn","won","wouldn","shouldn","cant","couldn","im","ive","youre","isnt","arent","wasnt","werent",
+    "nt","t","ll","re","ve","s","m","d",
+    "want","make","made","doing","did","do","does","going","went","start","started","finish","finished","get","got",
+    "today","tomorrow","yesterday","day","things","stuff"
+}
+# minimal stopword set (keep it small; you can expand later)
+STOPWORDS = {
+    "a","an","the","and","or","but","if","then","so","because","as","of","to","in","on","for","with","at","by","from",
+    "is","am","are","was","were","be","been","being",
+    "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their"
+}
 
-def choose_topic(keywords, reflection):
-    # prefer non-stopword nouns from your POS-based top_keywords
+def normalize_quotes(s: str) -> str:
+    for k,v in CONTRACTIONS.items():
+        s = s.replace(k, v)
+    return s
+
+def normalize_contractions(s: str) -> str:
+    # Turn didn’t → didn’t (ASCII), then remove stray fragments like "didn t"
+    s = normalize_quotes(s)
+    s = re.sub(r"\b(n|)\'t\b", " not", s)         # didn't → did not
+    s = re.sub(r"\b(can|could|should|would)n\'t\b", r"\1 not", s)  # can’t → can not
+    s = re.sub(r"\bI\'m\b", "I am", s, flags=re.I)
+    s = re.sub(r"\bI\'ve\b", "I have", s, flags=re.I)
+    s = re.sub(r"\bI\'ll\b", "I will", s, flags=re.I)
+    s = re.sub(r"\bI\'d\b", "I would", s, flags=re.I)
+    s = re.sub(r"\b(\w+)\'re\b", r"\1 are", s)
+    s = re.sub(r"\b(\w+)\'ve\b", r"\1 have", s)
+    s = re.sub(r"\b(\w+)\'ll\b", r"\1 will", s)
+    s = re.sub(r"\b(\w+)\'d\b", r"\1 would", s)
+    return s
+
+def clean_tokens(s: str) -> list[str]:
+    # Lower, keep letters/hyphens/spaces, split
+    s = s.lower()
+    s = re.sub(r"[^a-z0-9\- ]+", " ", s)
+    toks = [t for t in s.split() if len(t) > 2 and t not in STOPWORDS and t not in BAD_TOPIC_TOKENS]
+    return toks
+
+def top_keywords(text: str, n: int = 5):
+    text = normalize_contractions(text)
+    # Try POS tags first (keeps only nouns); fall back to regex tokens
+    try:
+        tags = TextBlob(text).tags  # needs punkt + averaged_perceptron_tagger
+        nouns = []
+        for w,pos in tags:
+            w = w.lower()
+            if pos.startswith("NN") and len(w) > 2 and w.isalpha() and w not in STOPWORDS and w not in BAD_TOPIC_TOKENS:
+                nouns.append(w)
+        # de-dupe preserving order
+        seen, out = set(), []
+        for w in nouns:
+            if w not in seen:
+                seen.add(w); out.append(w)
+            if len(out) >= n: break
+        if out:
+            return out
+    except Exception:
+        pass
+
+    # Fallback: regex tokens with filters
+    toks = clean_tokens(text)
+    seen, out = set(), []
+    for w in toks:
+        if w not in seen:
+            seen.add(w); out.append(w)
+        if len(out) >= n: break
+    return out
+
+def choose_topic(keywords: list[str], reflection: str) -> str:
     for w in keywords:
         if len(w) > 2 and w.isalpha() and w not in BAD_TOPIC_TOKENS:
             return w
-    # fallback: scan reflection for a decent noun-like word
-    for w in re.findall(r"[a-zA-Z]{3,}", reflection.lower()):
+    # fallback: scan cleaned tokens
+    for w in clean_tokens(reflection):
         if w not in BAD_TOPIC_TOKENS:
             return w
     return "this"
@@ -154,10 +224,10 @@ def summarize():
         return jsonify({"error": "Too many requests"}), 429
 
     data = request.get_json(silent=True) or {}
-    reflection = (data.get("reflection") or "").strip()
-    reflection = normalize_quotes((data.get("reflection") or "").strip())
+    reflection_raw = (data.get("reflection") or "").strip()
+    reflection = normalize_contractions(reflection_raw)
     user_name  = (data.get("name") or "friend").strip()[:24]
-    style      = (data.get("style") or "").strip()  # optional: "coach"|"friend"|"zen"
+    style      = (data.get("style") or "").strip()
 
     if not reflection:
         return jsonify({"error":"Empty reflection"}), 400
