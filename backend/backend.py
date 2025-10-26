@@ -87,7 +87,14 @@ class ResponseBank:
             idx = list(range(len(self.items)))
 
         # Only add **filtered** keywords back into the query to avoid “didn” etc.
-        safe_kws = [w for w in (keywords or []) if w not in STOPWORDS and w not in BAD_TOPIC_TOKENS and w.isalpha() and len(w) > 2]
+        safe_kws = [w for w in (keywords or [])
+            if w.isalpha() and len(w) > 2
+            and w not in STOPWORDS and w not in BAD_TOPIC_TOKENS]
+
+        # If the mood is negative, do not let positive words bias retrieval
+        if mood == "negative":
+            safe_kws = [w for w in safe_kws if w not in POS_WORDS]
+
         q = clean_text(reflection + (" " + " ".join(safe_kws) if safe_kws else ""))
 
         q_vec = self.vectorizer.transform([q])
@@ -105,7 +112,7 @@ class ResponseBank:
         return [self.items[i] for i in ranked]
 
 # put near your helpers
-POS_TOKENS = {"good","great","ok","okay","glad","happy","excited","confident","proud","relieved"}
+POS_WORDS = {"good","great","ok","okay","glad","happy","excited","confident","proud","relieved"}
 NEGATORS   = {"not","no","never","cannot","cant","can't","dont","don't","didnt","didn't","won't","wont","isn't","isnt","aren't","arent","wasn't","wasnt","weren't","werent"}
 NEG_WORDS_HARD = {"shit","terrible","awful","horrible","worthless","useless","hopeless","bad","sucks","suck","garbage","failure","failed","failing"}
 
@@ -204,12 +211,22 @@ def top_keywords(text: str, n: int = 5) -> list[str]:
     # final guard: strip any negations that somehow slipped through
     return [w for w in kws if w not in NEGATIONS]
 
-def choose_topic(keywords: list[str], reflection: str) -> str:
+def choose_topic(keywords: list[str], reflection: str, mood: str) -> str:
+    def ok_topic(w: str) -> bool:
+        if not (w.isalpha() and len(w) > 2):
+            return False
+        if w in STOPWORDS or w in BAD_TOPIC_TOKENS:
+            return False
+        # If overall mood is negative, do NOT use positive words as the topic
+        if mood == "negative" and w in POS_WORDS:
+            return False
+        return True
+
     for w in keywords:
-        if w.isalpha() and len(w) > 2 and w not in BAD_TOPIC_TOKENS and w not in STOPWORDS and w not in NEGATIONS:
+        if ok_topic(w):
             return w
     for w in cleaned_tokens(reflection):
-        if w not in BAD_TOPIC_TOKENS and w not in NEGATIONS:
+        if ok_topic(w):
             return w
     return "this"
 
@@ -221,7 +238,7 @@ RESP = ResponseBank(DATA_PATH)
 def health():
     return jsonify({"ok": True}), 200
 
-APP_VERSION = "kwfix-2025-10-25-01"
+APP_VERSION = "kwfix-2025-10-25-04"
 
 @app.get("/version")
 def version():
@@ -251,16 +268,25 @@ def summarize():
     kws = top_keywords(reflection, n=5)
 
     mood = sentiment_to_mood(pol)
+
+    if mood == "negative":
+        # keep keywords but drop obviously positive ones to avoid weird echoes
+        kws = [w for w in kws if w not in POS_WORDS]
+
     candidates = RESP.query(reflection, mood=mood, style=style or None, keywords=kws, k=8)
 
     # pick one of the top results with a bit of randomness (top-3 weighted sample)
     pick_pool = candidates[:3] if len(candidates) >= 3 else candidates
     chosen = random.choice(pick_pool) if pick_pool else {"text":"Keeping it simple—one tiny step is enough.", "tags":[]}
 
-    topic = choose_topic(kws, reflection)
+    topic = choose_topic(kws, reflection, mood)
 
     # last-ditch topic guard
-    if (not topic.isalpha()) or (len(topic) < 3) or (topic in NEGATIONS) or (topic in STOPWORDS) or (topic in BAD_TOPIC_TOKENS):
+    if (
+        (not topic.isalpha()) or (len(topic) < 3)
+        or (topic in NEGATIONS) or (topic in STOPWORDS) or (topic in BAD_TOPIC_TOKENS)
+        or (mood == "negative" and topic in POS_WORDS)
+    ):
         topic = "this"
 
     greeting = time_greeting()
