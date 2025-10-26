@@ -120,6 +120,9 @@ def sentiment_to_mood(p: float) -> str:
 CONTRACTIONS = {
     "’": "'", "‘": "'", "“": '"', "”": '"',
 }
+
+NEGATIONS = {"not","no","never","none","without"}
+
 # words to always drop as topics/keywords (contraction bits, auxiliaries, generic verbs)
 BAD_TOPIC_TOKENS = {
     "didn","don","doesn","won","wouldn","shouldn","cant","couldn","im","ive","youre","isnt","arent","wasnt","werent",
@@ -131,7 +134,8 @@ BAD_TOPIC_TOKENS = {
 STOPWORDS = {
     "a","an","the","and","or","but","if","then","so","because","as","of","to","in","on","for","with","at","by","from",
     "is","am","are","was","were","be","been","being",
-    "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their"
+    "i","you","he","she","we","they","me","him","her","us","them","my","your","his","her","our","their",
+    NEGATIONS
 }
 
 def normalize_quotes(s: str) -> str:
